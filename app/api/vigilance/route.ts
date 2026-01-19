@@ -20,8 +20,9 @@ const MAP_URLS: Record<string, string> = {
   vert: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_vert.png",
   jaune: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_jaune.png",
   orange: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_orange.png",
-  rouge: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_rouge.png",
+  rouge: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/red_new.png",
   violet: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_violet.png",
+  erreur: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/error.png",
 }
 
 interface VigilanceData {
@@ -60,7 +61,7 @@ async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
     return {
       colorId: -1,
       colorName: "erreur",
-      mapUrl: MAP_URLS.gris,
+      mapUrl: MAP_URLS.erreur,
       lastUpdate: new Date().toISOString(),
       phenomena: [],
     }
@@ -148,7 +149,7 @@ async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
   return {
     colorId: -1,
     colorName: "erreur",
-    mapUrl: MAP_URLS.gris,
+    mapUrl: MAP_URLS.erreur,
     lastUpdate: new Date().toISOString(),
     phenomena: [],
   }
@@ -269,7 +270,7 @@ export async function GET() {
       {
         colorId: -1,
         colorName: "erreur",
-        mapUrl: MAP_URLS.gris,
+        mapUrl: MAP_URLS.erreur,
         lastUpdate: new Date().toISOString(),
         phenomena: [],
       },
