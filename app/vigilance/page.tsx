@@ -128,7 +128,6 @@ export default function VigilancePage() {
                 <div
                   ref={mapContainerRef}
                   className="flex-1 flex items-center justify-center relative overflow-hidden p-4"
-                  style={{ backgroundColor: "#d4dfc4" }}
                 >
                   <img
                     src={mapUrl || "/placeholder.svg"}
