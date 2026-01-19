@@ -16,13 +16,13 @@ const COLOR_ID_MAP: Record<number, string> = {
 
 // Map URLs from GitHub
 const MAP_URLS: Record<string, string> = {
-  gris: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_gris.png",
-  vert: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_vert.png",
-  jaune: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_jaune.png",
-  orange: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_orange.png",
-  rouge: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/red_new.png",
-  violet: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_violet.png",
-  erreur: "https://raw.githubusercontent.com/pyronix-dev/upwork/main/error.png",
+  gris: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_gris.png",
+  vert: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_vert.png",
+  jaune: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_jaune.png",
+  orange: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_orange.png",
+  rouge: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_rouge.png",
+  violet: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_violet.png",
+  erreur: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/error.png",
 }
 
 interface VigilanceData {
