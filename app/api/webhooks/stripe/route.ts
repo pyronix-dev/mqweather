@@ -216,6 +216,53 @@ export async function POST(request: NextRequest) {
                     .from('subscriptions')
                     .update({ status: subscription.status === 'active' ? 'active' : 'cancelled' })
                     .eq('stripe_subscription_id', subscription.id)
+
+                // Detect Plan Change
+                // Check if items changed in previous_attributes
+                // @ts-ignore
+                const previousAttributes = event.data.previous_attributes
+                const itemsChanged = previousAttributes && previousAttributes.items
+
+                if (itemsChanged && subscription.status === 'active') {
+                    console.log('🔄 Plan change detected')
+                    const newPrice = subscription.items.data[0].price.unit_amount
+
+                    if (newPrice) {
+                        // Helper to find plan key from price
+                        const getPlanFromAmount = (amount: number) => {
+                            for (const [key, val] of Object.entries(PLAN_PRICES)) {
+                                if (val === amount) return key
+                            }
+                            return null
+                        }
+
+                        const newPlan = getPlanFromAmount(newPrice)
+
+                        if (newPlan) {
+                            // Fetch user email
+                            const { data: subData } = await supabase
+                                .from('subscriptions')
+                                .select('user_id')
+                                .eq('stripe_subscription_id', subscription.id)
+                                .single()
+
+                            if (subData?.user_id) {
+                                const { data: userData } = await supabase
+                                    .from('users')
+                                    .select('email')
+                                    .eq('id', subData.user_id)
+                                    .single()
+
+                                if (userData?.email) {
+                                    console.log(`📧 Sending plan change email to ${userData.email}`)
+                                    const { sendPlanChangeEmail } = await import('@/lib/brevo')
+                                    await sendPlanChangeEmail(userData.email, newPlan)
+                                }
+                            }
+                        }
+                    }
+                }
+
             } catch (error) {
                 console.error('Failed to update subscription in DB:', error)
             }

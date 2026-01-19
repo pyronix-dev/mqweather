@@ -4,11 +4,12 @@
  * Handles sending transactional SMS and Email via Brevo API
  * Docs: https://developers.brevo.com/
  */
+import { getPaymentConfirmationEmailHtml, getCancellationEmailHtml, getPlanChangeEmailHtml } from '@/lib/email-templates'
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY
-const BREVO_SMS_SENDER = process.env.BREVO_SMS_SENDER || 'MQWeather'
-const BREVO_EMAIL_SENDER = process.env.BREVO_EMAIL_SENDER || 'alertes@mqweather.fr'
-const BREVO_EMAIL_SENDER_NAME = process.env.BREVO_EMAIL_SENDER_NAME || 'MQ Weather Alertes'
+const BREVO_SMS_SENDER = process.env.BREVO_SMS_SENDER || 'MeteoMQ'
+const BREVO_EMAIL_SENDER = process.env.BREVO_EMAIL_SENDER || 'bossjack1kalirafik@gmail.com'
+const BREVO_EMAIL_SENDER_NAME = process.env.BREVO_EMAIL_SENDER_NAME || 'Météo Martinique alertes'
 
 const BREVO_API_URL = 'https://api.brevo.com/v3'
 
@@ -94,6 +95,9 @@ export async function sendEmail(
   htmlContent: string,
   textContent?: string
 ): Promise<SendEmailResult> {
+  console.log('📧 Attempting to send email to:', to)
+  console.log('🔑 API Key configured:', !!BREVO_API_KEY, 'Length:', BREVO_API_KEY?.length)
+
   if (!BREVO_API_KEY) {
     console.error('❌ BREVO_API_KEY is not configured')
     return { success: false, error: 'Brevo API key not configured' }
@@ -120,6 +124,8 @@ export async function sendEmail(
     })
 
     const data = await response.json()
+    console.log('📡 Brevo Response Status:', response.status)
+    console.log('📦 Brevo Response Data:', JSON.stringify(data, null, 2))
 
     if (response.ok) {
       console.log('✅ Email sent successfully:', data.messageId)
@@ -182,7 +188,7 @@ export async function sendSMSConfirmation(
   const price = getPriceForPlan(plan)
   const planName = getPlanDisplayName(plan)
 
-  const message = `MQ Weather: Merci! Votre abonnement ${planName} (${price}) est actif. Reference: ${referenceCode}. Vous recevrez des alertes meteo automatiquement.`
+  const message = `Météo Martinique: Merci! Votre abonnement ${planName} (${price}) est actif. Reference: ${referenceCode}. Vous recevrez des alertes meteo automatiquement.`
 
   return sendSMS(phone, message)
 }
@@ -197,115 +203,42 @@ export async function sendEmailConfirmation(
 ): Promise<SendEmailResult> {
   const price = getPriceForPlan(plan)
   const planName = getPlanDisplayName(plan)
-  const subject = 'Vous avez mis en place un nouvel abonnement MQ Weather'
+  const subject = 'Vous avez mis en place un nouvel abonnement Météo Martinique'
 
-  const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f1f5f9; padding: 40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-          
-          <!-- Header with Logo -->
-          <tr>
-            <td style="padding: 30px 40px; border-bottom: 1px solid #e2e8f0;">
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td>
-                    <img src="https://mqweather.surge.sh/icon.svg" alt="MQ Weather" width="40" height="40" style="display: block;">
-                  </td>
-                  <td style="text-align: right;">
-                    <span style="font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">Confirmation de paiement</span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          
-          <!-- Main Content -->
-          <tr>
-            <td style="padding: 40px;">
-              <h1 style="margin: 0 0 10px 0; font-size: 24px; color: #1e293b; font-weight: 600;">Bonjour,</h1>
-              <p style="margin: 0 0 30px 0; font-size: 16px; color: #475569; line-height: 1.6;">
-                Votre prélèvement automatique a été configuré avec succès.
-              </p>
-              
-              <!-- Reference Card -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
-                <tr>
-                  <td style="padding: 24px;">
-                    <p style="margin: 0 0 15px 0; font-size: 16px; font-weight: 700; color: #1e293b;">
-                      Votre numéro de référence est: <span style="color: #059669;">${referenceCode}</span>
-                    </p>
-                    
-                    <!-- Checkmark Item 1 -->
-                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px;">
-                      <tr>
-                        <td width="24" valign="top">
-                          <span style="color: #10b981; font-size: 16px;">✓</span>
-                        </td>
-                        <td style="color: #475569; font-size: 14px; line-height: 1.5;">
-                          Nous vous informerons avant que le premier paiement de <strong style="color: #1e293b;">${price}</strong> ne soit effectué
-                        </td>
-                      </tr>
-                    </table>
-                    
-                    <!-- Checkmark Item 2 -->
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td width="24" valign="top">
-                          <span style="color: #10b981; font-size: 16px;">✓</span>
-                        </td>
-                        <td style="color: #475569; font-size: 14px; line-height: 1.5;">
-                          Abonnement: <strong style="color: #1e293b;">${planName}</strong>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-              
-              <!-- What's Next Section -->
-              <h2 style="margin: 30px 0 15px 0; font-size: 18px; color: #1e293b; font-weight: 600;">
-                Que se passe-t-il ensuite ?
-              </h2>
-              <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">
-                Vous recevrez automatiquement des alertes météo détaillées en cas de vigilance sur la Martinique. Conservez votre numéro de référence pour gérer votre abonnement.
-              </p>
-            </td>
-          </tr>
-          
-          <!-- Footer -->
-          <tr>
-            <td style="padding: 30px 40px; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="text-align: center;">
-                    <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #1e293b;">MQ Weather</p>
-                    <p style="margin: 0; font-size: 12px; color: #64748b;">
-                      Alertes Météo Martinique<br>
-                      <a href="https://mqweather.surge.sh" style="color: #059669; text-decoration: none;">mqweather.surge.sh</a>
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-`
+  const htmlContent = getPaymentConfirmationEmailHtml(price, planName, referenceCode)
 
   return sendEmail(email, subject, htmlContent)
 }
 
+
+/**
+ * Send Cancellation Email
+ */
+export async function sendCancellationEmail(
+  email: string,
+  plan: string,
+  endDate: string
+): Promise<SendEmailResult> {
+  const planName = getPlanDisplayName(plan)
+  const subject = 'Confirmation de l\'annulation de votre abonnement Météo Martinique'
+
+  const htmlContent = getCancellationEmailHtml(planName, endDate)
+
+  return sendEmail(email, subject, htmlContent)
+}
+
+/**
+ * Send Plan Change Email
+ */
+export async function sendPlanChangeEmail(
+  email: string,
+  newPlan: string
+): Promise<SendEmailResult> {
+  const planName = getPlanDisplayName(newPlan)
+  const price = getPriceForPlan(newPlan)
+  const subject = 'Confirmation de changement d\'abonnement Météo Martinique'
+
+  const htmlContent = getPlanChangeEmailHtml(planName, price)
+
+  return sendEmail(email, subject, htmlContent)
+}

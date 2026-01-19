@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import { cookies } from 'next/headers'
 import { sendSMS, sendEmail } from '@/lib/brevo'
 import { createSupabaseAdmin } from '@/lib/supabase'
+import { getOtpEmailHtml } from '@/lib/email-templates'
 import crypto from 'crypto'
 
 // Helper to hash data
@@ -72,21 +73,19 @@ export async function POST(request: NextRequest) {
             }
 
             // 4. Send OTP via Brevo
-            const isEmailIdentifier = identifier.includes('@')
-
-            if (isEmailIdentifier && user.email) {
+            // Prioritize Email if available (covers Reference Code logins with Email)
+            if (user.email) {
                 console.log(`📧 Sending OTP to Email: ${user.email}`)
-                const htmlContent = `
-                <div style="font-family: sans-serif; padding: 20px; text-align: center;">
-                    <h1 style="color: #1e293b;">Votre code de connexion</h1>
-                    <p style="font-size: 32px; letter-spacing: 8px; font-weight: bold; color: #059669; background: #f0fdf4; padding: 20px; border-radius: 12px; display: inline-block;">${otpCode}</p>
-                    <p style="color: #64748b; margin-top: 20px;">Ce code est valide pendant 5 minutes.</p>
-                </div>`
+                const htmlContent = getOtpEmailHtml(otpCode)
+                await sendEmail(user.email, "Votre code de connexion Météo Martinique", htmlContent)
+            }
 
-                await sendEmail(user.email, "Votre code de connexion MQ Weather", htmlContent)
-            } else if (user.phone) {
+            // Send SMS if phone exists AND (no email OR explicit phone identifier?)
+            // For now, let's keep it simple: If email sent, maybe skip SMS to avoid spam?
+            // Or fallback: If NO email, send SMS.
+            else if (user.phone) {
                 console.log(`📱 Sending OTP to Phone: ${user.phone}`)
-                await sendSMS(user.phone, `MQ Weather: Votre code de connexion est ${otpCode}. Valide 5 min.`)
+                await sendSMS(user.phone, `Météo Martinique: Votre code de connexion est ${otpCode}. Valide 5 min.`)
             }
 
             // Store user ID in cookie for verification step

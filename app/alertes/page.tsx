@@ -257,6 +257,24 @@ function AlertesContent() {
   const [emailProfile, setEmailProfile] = useState("particulier")
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [acceptSmsterms, setAcceptSmsTerms] = useState(false)
+
+  // Reset states when switching modes
+  useEffect(() => {
+    if (showEmailSubscription) {
+      // Reset/init for email
+      setPhoneVerified(user?.email ? true : false) // If logged in, assume verified
+      setCodeSent(false)
+      setVerificationCode("")
+    }
+  }, [showEmailSubscription, user])
+
+  useEffect(() => {
+    if (showSmsSubscription) {
+      setPhoneVerified(false)
+      setCodeSent(false)
+      setVerificationCode("")
+    }
+  }, [showSmsSubscription])
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [smsBillingCycle, setSmsBillingCycle] = useState<"monthly" | "annual">("annual")
   const [isLoading, setIsLoading] = useState(false)
@@ -323,6 +341,19 @@ function AlertesContent() {
     }
   }
 
+  const [rateLimitUntil, setRateLimitUntil] = useState<number | null>(null)
+
+  // Effect to clear rate limit when time expires
+  useEffect(() => {
+    if (!rateLimitUntil) return
+    const interval = setInterval(() => {
+      if (Date.now() > rateLimitUntil) {
+        setRateLimitUntil(null)
+      }
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [rateLimitUntil])
+
   const handleVerifyCode = async () => {
     setIsVerifyingCode(true)
     try {
@@ -332,6 +363,16 @@ function AlertesContent() {
         body: JSON.stringify({ phone, code: verificationCode })
       })
       const data = await res.json()
+
+      if (res.status === 429) {
+        // Block user for 5 minutes (default) or parse from message if possible
+        // The API says "patienter X minute(s)"
+        const waitMinutes = 5
+        setRateLimitUntil(Date.now() + waitMinutes * 60 * 1000)
+        alert(data.error)
+        return
+      }
+
       if (res.ok) {
         setPhoneVerified(true)
         setStep(2) // Move to confirmation step visually
@@ -340,6 +381,53 @@ function AlertesContent() {
       }
     } catch (e) {
       alert("Erreur de verification")
+    } finally {
+      setIsVerifyingCode(false)
+    }
+  }
+
+  const handleSendEmailCode = async () => {
+    if (!email) {
+      alert("Email requis")
+      return
+    }
+    setIsSendingCode(true)
+    try {
+      const res = await fetch('/api/auth/send-otp-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setCodeSent(true)
+        alert('Code envoyé par email !')
+      } else {
+        alert(data.error || "Erreur d'envoi")
+      }
+    } catch (e) {
+      alert("Erreur de connexion")
+    } finally {
+      setIsSendingCode(false)
+    }
+  }
+
+  const handleVerifyEmailCode = async () => {
+    setIsVerifyingCode(true)
+    try {
+      const res = await fetch('/api/auth/verify-otp-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: verificationCode })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setPhoneVerified(true) // Reuse phoneVerified state to mean "Contact Verified" generally
+      } else {
+        alert(data.error || "Code invalide")
+      }
+    } catch (e) {
+      alert("Erreur de vérification")
     } finally {
       setIsVerifyingCode(false)
     }
@@ -422,7 +510,32 @@ function AlertesContent() {
             </div>
 
             <div className="p-6 sm:p-8 space-y-6">
+
+              {/* Step Indicator for Email */}
+              <div className="flex items-center gap-4 mb-8">
+                <button
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${!phoneVerified ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-400 border border-slate-200"}`}
+                >
+                  {!phoneVerified ? (
+                    <span className="w-6 h-6 flex items-center justify-center bg-white/20 rounded-full">1</span>
+                  ) : <CheckIcon />}
+                  <span>Vérifier l'email</span>
+                </button>
+                <div className="flex-1 h-0.5 bg-slate-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full bg-slate-600 transition-all duration-500 ${phoneVerified ? "w-full" : "w-0"}`}
+                  />
+                </div>
+                <button
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${phoneVerified ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-400 border border-slate-200"}`}
+                >
+                  <span className="w-6 h-6 flex items-center justify-center bg-white/20 rounded-full">2</span>
+                  <span>Payer</span>
+                </button>
+              </div>
+
               <div>
+                <label className="block text-sm font-black text-slate-700 mb-2">Adresse email</label>
                 {user?.email ? (
                   <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3">
                     <div className="p-2 bg-emerald-100 rounded-full text-emerald-600">
@@ -432,22 +545,88 @@ function AlertesContent() {
                       <p className="font-bold text-emerald-800">Connecté en tant que</p>
                       <p className="text-sm text-emerald-600">{user.email}</p>
                     </div>
+                    <div className="ml-auto">
+                      <span className="bg-emerald-200 text-emerald-800 text-xs font-bold px-2 py-1 rounded">Vérifié</span>
+                    </div>
                   </div>
                 ) : (
                   <>
-                    <label className="block text-sm font-black text-slate-700 mb-2">Adresse email</label>
-                    <div className="relative group">
+                    <div className="relative group mb-4">
                       <input
                         type="email"
                         placeholder="votre@email.fr"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-5 py-4 border-2 border-slate-200 rounded-xl bg-white text-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-emerald-100 focus:border-emerald-400 transition-all pr-14"
+                        disabled={phoneVerified || codeSent}
+                        className="w-full px-5 py-4 border-2 border-slate-200 rounded-xl bg-white text-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-emerald-100 focus:border-emerald-400 transition-all pr-14 disabled:bg-slate-100"
                       />
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500">
-                        <EmailIcon />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        {phoneVerified ? <span className="text-emerald-500 font-bold">✓</span> : <EmailIcon />}
                       </div>
                     </div>
+
+                    {/* Verification Area */}
+                    {!phoneVerified && (
+                      <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-200">
+                        <h3 className="text-sm font-black text-slate-700 mb-4 uppercase tracking-wide">
+                          Code de vérification
+                        </h3>
+                        <div className="flex flex-col gap-4">
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                            <input
+                              type="text"
+                              placeholder="• • • • • •"
+                              value={verificationCode}
+                              onChange={(e) => setVerificationCode(e.target.value)}
+                              maxLength={6}
+                              className="flex-1 px-5 py-4 border border-slate-200 rounded-xl bg-white text-center text-xl tracking-[0.5em] font-mono font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:bg-slate-100"
+                            />
+                            {!codeSent ? (
+                              <button
+                                onClick={handleSendEmailCode}
+                                disabled={!email || isSendingCode}
+                                className="px-8 py-4 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-300 text-white font-black rounded-xl transition-all hover:shadow-lg active:scale-95 whitespace-nowrap"
+                              >
+                                {isSendingCode ? 'Envoi...' : 'Envoyer le code'}
+                              </button>
+                            ) : (
+                              <button
+                                onClick={handleVerifyEmailCode}
+                                disabled={!verificationCode || isVerifyingCode}
+                                className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white font-black rounded-xl transition-all hover:shadow-lg active:scale-95 whitespace-nowrap"
+                              >
+                                {isVerifyingCode ? 'Vérif...' : 'Vérifier'}
+                              </button>
+                            )}
+                          </div>
+                          {codeSent && (
+                            <div className="text-center">
+                              <p className="text-xs text-slate-500 mb-2">Code non reçu ?</p>
+                              <button
+                                onClick={handleSendEmailCode}
+                                disabled={isSendingCode}
+                                className="text-sm font-bold text-slate-700 underline hover:text-slate-900 disabled:opacity-50"
+                              >
+                                {isSendingCode ? 'Envoi...' : 'Renvoyer un nouveau code'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {phoneVerified && (
+                      <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3">
+                        <div className="p-2 bg-emerald-100 rounded-full text-emerald-600">
+                          <CheckIcon />
+                        </div>
+                        <div>
+                          <p className="font-bold text-emerald-800">Email vérifié avec succès !</p>
+                          <p className="text-sm text-emerald-600">Vous pouvez maintenant procéder au paiement.</p>
+                        </div>
+                      </div>
+                    )}
+
                   </>
                 )}
               </div>
@@ -513,7 +692,7 @@ function AlertesContent() {
               </div>
 
               <button
-                disabled={!email || !acceptTerms || isLoading}
+                disabled={!email || !acceptTerms || isLoading || (!phoneVerified && !user?.email)}
                 onClick={() => handleCheckout('email-annual')}
                 className="w-full py-5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:from-slate-300 disabled:to-slate-300 disabled:cursor-not-allowed text-white font-black text-lg rounded-xl transition-all duration-300 hover:shadow-xl active:scale-[0.98]"
               >
@@ -648,31 +827,51 @@ function AlertesContent() {
                       <h3 className="text-sm font-black text-slate-700 mb-4 uppercase tracking-wide">
                         Code de vérification (SMS #1)
                       </h3>
-                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                        <input
-                          type="text"
-                          placeholder="• • • • • •"
-                          value={verificationCode}
-                          onChange={(e) => setVerificationCode(e.target.value)}
-                          maxLength={6}
-                          className="flex-1 px-5 py-4 border border-slate-200 rounded-xl bg-white text-center text-xl tracking-[0.5em] font-mono font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:bg-slate-100"
-                        />
-                        {!codeSent ? (
-                          <button
-                            onClick={handleSendCode}
-                            disabled={!phone || !selectedProfile || isSendingCode}
-                            className="px-8 py-4 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-300 text-white font-black rounded-xl transition-all hover:shadow-lg active:scale-95"
-                          >
-                            {isSendingCode ? 'Envoi...' : 'Envoyer le code'}
-                          </button>
-                        ) : (
-                          <button
-                            onClick={handleVerifyCode}
-                            disabled={!verificationCode || isVerifyingCode}
-                            className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white font-black rounded-xl transition-all hover:shadow-lg active:scale-95"
-                          >
-                            {isVerifyingCode ? 'Vérif...' : 'Vérifier'}
-                          </button>
+                      <div className="flex flex-col gap-4">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                          <input
+                            type="text"
+                            placeholder="• • • • • •"
+                            value={verificationCode}
+                            onChange={(e) => setVerificationCode(e.target.value)}
+                            maxLength={6}
+                            className="flex-1 px-5 py-4 border border-slate-200 rounded-xl bg-white text-center text-xl tracking-[0.5em] font-mono font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:bg-slate-100"
+                          />
+                          {!codeSent ? (
+                            <button
+                              onClick={handleSendCode}
+                              disabled={!phone || !selectedProfile || isSendingCode}
+                              className="px-8 py-4 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-300 text-white font-black rounded-xl transition-all hover:shadow-lg active:scale-95"
+                            >
+                              {isSendingCode ? 'Envoi...' : 'Envoyer le code'}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={handleVerifyCode}
+                              disabled={!verificationCode || isVerifyingCode}
+                              className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white font-black rounded-xl transition-all hover:shadow-lg active:scale-95"
+                            >
+                              {isVerifyingCode ? 'Vérif...' : 'Vérifier'}
+                            </button>
+                          )}
+                        </div>
+
+                        {codeSent && (
+                          <div className="text-center">
+                            <p className="text-xs text-slate-500 mb-2">Code non reçu ?</p>
+                            <button
+                              onClick={handleSendCode}
+                              disabled={isSendingCode || !!rateLimitUntil}
+                              className="text-sm font-bold text-slate-700 underline hover:text-slate-900 disabled:opacity-50"
+                            >
+                              {isSendingCode
+                                ? 'Envoi en cours...'
+                                : !!rateLimitUntil
+                                  ? `Veuillez patienter...`
+                                  : 'Renvoyer un nouveau code'
+                              }
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>

@@ -129,11 +129,21 @@ export async function POST(request: NextRequest) {
                 })
 
             if (subError) console.error('Sub creation error:', subError)
+            else {
+                // Send notifications (Critical for local dev/immediate feedback)
+                console.log('📧 [Verify] Sending immediate notifications...')
 
-            // Send notifications only if subscription was just created (prevent duplicates)
-            // (Notifications logic omitted for brevity as Webhook also handles it, 
-            // but effectively we can assume the webhook handles emails/sms primarily 
-            // or perform a check to avoid double sending. for now we trust the webhook for emails)
+                if (plan.includes('sms')) {
+                    if (phone) {
+                        await sendSMSConfirmation(phone, plan, referenceCode)
+                    }
+                    if (email) {
+                        await sendEmailConfirmation(email, plan, referenceCode)
+                    }
+                } else if (plan.includes('email') && email) {
+                    await sendEmailConfirmation(email, plan, referenceCode)
+                }
+            }
         }
 
         const response = NextResponse.json({

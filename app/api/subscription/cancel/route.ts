@@ -47,12 +47,53 @@ export async function POST(request: Request) {
         // }
 
         // 3. Update Supabase
+        // We will update status to 'cancelled_pending' if it's not immediate, or just 'cancelled'
+        // For now, let's set it to 'cancelled' but we might want to keep access until end_date
+        // The previous code had just status update.
+
         const { error: updateError } = await supabase
             .from('subscriptions')
             .update({ status: 'cancelled' })
             .eq('id', subscription.id)
 
         if (updateError) throw updateError
+
+        // 4. Send Cancellation Email
+        console.log('📧 Preparing cancellation email for user:', userId)
+
+        // Need to fetch user email and plan details
+        const { data: user } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', userId)
+            .single()
+
+        if (user?.email) {
+            console.log('📧 Found user email:', user.email)
+            const { sendCancellationEmail } = await import('@/lib/brevo')
+
+            // Re-fetch or adjust select above
+            const { data: subDetails } = await supabase
+                .from('subscriptions')
+                .select('plan, expires_at')
+                .eq('id', subscription.id)
+                .single()
+
+            if (subDetails) {
+                console.log('📧 Found subscription details:', subDetails)
+                // Use expires_at instead of current_period_end
+                const endDate = subDetails.expires_at
+                    ? new Date(subDetails.expires_at).toLocaleDateString('fr-FR')
+                    : new Date().toLocaleDateString('fr-FR')
+
+                await sendCancellationEmail(user.email, subDetails.plan, endDate)
+                console.log('✅ Cancellation email sent')
+            } else {
+                console.warn('⚠️ Could not fetch subscription details for email')
+            }
+        } else {
+            console.warn('⚠️ No email found for user, skipping cancellation email')
+        }
 
         return NextResponse.json({ success: true })
 
