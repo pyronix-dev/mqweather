@@ -97,18 +97,18 @@ export default function VigilancePage() {
                     )}
                     <div
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${currentVigilance.name === "vert"
-                          ? "bg-green-50 border border-green-200"
-                          : currentVigilance.name === "jaune"
-                            ? "bg-yellow-50 border border-yellow-200"
-                            : currentVigilance.name === "orange"
-                              ? "bg-orange-50 border border-orange-200"
-                              : currentVigilance.name === "rouge"
-                                ? "bg-red-50 border border-red-200"
-                                : currentVigilance.name === "violet"
-                                  ? "bg-purple-50 border border-purple-200"
-                                  : currentVigilance.name === "erreur"
-                                    ? "bg-red-100 border border-red-300"
-                                    : "bg-gray-50 border border-gray-200"
+                        ? "bg-green-50 border border-green-200"
+                        : currentVigilance.name === "jaune"
+                          ? "bg-yellow-50 border border-yellow-200"
+                          : currentVigilance.name === "orange"
+                            ? "bg-orange-50 border border-orange-200"
+                            : currentVigilance.name === "rouge"
+                              ? "bg-red-50 border border-red-200"
+                              : currentVigilance.name === "violet"
+                                ? "bg-purple-50 border border-purple-200"
+                                : currentVigilance.name === "erreur"
+                                  ? "bg-red-100 border border-red-300"
+                                  : "bg-gray-50 border border-gray-200"
                         }`}
                     >
                       <div className={`w-2.5 h-2.5 rounded-full ${currentVigilance.color}`} />
@@ -136,7 +136,7 @@ export default function VigilancePage() {
                   />
 
                   <div className="absolute top-2 left-2 bg-white/80 backdrop-blur-sm rounded px-2 py-1 shadow-sm">
-                    <p className="text-[9px] text-slate-500 font-medium">Mise à jour: {formatLastUpdate()}</p>
+                    <p className="text-[9px] text-slate-500 font-medium" suppressHydrationWarning>Mise à jour: {formatLastUpdate()}</p>
                   </div>
 
                   <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-slate-200">
@@ -185,18 +185,18 @@ export default function VigilancePage() {
               <div className="space-y-4 sm:space-y-6">
                 <div
                   className={`rounded-xl p-4 ${currentVigilance.name === "vert"
-                      ? "bg-green-50 border-l-4 border-green-500"
-                      : currentVigilance.name === "jaune"
-                        ? "bg-yellow-50 border-l-4 border-yellow-400"
-                        : currentVigilance.name === "orange"
-                          ? "bg-orange-50 border-l-4 border-orange-500"
-                          : currentVigilance.name === "rouge"
-                            ? "bg-red-50 border-l-4 border-red-500"
-                            : currentVigilance.name === "violet"
-                              ? "bg-purple-50 border-l-4 border-purple-600"
-                              : currentVigilance.name === "erreur"
-                                ? "bg-red-100 border-l-4 border-red-600"
-                                : "bg-gray-50 border-l-4 border-gray-500"
+                    ? "bg-green-50 border-l-4 border-green-500"
+                    : currentVigilance.name === "jaune"
+                      ? "bg-yellow-50 border-l-4 border-yellow-400"
+                      : currentVigilance.name === "orange"
+                        ? "bg-orange-50 border-l-4 border-orange-500"
+                        : currentVigilance.name === "rouge"
+                          ? "bg-red-50 border-l-4 border-red-500"
+                          : currentVigilance.name === "violet"
+                            ? "bg-purple-50 border-l-4 border-purple-600"
+                            : currentVigilance.name === "erreur"
+                              ? "bg-red-100 border-l-4 border-red-600"
+                              : "bg-gray-50 border-l-4 border-gray-500"
                     }`}
                 >
                   <p className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Niveau actuel</p>
