@@ -55,7 +55,7 @@ export default function VigilancePage() {
     : VIGILANCE_COLORS[6]
 
   // Force usage of new design map as requested
-  const mapUrl = "https://raw.githubusercontent.com/pyronix-dev/upwork/main/new_design.png"
+  const mapUrl = "https://raw.githubusercontent.com/pyronix-dev/upwork/main/red_new.png"
   // Previous logic: const mapUrl = vigilanceData?.mapUrl || "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_gris.png"
 
   const formatLastUpdate = () => {
