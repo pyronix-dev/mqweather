@@ -1,0 +1,88 @@
+import { NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
+import { cookies } from 'next/headers'
+import { createSupabaseAdmin } from '@/lib/supabase'
+
+// Plan display names
+const PLAN_NAMES: Record<string, string> = {
+    'sms-monthly': 'SMS Standard - Mensuel',
+    'sms-annual': 'SMS Standard - Annuel',
+    'email-annual': 'Alertes Email - Annuel'
+}
+
+// Plan prices
+const PLAN_PRICES: Record<string, string> = {
+    'sms-monthly': '4,99€',
+    'sms-annual': '49,90€',
+    'email-annual': '10€'
+}
+
+export async function GET() {
+    try {
+        const cookieStore = await cookies()
+        const authSession = cookieStore.get('auth_session')?.value
+
+        if (!authSession) {
+            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+        }
+
+        const session = JSON.parse(authSession)
+        const userId = session.userId
+
+        if (!userId) {
+            return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
+        }
+
+        const supabase = createSupabaseAdmin()
+
+        // Fetch user data
+        const { data: user, error: userError } = await supabase
+            .from('users')
+            .select('id, reference_code, email, phone, full_name')
+            .eq('id', userId)
+            .single()
+
+        if (!user || userError) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        }
+
+        // Fetch active subscription
+        const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('plan, status, expires_at, amount')
+            .eq('user_id', userId)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single()
+
+        // Format subscription data
+        let subscriptionData = null
+        if (subscription) {
+            const expiresAt = subscription.expires_at ? new Date(subscription.expires_at) : null
+            subscriptionData = {
+                plan: PLAN_NAMES[subscription.plan] || subscription.plan,
+                price: PLAN_PRICES[subscription.plan] || `${(subscription.amount / 100).toFixed(2)}€`,
+                status: subscription.status === 'active' ? 'Actif' : 'Inactif',
+                nextBilling: expiresAt ? expiresAt.toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                }) : 'Non défini'
+            }
+        }
+
+        return NextResponse.json({
+            reference: user.reference_code,
+            full_name: user.full_name,
+            email: user.email,
+            phone: user.phone,
+            subscription: subscriptionData
+        })
+
+    } catch (error) {
+        console.error('Auth me error:', error)
+        return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    }
+}

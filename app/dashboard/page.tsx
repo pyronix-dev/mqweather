@@ -1,0 +1,317 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Header } from "@/components/header"
+import { Footer } from "@/components/footer"
+
+const UserIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+)
+
+const MessageIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+    </svg>
+)
+
+const BellIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+)
+
+const CreditCardIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+    </svg>
+)
+
+const LogOutIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+    </svg>
+)
+
+const DownloadIcon = () => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+    </svg>
+)
+
+const CheckBadgeIcon = () => (
+    <svg className="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+        <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.491 4.491 0 013.497-1.307zm4.45 6.45l-3.25 3.5a.75.75 0 11-1.1-1.02l2.7-2.9 2.7-2.9a.75.75 0 011.1 1.02l-3.25 3.5z" clipRule="evenodd" />
+    </svg>
+)
+
+interface UserData {
+    reference: string
+    full_name: string | null
+    email: string | null
+    phone: string | null
+    subscription: {
+        plan: string
+        price: string
+        status: string
+        nextBilling: string
+    } | null
+}
+
+const PLAN_NAMES: Record<string, string> = {
+    'sms-monthly': 'SMS Standard - Mensuel',
+    'sms-annual': 'SMS Standard - Annuel',
+    'email-annual': 'Alertes Email - Annuel'
+}
+
+const PLAN_PRICES: Record<string, string> = {
+    'sms-monthly': '4,99€',
+    'sms-annual': '49,90€',
+    'email-annual': '10€'
+}
+
+export default function DashboardPage() {
+    const [user, setUser] = useState<UserData | null>(null)
+    const [loading, setLoading] = useState(true)
+    const router = useRouter()
+
+    useEffect(() => {
+        // Fetch user data from API
+        const fetchUserData = async () => {
+            try {
+                const res = await fetch('/api/auth/me')
+                if (!res.ok) {
+                    // Not authenticated, redirect to login
+                    router.push('/login')
+                    return
+                }
+                const data = await res.json()
+                setUser(data)
+            } catch (error) {
+                console.error('Failed to fetch user data:', error)
+                router.push('/login')
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchUserData()
+    }, [router])
+
+    const handleLogout = async () => {
+        await fetch('/api/auth/logout', { method: 'POST' })
+        router.push('/login')
+    }
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-stone-100 flex items-center justify-center">
+                <div className="text-slate-600 font-medium">Chargement...</div>
+            </div>
+        )
+    }
+
+    if (!user) {
+        return null
+    }
+
+    // Determine display name: First Name -> Email -> Reference
+    let displayName = user.reference
+    if (user.full_name) {
+        displayName = user.full_name.split(' ')[0] // Get first name
+    } else if (user.email) {
+        displayName = user.email // Fallback to email
+    }
+
+    // Determine primary contact based on subscription
+    let primaryContact = user.email || user.phone || 'Non défini';
+    let contactLabel = 'Email';
+    let isSmsPlan = false;
+
+    if (user.subscription) {
+        if (user.subscription.plan.toLowerCase().includes('sms')) {
+            primaryContact = user.phone || primaryContact;
+            contactLabel = 'Numéro vérifié';
+            isSmsPlan = true;
+        } else if (user.subscription.plan.toLowerCase().includes('email')) {
+            primaryContact = user.email || primaryContact;
+            contactLabel = 'Email';
+        }
+    } else {
+        // Fallback for no subscription: prioritize Email, then Phone
+        if (user.email) {
+            primaryContact = user.email;
+            contactLabel = 'Email';
+        } else if (user.phone) {
+            primaryContact = user.phone;
+            contactLabel = 'Téléphone';
+        }
+    }
+
+    // Construct query params for "Change Plan"
+    const changePlanParams = new URLSearchParams()
+    if (user.email) changePlanParams.set('email', user.email)
+    if (user.phone) changePlanParams.set('phone', user.phone)
+    if (user.reference) changePlanParams.set('ref', user.reference)
+
+    return (
+        <div className="min-h-screen bg-stone-100">
+            <Header />
+
+            <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+                {/* Welcome Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-800">
+                            Bonjour, {displayName} 👋
+                        </h1>
+                        <p className="text-slate-500 font-medium">
+                            Gérez votre abonnement et vos alertes
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl transition-colors text-sm w-fit shadow-sm"
+                    >
+                        <LogOutIcon />
+                        Se déconnecter
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Main Info Column */}
+                    <div className="lg:col-span-2 space-y-6">
+
+                        {/* Active Subscription Card */}
+                        {user.subscription ? (
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                    <h2 className="font-black text-slate-800 flex items-center gap-2">
+                                        <CheckBadgeIcon />
+                                        Abonnement Actif
+                                    </h2>
+                                    <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wide">
+                                        {user.subscription.status}
+                                    </span>
+                                </div>
+
+                                <div className="p-6">
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                                        <div>
+                                            <h3 className="text-xl font-bold text-slate-800 mb-1">
+                                                {user.subscription.plan}
+                                            </h3>
+                                            <p className="text-slate-500 text-sm">
+                                                Renouvellement le {user.subscription.nextBilling}
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="block text-2xl font-black text-slate-800">
+                                                {user.subscription.price}
+                                            </span>
+                                            <span className="text-xs text-slate-500 font-medium">
+                                                {user.subscription.plan.includes('Mensuel') ? '/ mois' : '/ an'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-slate-100">
+                                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                            <p className="text-xs text-slate-500 font-bold uppercase mb-1">
+                                                Référence
+                                            </p>
+                                            <p className="font-mono font-bold text-slate-700 text-lg">
+                                                {user.reference}
+                                            </p>
+                                        </div>
+                                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                            <p className="text-xs text-slate-500 font-bold uppercase mb-1">
+                                                {contactLabel}
+                                            </p>
+                                            <div className="flex items-center gap-2 text-slate-700 font-medium">
+                                                {primaryContact}
+                                                {isSmsPlan && <span className="text-emerald-500">✓</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-4">
+                                    <Link
+                                        href={`/alertes?${changePlanParams.toString()}`}
+                                        className="text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
+                                    >
+                                        Changer de plan
+                                    </Link>
+                                    <Link
+                                        href="/dashboard/cancel"
+                                        className="text-sm font-bold text-red-600 hover:text-red-700 transition-colors ml-auto"
+                                    >
+                                        Annuler l&apos;abonnement
+                                    </Link>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
+                                <h2 className="font-black text-slate-800 text-xl mb-2">Aucun abonnement actif</h2>
+                                <p className="text-slate-500 mb-6">Souscrivez à nos alertes météo pour rester informé</p>
+                                <a href="/alertes" className="inline-block px-6 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-900 transition-colors">
+                                    Voir les offres
+                                </a>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Sidebar */}
+                    <div className="space-y-6">
+
+                        {/* Profile Card */}
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md">
+                                    {displayName.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-slate-800">{user.reference}</h3>
+                                    <p className="text-sm text-slate-500">{primaryContact}</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <button className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-sm font-medium group">
+                                    <UserIcon />
+                                    Modifier mon profil
+                                </button>
+                                <button className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-sm font-medium group">
+                                    <BellIcon />
+                                    Préférences de notification
+                                </button>
+                                <button className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-sm font-medium group">
+                                    <MessageIcon />
+                                    Support client
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Help Card */}
+                        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white text-center">
+                            <h3 className="font-black text-lg mb-2">Besoin d&apos;aide ?</h3>
+                            <p className="text-white/80 text-sm mb-4">
+                                Notre équipe est disponible pour répondre à vos questions sur les alertes météo.
+                            </p>
+                            <button className="w-full py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg font-bold text-sm transition-all">
+                                Contacter le support
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </main>
+
+            <Footer />
+        </div>
+    )
+}
