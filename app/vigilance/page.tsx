@@ -54,7 +54,9 @@ export default function VigilancePage() {
     ? VIGILANCE_COLORS.find((c) => c.name === vigilanceData.colorName) || VIGILANCE_COLORS[6]
     : VIGILANCE_COLORS[6]
 
-  const mapUrl = vigilanceData?.mapUrl || "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_gris.png"
+  // Force usage of new design map as requested
+  const mapUrl = "https://raw.githubusercontent.com/pyronix-dev/upwork/main/new_design.png"
+  // Previous logic: const mapUrl = vigilanceData?.mapUrl || "https://raw.githubusercontent.com/pyronix-dev/upwork/main/map_gris.png"
 
   const formatLastUpdate = () => {
     if (vigilanceData?.lastUpdate) {
