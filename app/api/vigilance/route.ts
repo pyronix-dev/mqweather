@@ -5,14 +5,37 @@ const METEO_FRANCE_API_KEY = process.env.METEO_FRANCE_API_KEY
 const METEO_FRANCE_APPLICATION_ID = process.env.METEO_FRANCE_APPLICATION_ID
 const TOKEN_URL = "https://portail-api.meteofrance.fr/token"
 
+// Color ID mapping from Météo France API
+// 1 = Vert (Green), 2 = Jaune (Yellow), 3 = Orange, 4 = Rouge (Red), 5 = Violet (Purple)
+const COLOR_ID_MAP: Record<number, string> = {
+  1: "vert",
+  2: "jaune",
+  3: "orange",
+  4: "rouge",
+  5: "violet",
+}
+
+// Map URLs from GitHub
+const MAP_URLS: Record<string, string> = {
+  gris: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_gris.png",
+  vert: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_vert.png",
+  jaune: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_jaune.png",
+  orange: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_orange.png",
+  rouge: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_rouge.png",
+  violet: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_violet.png",
+  erreur: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/error.png",
+}
+
 // In-memory token cache (simple version)
 // In a real serverless env, this might reset on cold starts, but it helps for hot invocations
 let cachedToken: string | null = null
 let tokenExpiration: number = 0
 
 async function getOAuthToken(): Promise<string | null> {
+  const start = performance.now()
   // Return cached token if valid (with 60s buffer)
   if (cachedToken && Date.now() < tokenExpiration - 60000) {
+    console.log(`[v0] Token Check: Cached token valid. (Time: ${(performance.now() - start).toFixed(2)}ms)`)
     return cachedToken
   }
 
@@ -44,7 +67,7 @@ async function getOAuthToken(): Promise<string | null> {
     const expiresIn = data.expires_in || 3600
     tokenExpiration = Date.now() + (expiresIn * 1000)
 
-    console.log("[v0] New OAuth2 token obtained successfully")
+    console.log(`[v0] New OAuth2 token obtained. (Time: ${(performance.now() - start).toFixed(2)}ms)`)
     return cachedToken
   } catch (error) {
     console.error("[v0] Error fetching token:", error)
@@ -53,6 +76,7 @@ async function getOAuthToken(): Promise<string | null> {
 }
 
 async function tryFetchWithToken(endpoint: string, token: string): Promise<Response | null> {
+  const start = performance.now()
   try {
     const response = await fetch(endpoint, {
       headers: {
@@ -61,6 +85,8 @@ async function tryFetchWithToken(endpoint: string, token: string): Promise<Respo
       },
       cache: "no-store",
     })
+
+    console.log(`[v0] Data Fetch (${endpoint.split('/').pop()}): ${(performance.now() - start).toFixed(2)}ms`)
 
     if (response.ok) {
       return response
@@ -125,7 +151,8 @@ async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
 }
 
 async function processResponse(response: Response): Promise<VigilanceData> {
-  console.log(`[v0] Success with token`)
+  const start = performance.now()
+  console.log(`[v0] Success with token. Starting processing...`)
   // Get the response as array buffer for ZIP processing
   const arrayBuffer = await response.arrayBuffer()
   const zip = new JSZip()
@@ -150,6 +177,7 @@ async function processResponse(response: Response): Promise<VigilanceData> {
     // Parse the TXT content for vigilance data
     const vigilanceData = parseVigilanceTxtContent(content)
     if (vigilanceData) {
+      console.log(`[v0] Processing Complete. (Time: ${(performance.now() - start).toFixed(2)}ms)`)
       return vigilanceData
     }
   } else {
