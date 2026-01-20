@@ -2,36 +2,54 @@ import { NextResponse } from "next/server"
 import JSZip from "jszip"
 
 const METEO_FRANCE_API_KEY = process.env.METEO_FRANCE_API_KEY
-const METEO_FRANCE_OAUTH_KEY = process.env.METEO_FRANCE_OAUTH_KEY
+const METEO_FRANCE_APPLICATION_ID = process.env.METEO_FRANCE_APPLICATION_ID
+const TOKEN_URL = "https://portail-api.meteofrance.fr/token"
 
-// Color ID mapping from Météo France API
-// 1 = Vert (Green), 2 = Jaune (Yellow), 3 = Orange, 4 = Rouge (Red), 5 = Violet (Purple)
-const COLOR_ID_MAP: Record<number, string> = {
-  1: "vert",
-  2: "jaune",
-  3: "orange",
-  4: "rouge",
-  5: "violet",
-}
+// In-memory token cache (simple version)
+// In a real serverless env, this might reset on cold starts, but it helps for hot invocations
+let cachedToken: string | null = null
+let tokenExpiration: number = 0
 
-// Map URLs from GitHub
-const MAP_URLS: Record<string, string> = {
-  gris: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_gris.png",
-  vert: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_vert.png",
-  jaune: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_jaune.png",
-  orange: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_orange.png",
-  rouge: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_rouge.png",
-  violet: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_violet.png",
-  erreur: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/error.png",
-}
+async function getOAuthToken(): Promise<string | null> {
+  // Return cached token if valid (with 60s buffer)
+  if (cachedToken && Date.now() < tokenExpiration - 60000) {
+    return cachedToken
+  }
 
-interface VigilanceData {
-  colorId: number
-  colorName: string
-  mapUrl: string
-  lastUpdate: string
-  phenomena: string[]
-  rawData?: string
+  if (!METEO_FRANCE_APPLICATION_ID) {
+    console.error("[v0] No METEO_FRANCE_APPLICATION_ID configured")
+    return null
+  }
+
+  try {
+    console.log("[v0] Requesting new OAuth2 token...")
+    const response = await fetch(TOKEN_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${METEO_FRANCE_APPLICATION_ID}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'grant_type=client_credentials',
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      console.error(`[v0] Token request failed: ${response.status} ${await response.text()}`)
+      return null
+    }
+
+    const data = await response.json()
+    cachedToken = data.access_token
+    // Set expiration (usually 3600s). Default to 1 hour if not provided
+    const expiresIn = data.expires_in || 3600
+    tokenExpiration = Date.now() + (expiresIn * 1000)
+
+    console.log("[v0] New OAuth2 token obtained successfully")
+    return cachedToken
+  } catch (error) {
+    console.error("[v0] Error fetching token:", error)
+    return null
+  }
 }
 
 async function tryFetchWithToken(endpoint: string, token: string): Promise<Response | null> {
@@ -56,96 +74,47 @@ async function tryFetchWithToken(endpoint: string, token: string): Promise<Respo
 }
 
 async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
-  if (!METEO_FRANCE_API_KEY && !METEO_FRANCE_OAUTH_KEY) {
-    console.log("[v0] No API keys configured, returning error status")
-    return {
-      colorId: -1,
-      colorName: "erreur",
-      mapUrl: MAP_URLS.erreur,
-      lastUpdate: new Date().toISOString(),
-      phenomena: [],
+  // Strategy: 
+  // 1. Try static API Key first (if available) - simplest
+  // 2. Try OAuth2 flow (auto-renew)
+
+  // 1. Static Key
+  if (METEO_FRANCE_API_KEY) {
+    const endpoints = [
+      "https://public-api.meteofrance.fr/public/DPVigilance/v1/vigilanceom/flux/dernier",
+    ]
+    for (const endpoint of endpoints) {
+      console.log(`[v0] Trying Static API_KEY on: ${endpoint}`)
+      const response = await tryFetchWithToken(endpoint, METEO_FRANCE_API_KEY)
+      if (response) return await processResponse(response)
     }
   }
 
-  const endpoints = [
-    "https://public-api.meteofrance.fr/public/DPVigilance/v1/vigilanceom/flux/dernier",
-    "https://public-api.meteofrance.fr/public/DPVigilance/v1/vigilanceom/controle/dernier",
-  ]
+  // 2. OAuth2 Flow
+  const token = await getOAuthToken()
+  if (token) {
+    const endpoint = "https://public-api.meteofrance.fr/public/DPVigilance/v1/vigilanceom/flux/dernier"
+    console.log(`[v0] Trying OAuth2 Token on: ${endpoint}`)
 
-  const tokens: { name: string; value: string }[] = []
-  if (METEO_FRANCE_API_KEY) {
-    tokens.push({ name: "API_KEY", value: METEO_FRANCE_API_KEY })
-  }
-  if (METEO_FRANCE_OAUTH_KEY) {
-    tokens.push({ name: "OAUTH_KEY", value: METEO_FRANCE_OAUTH_KEY })
-  }
+    let response = await tryFetchWithToken(endpoint, token)
 
-  for (const endpoint of endpoints) {
-    for (const token of tokens) {
-      try {
-        console.log(`[v0] Trying ${token.name} on endpoint: ${endpoint}`)
-        const response = await tryFetchWithToken(endpoint, token.value)
-
-        if (!response) {
-          continue // Try next token
-        }
-
-        console.log(`[v0] Success with ${token.name}`)
-        const contentType = response.headers.get("content-type")
-        console.log(`[v0] Content-Type: ${contentType}`)
-
-        // Get the response as array buffer for ZIP processing
-        const arrayBuffer = await response.arrayBuffer()
-        const zip = new JSZip()
-        const zipContents = await zip.loadAsync(arrayBuffer)
-
-        const allFiles = Object.keys(zipContents.files)
-        console.log(`[v0] ZIP files found:`, allFiles)
-
-        // TFFF is the ICAO code for Fort-de-France, Martinique
-        const txtFiles = allFiles.filter((f) => f.toLowerCase().endsWith(".txt"))
-        console.log(`[v0] TXT files found:`, txtFiles)
-
-        // Look for Martinique file (TFFF = Fort-de-France airport code)
-        const martiniqueTxtFile = txtFiles.find((f) => f.includes("TFFF") || f.toLowerCase().includes("martinique"))
-
-        if (martiniqueTxtFile) {
-          console.log(`[v0] Found Martinique TXT file: ${martiniqueTxtFile}`)
-          const file = zipContents.files[martiniqueTxtFile]
-          const content = await file.async("string")
-          console.log(`[v0] File content:\n${content}`)
-
-          // Parse the TXT content for vigilance data
-          const vigilanceData = parseVigilanceTxtContent(content)
-          if (vigilanceData) {
-            return vigilanceData
-          }
-        } else {
-          console.log(`[v0] No Martinique TXT file found, checking all TXT files...`)
-          // Fallback: check all TXT files for Martinique data
-          for (const txtFile of txtFiles) {
-            const file = zipContents.files[txtFile]
-            const content = await file.async("string")
-
-            if (content.toLowerCase().includes("martinique") || content.includes("972")) {
-              console.log(`[v0] Found Martinique data in: ${txtFile}`)
-              console.log(`[v0] File content:\n${content}`)
-
-              const vigilanceData = parseVigilanceTxtContent(content)
-              if (vigilanceData) {
-                return vigilanceData
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.error(`[v0] Error with ${token.name} on ${endpoint}:`, error)
+    // Retry logic for 401 (Invalid Token) - force refresh
+    if (!response || response.status === 401) {
+      console.log("[v0] Token might be expired (401), refreshing...")
+      cachedToken = null // Clear cache
+      const newToken = await getOAuthToken()
+      if (newToken) {
+        response = await tryFetchWithToken(endpoint, newToken)
       }
     }
+
+    if (response && response.ok) {
+      return await processResponse(response)
+    }
   }
 
-  // All tokens failed
-  console.log("[v0] All tokens failed, returning error status")
+  // All failed
+  console.log("[v0] All methods failed, returning error status")
   return {
     colorId: -1,
     colorName: "erreur",
@@ -153,6 +122,55 @@ async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
     lastUpdate: new Date().toISOString(),
     phenomena: [],
   }
+}
+
+async function processResponse(response: Response): Promise<VigilanceData> {
+  console.log(`[v0] Success with token`)
+  // Get the response as array buffer for ZIP processing
+  const arrayBuffer = await response.arrayBuffer()
+  const zip = new JSZip()
+  const zipContents = await zip.loadAsync(arrayBuffer)
+
+  const allFiles = Object.keys(zipContents.files)
+  console.log(`[v0] ZIP files found:`, allFiles)
+
+  // TFFF is the ICAO code for Fort-de-France, Martinique
+  const txtFiles = allFiles.filter((f) => f.toLowerCase().endsWith(".txt"))
+  console.log(`[v0] TXT files found:`, txtFiles)
+
+  // Look for Martinique file (TFFF = Fort-de-France airport code)
+  const martiniqueTxtFile = txtFiles.find((f) => f.includes("TFFF") || f.toLowerCase().includes("martinique"))
+
+  if (martiniqueTxtFile) {
+    console.log(`[v0] Found Martinique TXT file: ${martiniqueTxtFile}`)
+    const file = zipContents.files[martiniqueTxtFile]
+    const content = await file.async("string")
+    console.log(`[v0] File content:\n${content}`)
+
+    // Parse the TXT content for vigilance data
+    const vigilanceData = parseVigilanceTxtContent(content)
+    if (vigilanceData) {
+      return vigilanceData
+    }
+  } else {
+    console.log(`[v0] No Martinique TXT file found, checking all TXT files...`)
+    // Fallback: check all TXT files for Martinique data
+    for (const txtFile of txtFiles) {
+      const file = zipContents.files[txtFile]
+      const content = await file.async("string")
+
+      if (content.toLowerCase().includes("martinique") || content.includes("972")) {
+        console.log(`[v0] Found Martinique data in: ${txtFile}`)
+        console.log(`[v0] File content:\n${content}`)
+
+        const vigilanceData = parseVigilanceTxtContent(content)
+        if (vigilanceData) {
+          return vigilanceData
+        }
+      }
+    }
+  }
+  throw new Error("No valid data found in response")
 }
 
 function parseVigilanceTxtContent(content: string): VigilanceData | null {
