@@ -110,8 +110,16 @@ export async function GET(request: Request) {
                 return NextResponse.json({ message: 'Status updated (Green/Grey)', newColor: currentColorName });
             }
         } else {
-            console.log('[Cron] No change in vigilance.');
-            return NextResponse.json({ message: 'No change', color: currentColorName });
+            console.log('[Cron] No change in vigilance. Updating heartbeat...');
+            // Heartbeat: Update updated_at so we know the check ran
+            await supabase
+                .from('vigilance_state')
+                .update({
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', lastState.id);
+
+            return NextResponse.json({ message: 'No change (Heartbeat updated)', color: currentColorName });
         }
 
         return NextResponse.json({ message: 'Check complete' });
