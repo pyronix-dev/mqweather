@@ -32,10 +32,8 @@ let cachedToken: string | null = null
 let tokenExpiration: number = 0
 
 async function getOAuthToken(): Promise<string | null> {
-  const start = performance.now()
   // Return cached token if valid (with 60s buffer)
   if (cachedToken && Date.now() < tokenExpiration - 60000) {
-    console.log(`[v0] Token Check: Cached token valid. (Time: ${(performance.now() - start).toFixed(2)}ms)`)
     return cachedToken
   }
 
@@ -67,7 +65,7 @@ async function getOAuthToken(): Promise<string | null> {
     const expiresIn = data.expires_in || 3600
     tokenExpiration = Date.now() + (expiresIn * 1000)
 
-    console.log(`[v0] New OAuth2 token obtained. (Time: ${(performance.now() - start).toFixed(2)}ms)`)
+    console.log("[v0] New OAuth2 token obtained successfully")
     return cachedToken
   } catch (error) {
     console.error("[v0] Error fetching token:", error)
@@ -76,7 +74,6 @@ async function getOAuthToken(): Promise<string | null> {
 }
 
 async function tryFetchWithToken(endpoint: string, token: string): Promise<Response | null> {
-  const start = performance.now()
   try {
     const response = await fetch(endpoint, {
       headers: {
@@ -85,8 +82,6 @@ async function tryFetchWithToken(endpoint: string, token: string): Promise<Respo
       },
       cache: "no-store",
     })
-
-    console.log(`[v0] Data Fetch (${endpoint.split('/').pop()}): ${(performance.now() - start).toFixed(2)}ms`)
 
     if (response.ok) {
       return response
@@ -151,8 +146,7 @@ async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
 }
 
 async function processResponse(response: Response): Promise<VigilanceData> {
-  const start = performance.now()
-  console.log(`[v0] Success with token. Starting processing...`)
+  console.log(`[v0] Success with token`)
   // Get the response as array buffer for ZIP processing
   const arrayBuffer = await response.arrayBuffer()
   const zip = new JSZip()
@@ -177,7 +171,6 @@ async function processResponse(response: Response): Promise<VigilanceData> {
     // Parse the TXT content for vigilance data
     const vigilanceData = parseVigilanceTxtContent(content)
     if (vigilanceData) {
-      console.log(`[v0] Processing Complete. (Time: ${(performance.now() - start).toFixed(2)}ms)`)
       return vigilanceData
     }
   } else {
