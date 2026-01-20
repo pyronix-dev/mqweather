@@ -5,6 +5,7 @@ import { useParams, useSearchParams, useRouter } from "next/navigation"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { getDayIndexFromSlug } from "@/lib/utils"
 
 const BackIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,7 +203,10 @@ export default function DayDetailContent() {
   const params = useParams()
   const searchParams = useSearchParams()
   const router = useRouter()
-  const dayIndex = Number(params.day)
+
+  // Ensure we handle array or string param
+  const dayParam = Array.isArray(params.day) ? params.day[0] : params.day
+  const dayIndex = getDayIndexFromSlug(dayParam || "today")
 
   const [weather, setWeather] = useState<any>(null)
   const [hourlyData, setHourlyData] = useState<any[]>([])
@@ -416,7 +420,7 @@ export default function DayDetailContent() {
             <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 mb-6">
               <h3 className="text-lg font-bold text-slate-800 mb-4">Température horaire</h3>
               <ResponsiveContainer width="100%" height={250}>
-                <AreaChart data={hourlyData}>
+                <AreaChart data={hourlyData} margin={{ top: 10, right: 0, left: -30, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorTempDetail" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
@@ -425,7 +429,7 @@ export default function DayDetailContent() {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="time" stroke="#6b7280" style={{ fontSize: "10px" }} interval={2} />
-                  <YAxis stroke="#6b7280" style={{ fontSize: "10px" }} domain={["auto", "auto"]} />
+                  <YAxis stroke="#6b7280" style={{ fontSize: "10px" }} domain={["auto", "auto"]} width={30} />
                   <Tooltip
                     contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "12px" }}
                     labelStyle={{ color: "#374151", fontWeight: "bold" }}
@@ -448,10 +452,10 @@ export default function DayDetailContent() {
               <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200">
                 <h3 className="text-lg font-bold text-slate-800 mb-4">Probabilité de pluie</h3>
                 <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={hourlyData}>
+                  <BarChart data={hourlyData} margin={{ top: 10, right: 0, left: -30, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="time" stroke="#6b7280" style={{ fontSize: "10px" }} interval={3} />
-                    <YAxis stroke="#6b7280" style={{ fontSize: "10px" }} domain={[0, 100]} />
+                    <YAxis stroke="#6b7280" style={{ fontSize: "10px" }} domain={[0, 100]} width={30} />
                     <Tooltip
                       contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "12px" }}
                       formatter={(value: number) => [`${value}%`, "Probabilité"]}
@@ -464,7 +468,7 @@ export default function DayDetailContent() {
               <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200">
                 <h3 className="text-lg font-bold text-slate-800 mb-4">Vitesse du vent</h3>
                 <ResponsiveContainer width="100%" height={200}>
-                  <AreaChart data={hourlyData}>
+                  <AreaChart data={hourlyData} margin={{ top: 10, right: 0, left: -30, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorWind" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
@@ -473,7 +477,7 @@ export default function DayDetailContent() {
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="time" stroke="#6b7280" style={{ fontSize: "10px" }} interval={3} />
-                    <YAxis stroke="#6b7280" style={{ fontSize: "10px" }} />
+                    <YAxis stroke="#6b7280" style={{ fontSize: "10px" }} width={30} />
                     <Tooltip
                       contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "12px" }}
                       formatter={(value: number) => [`${Math.round(value)} km/h`, "Vent"]}

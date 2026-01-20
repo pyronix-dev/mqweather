@@ -2,7 +2,7 @@
     "crons": [
         {
             "path": "/api/cron/check-vigilance",
-            "schedule": "*/10 * * * *"
+            "schedule": "*/15 * * * *"
         }
     ]
 }

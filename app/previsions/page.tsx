@@ -7,6 +7,7 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import maplibregl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
+import { getSlugFromIndex } from "@/lib/utils"
 
 const SearchIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -544,7 +545,9 @@ function PrevisionContent() {
     params.set("lat", selectedCity.lat.toString())
     params.set("lon", selectedCity.lon.toString())
     params.set("dayIndex", dayIndex.toString())
-    router.push(`/previsions/${dayIndex}?${params.toString()}`)
+
+    const slug = getSlugFromIndex(dayIndex)
+    router.push(`/previsions/${slug}?${params.toString()}`)
   }
 
   return (
