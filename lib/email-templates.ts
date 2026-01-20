@@ -102,6 +102,57 @@ export function getOtpEmailHtml(code: string): string {
 `
 }
 
+export function getMagicLinkEmailHtml(link: string, code: string): string {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #333333; }
+    .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .header { background-color: #ffffff; padding: 30px 40px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+    .logo { height: 60px; width: auto; }
+    .content { padding: 40px; line-height: 1.6; }
+    .h1 { color: #1a202c; font-size: 24px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+    .btn-container { text-align: center; margin: 30px 0; }
+    .btn { display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    .otp-box { background-color: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; text-align: center; margin: 30px 0; }
+    .otp-code { font-family: 'Courier New', monospace; font-size: 24px; font-weight: bold; color: #334155; letter-spacing: 3px; }
+    .footer { background-color: #f8fafc; padding: 20px 40px; text-align: center; font-size: 12px; color: #94a3b8; }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="${LOGO_TEXT_URL}" alt="Météo Martinique" class="logo">
+        </div>
+        <div class="content">
+            <h1 class="h1">Connexion à votre compte</h1>
+            <p>Bonjour,</p>
+            <p>Cliquez sur le lien ci-dessous pour vous connecter directement :</p>
+            
+            <div class="btn-container">
+                <a href="${link}" class="btn">Me connecter</a>
+            </div>
+            
+            <p style="text-align: center; font-size: 14px; color: #64748b;">Ou utilisez ce code de vérification :</p>
+            
+            <div class="otp-box">
+                <div class="otp-code">${code}</div>
+            </div>
+            
+            <p>Ce lien et ce code sont valides pendant 10 minutes.</p>
+        </div>
+        <div class="footer">
+            <img src="${LOGO_ICON_URL}" alt="Icon" width="40" height="30" style="margin-bottom: 10px; opacity: 0.8;">
+            <p>&copy; ${new Date().getFullYear()} Météo Martinique. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html>
+`
+}
+
 export function getVerifyEmailHtml(code: string): string {
     return `
 <!DOCTYPE html>
@@ -240,6 +291,7 @@ export function getCancellationEmailHtml(planName: string, endDate: string): str
 `
 }
 
+// ... existing code ...
 export function getPlanChangeEmailHtml(planName: string, price: string): string {
     return `
 <!DOCTYPE html>
@@ -285,4 +337,109 @@ export function getPlanChangeEmailHtml(planName: string, price: string): string 
 </body>
 </html>
 `
+}
+
+interface VigilanceTheme {
+    color: string;
+    bgColor: string;
+    borderColor: string;
+    title: string;
+    message: string;
+    animation?: string;
+}
+
+const VIGILANCE_THEMES: Record<string, VigilanceTheme> = {
+    jaune: {
+        color: '#f59e0b', // Yellow-500
+        bgColor: '#fffbeb', // Yellow-50
+        borderColor: '#fcd34d', // Yellow-300
+        title: 'Vigilance Jaune',
+        message: 'Soyez attentif',
+        animation: ''
+    },
+    orange: {
+        color: '#f97316', // Orange-500
+        bgColor: '#fff7ed', // Orange-50
+        borderColor: '#fdba74', // Orange-300
+        title: 'Vigilance Orange',
+        message: 'Soyez vigilant',
+        animation: ''
+    },
+    rouge: {
+        color: '#dc2626', // Red-600
+        bgColor: '#fef2f2', // Red-50
+        borderColor: '#fca5a5', // Red-300
+        title: 'Vigilance Rouge',
+        message: 'Vigilance absolue',
+        animation: 'pulse-border'
+    },
+    violet: {
+        color: '#7c3aed', // Violet-600
+        bgColor: '#f5f3ff', // Violet-50
+        borderColor: '#c4b5fd', // Violet-300
+        title: 'Vigilance Violette',
+        message: 'Danger extrême',
+        animation: 'pulse-border-violet'
+    }
+}
+
+export function getVigilanceAlertEmailHtml(colorName: string): string {
+    const theme = VIGILANCE_THEMES[colorName.toLowerCase()] || VIGILANCE_THEMES.jaune
+
+    // Use a reliable ext icon or base64. Using Icons8 for now as placeholder is reliable.
+    // White icon for colored background
+    const iconUrl = "https://img.icons8.com/ios-filled/100/ffffff/high-priority-message.png"
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerte Météo Martinique</title>
+    <style>
+        .btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+        
+        <!-- Brand Header -->
+        <div style="background-color: #ffffff; padding: 24px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+            <img src="${LOGO_TEXT_URL}" alt="Météo Martinique" style="height: 48px; width: auto;">
+        </div>
+
+        <!-- Colored Alert Banner -->
+        <div style="background-color: ${theme.color}; padding: 40px 24px; text-align: center;">
+            <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                ${theme.title}
+            </h1>
+            <p style="margin: 12px 0 0 0; color: rgba(255,255,255,0.95); font-size: 20px; font-weight: 600;">
+                ${theme.message}
+            </p>
+        </div>
+
+        <!-- Content Body -->
+        <div style="padding: 40px 32px; text-align: center;">
+            <p style="margin: 0 0 32px 0; color: #1f2937; font-size: 18px; line-height: 1.6;">
+                Le niveau de vigilance a changé sur la Martinique.
+                <br>
+                <span style="color: #6b7280; font-size: 16px;">Veuillez consulter la carte pour les détails.</span>
+            </p>
+
+            <a href="https://mqweather.vercel.app/vigilance" class="btn" style="display: inline-block; background-color: ${theme.color}; color: white; padding: 18px 40px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+                Voir la carte vigilance
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb;">
+             <img src="${LOGO_ICON_URL}" alt="Icon" width="32" height="24" style="opacity: 0.6; margin-bottom: 12px;">
+            <p style="margin: 0; color: #94a3b8; font-size: 13px;">Météo Martinique Alertes</p>
+            <p style="margin: 4px 0 0 0; color: #cbd5e1; font-size: 12px;">© ${new Date().getFullYear()} Météo Martinique. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html>
+    `
 }

@@ -123,3 +123,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes pulse-red-shadow {
+  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+@keyframes pulse-violet-shadow {
+  0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+}
+
+.pulse-border-red {
+  animation: pulse-red-shadow 2s infinite;
+}
+
+.pulse-border-violet {
+  animation: pulse-violet-shadow 2s infinite;
+}
+

@@ -6,7 +6,8 @@
  */
 import { getPaymentConfirmationEmailHtml, getCancellationEmailHtml, getPlanChangeEmailHtml } from '@/lib/email-templates'
 
-const BREVO_API_KEY = process.env.BREVO_API_KEY
+// Removed top-level BREVO_API_KEY to force dynamic reading
+
 const BREVO_SMS_SENDER = process.env.BREVO_SMS_SENDER || 'MeteoMQ'
 const BREVO_EMAIL_SENDER = process.env.BREVO_EMAIL_SENDER || 'bossjack1kalirafik@gmail.com'
 const BREVO_EMAIL_SENDER_NAME = process.env.BREVO_EMAIL_SENDER_NAME || 'Météo Martinique alertes'
@@ -32,7 +33,8 @@ export async function sendSMS(
   phone: string,
   message: string
 ): Promise<SendSMSResult> {
-  if (!BREVO_API_KEY) {
+  const apiKey = process.env.BREVO_API_KEY
+  if (!apiKey) {
     console.error('❌ BREVO_API_KEY is not configured')
     return { success: false, error: 'Brevo API key not configured' }
   }
@@ -59,7 +61,7 @@ export async function sendSMS(
       method: 'POST',
       headers: {
         'accept': 'application/json',
-        'api-key': BREVO_API_KEY,
+        'api-key': apiKey,
         'content-type': 'application/json',
       },
       body: JSON.stringify({
@@ -95,10 +97,11 @@ export async function sendEmail(
   htmlContent: string,
   textContent?: string
 ): Promise<SendEmailResult> {
+  const apiKey = process.env.BREVO_API_KEY
   console.log('📧 Attempting to send email to:', to)
-  console.log('🔑 API Key configured:', !!BREVO_API_KEY, 'Length:', BREVO_API_KEY?.length)
+  console.log('🔑 API Key configured:', !!apiKey, 'Length:', apiKey?.length)
 
-  if (!BREVO_API_KEY) {
+  if (!apiKey) {
     console.error('❌ BREVO_API_KEY is not configured')
     return { success: false, error: 'Brevo API key not configured' }
   }
@@ -108,7 +111,7 @@ export async function sendEmail(
       method: 'POST',
       headers: {
         'accept': 'application/json',
-        'api-key': BREVO_API_KEY,
+        'api-key': apiKey,
         'content-type': 'application/json',
       },
       body: JSON.stringify({

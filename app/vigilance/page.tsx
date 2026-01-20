@@ -82,7 +82,14 @@ export default function VigilancePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch">
           {/* Map Section */}
           <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
-            <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
+            <div
+              className={`absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col ${currentVigilance.name === "rouge"
+                ? "pulse-border-red border-red-200"
+                : currentVigilance.name === "violet"
+                  ? "pulse-border-violet border-purple-200"
+                  : ""
+                }`}
+            >
               <div className="p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <div>

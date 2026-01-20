@@ -94,7 +94,7 @@ async function tryFetchWithToken(endpoint: string, token: string): Promise<Respo
   }
 }
 
-async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
+export async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
   // Strategy: 
   // 1. Try static API Key first (if available) - simplest
   // 2. Try OAuth2 flow (auto-renew)

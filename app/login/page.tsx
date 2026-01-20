@@ -54,11 +54,25 @@ export default function LoginPage() {
         setIsLoading(true)
         setError("")
 
+        // Validate Input
+        // 1. Check if it looks like an email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        // 2. Check if it looks like a Reference Code (Start with MQ, followed by exactly 6 digits)
+        const refCodeRegex = /^MQ\d{6}$/i
+
+        const trimmedIdentifier = identifier.trim()
+
+        if (!emailRegex.test(trimmedIdentifier) && !refCodeRegex.test(trimmedIdentifier)) {
+            setError("Veuillez entrer une adresse email valide ou un code de référence commençant par 'MQ'.")
+            setIsLoading(false)
+            return
+        }
+
         try {
             const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'send-code', identifier })
+                body: JSON.stringify({ action: 'send-code', identifier: trimmedIdentifier })
             })
             const data = await res.json()
 
@@ -100,18 +114,17 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-stone-50 to-slate-100">
+        <div className="min-h-screen bg-slate-50 flex flex-col">
             <Header />
 
-            <main className="flex items-center justify-center px-4 py-12 sm:py-20">
+            <main className="flex-1 flex items-center justify-center px-4 py-12 sm:py-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
                 <div className="w-full max-w-md">
                     {/* Logo & Title */}
                     <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-800 rounded-2xl mb-4 shadow-lg">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-900 text-white rounded-2xl mb-4 shadow-lg shadow-slate-200">
                             <UserIcon />
-                            <style jsx>{`svg { color: white; }`}</style>
                         </div>
-                        <h1 className="text-2xl font-black text-slate-800 mb-2">Espace Membre</h1>
+                        <h1 className="text-2xl font-black text-slate-900 mb-2">Espace Membre</h1>
                         <p className="text-slate-500 font-medium">
                             {step === "identifier"
                                 ? "Connectez-vous à votre compte"
@@ -120,8 +133,8 @@ export default function LoginPage() {
                     </div>
 
                     {/* Login Card */}
-                    <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-                        <div className="h-2 bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900" />
+                    <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+                        <div className="h-1.5 bg-slate-900" />
 
                         {error && (
                             <div className="mx-6 mt-6 sm:mx-8 px-4 py-3 bg-red-50 text-red-600 text-sm font-bold rounded-xl border border-red-100 flex items-center gap-2">
@@ -145,10 +158,13 @@ export default function LoginPage() {
                                         <input
                                             type="text"
                                             value={identifier}
-                                            onChange={(e) => setIdentifier(e.target.value)}
+                                            onChange={(e) => {
+                                                setIdentifier(e.target.value)
+                                                setError("") // Clear error on type
+                                            }}
                                             placeholder="votre@email.com ou MQ123456"
                                             required
-                                            className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-400 focus:bg-white transition-all"
+                                            className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:border-slate-400 focus:bg-white transition-all"
                                             suppressHydrationWarning
                                         />
                                     </div>
@@ -157,7 +173,7 @@ export default function LoginPage() {
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full py-4 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 disabled:from-slate-400 disabled:to-slate-400 text-white font-black text-lg rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+                                    className="w-full py-4 bg-slate-900 hover:bg-black disabled:bg-slate-400 text-white font-bold text-lg rounded-xl transition-all shadow-lg shadow-slate-200 hover:shadow-slate-300 active:scale-[0.98]"
                                 >
                                     {isLoading ? (
                                         <span className="flex items-center justify-center gap-2">
@@ -176,11 +192,11 @@ export default function LoginPage() {
                             <form onSubmit={handleVerifyCode} className="p-6 sm:p-8 space-y-5">
                                 <div className="text-center mb-6">
                                     <p className="text-slate-600 text-sm mb-1">Si vous avez un compte, un code à 6 chiffres a été envoyé à :</p>
-                                    <p className="font-bold text-slate-800">{identifier}</p>
+                                    <p className="font-bold text-slate-900">{identifier}</p>
                                     <button
                                         type="button"
                                         onClick={() => setStep("identifier")}
-                                        className="text-xs text-blue-600 hover:underline mt-2"
+                                        className="text-xs text-slate-600 hover:text-black font-medium hover:underline mt-2"
                                     >
                                         Modifier
                                     </button>
@@ -204,7 +220,7 @@ export default function LoginPage() {
                                             placeholder="123456"
                                             required
                                             pattern="[0-9]{6}"
-                                            className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 font-mono text-xl tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-400 focus:bg-white transition-all"
+                                            className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 font-mono text-xl tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-slate-200 focus:border-slate-400 focus:bg-white transition-all"
                                             suppressHydrationWarning
                                         />
                                     </div>
@@ -213,7 +229,7 @@ export default function LoginPage() {
                                 <button
                                     type="submit"
                                     disabled={isLoading || otp.length !== 6}
-                                    className="w-full py-4 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 disabled:from-slate-400 disabled:to-slate-400 text-white font-black text-lg rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+                                    className="w-full py-4 bg-slate-900 hover:bg-black disabled:bg-slate-400 text-white font-bold text-lg rounded-xl transition-all shadow-lg shadow-slate-200 hover:shadow-slate-300 active:scale-[0.98]"
                                 >
                                     {isLoading ? (
                                         <span className="flex items-center justify-center gap-2">
@@ -230,7 +246,7 @@ export default function LoginPage() {
 
                                 <p className="text-center text-xs text-slate-500 mt-4">
                                     Vous n&apos;avez rien reçu ?{" "}
-                                    <button type="button" className="text-slate-800 font-bold hover:underline">
+                                    <button type="button" className="text-slate-900 font-bold hover:underline">
                                         Renvoyer le code
                                     </button>
                                 </p>
@@ -239,27 +255,27 @@ export default function LoginPage() {
 
                         <div className="px-6 sm:px-8">
                             <div className="flex items-center gap-4">
-                                <div className="flex-1 h-px bg-slate-200" />
+                                <div className="flex-1 h-px bg-slate-100" />
                                 <span className="text-xs text-slate-400 font-medium">OU</span>
-                                <div className="flex-1 h-px bg-slate-200" />
+                                <div className="flex-1 h-px bg-slate-100" />
                             </div>
                         </div>
 
                         <div className="p-6 sm:p-8 pt-4">
                             <p className="text-center text-slate-600">
                                 Pas de compte ?{" "}
-                                <Link href="/alertes" className="font-bold text-slate-800 hover:underline">
+                                <Link href="/alertes" className="font-bold text-slate-900 hover:underline">
                                     Inscrivez-vous
                                 </Link>
                             </p>
                         </div>
                     </div>
 
-                    <p className="text-center text-xs text-slate-500 mt-6">
+                    <p className="text-center text-xs text-slate-400 mt-6">
                         En vous connectant, vous acceptez nos{" "}
-                        <a href="#" className="underline hover:text-slate-700">Conditions d&apos;utilisation</a>
+                        <a href="#" className="underline hover:text-slate-600">Conditions d&apos;utilisation</a>
                         {" "}et notre{" "}
-                        <a href="#" className="underline hover:text-slate-700">Politique de confidentialité</a>
+                        <a href="#" className="underline hover:text-slate-600">Politique de confidentialité</a>
                     </p>
                 </div>
             </main>
