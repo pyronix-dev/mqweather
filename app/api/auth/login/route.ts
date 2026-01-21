@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
             // Clear OTP cookie
             response.cookies.delete('otp_user_id')
 
-            // Set Auth Cookie with user data (valid for 7 days)
+            // Set Auth Cookie with user data (valid for 1 day)
             response.cookies.set('auth_session', JSON.stringify({
                 userId: user?.id,
                 referenceCode: user?.reference_code,
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60
+                maxAge: 24 * 60 * 60
             })
 
             return response
