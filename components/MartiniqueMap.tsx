@@ -20,6 +20,18 @@ export function MartiniqueMap({ markers, centerOn }: MartiniqueMapProps) {
     const mapContainer = useRef<HTMLDivElement>(null)
     const map = useRef<maplibregl.Map | null>(null)
     const [loaded, setLoaded] = useState(false)
+    const [showResetButton, setShowResetButton] = useState(false)
+    const [isMobile, setIsMobile] = useState(false)
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768)
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
+
+    const initialCenter: [number, number] = [-61.0242, 14.6415]
+    const getInitialZoom = () => (window.innerWidth < 768 ? 9.1 : 9.6)
 
     // Store marker positions (x, y) in pixels to render React components
     const [projectedMarkers, setProjectedMarkers] = useState<{ id: string, x: number, y: number }[]>([])
@@ -35,6 +47,8 @@ export function MartiniqueMap({ markers, centerOn }: MartiniqueMapProps) {
                 zoom: 12,
                 essential: true
             })
+            // Iterate checking just in case moveend doesn't fire perfectly or we want faster feedback
+            // But moveend is safest to avoid flickering.
         }
     }, [centerOn])
 
@@ -44,11 +58,13 @@ export function MartiniqueMap({ markers, centerOn }: MartiniqueMapProps) {
         if (map.current) return
 
         if (mapContainer.current) {
+            const zoomLevel = getInitialZoom()
+
             map.current = new maplibregl.Map({
                 container: mapContainer.current,
                 style: "https://api.maptiler.com/maps/dataviz-v4/style.json?key=UxUuNKolwcBvNiLEf3iZ",
-                center: [-61.0242, 14.6415], // Martinique Center
-                zoom: 9.6, // Zoomed in by 0.4 as requested
+                center: initialCenter,
+                zoom: zoomLevel,
                 interactive: false, // Disable user interaction as requested
                 attributionControl: false
             })
@@ -56,12 +72,19 @@ export function MartiniqueMap({ markers, centerOn }: MartiniqueMapProps) {
             map.current.on('load', () => {
                 setLoaded(true)
                 updateMarkerPositions()
+                checkResetButtonVisibility()
             })
 
             // Even though locked, resize might change positions
             map.current.on('resize', updateMarkerPositions)
-            map.current.on('move', updateMarkerPositions)
-            map.current.on('zoom', updateMarkerPositions)
+            map.current.on('move', () => {
+                updateMarkerPositions()
+                checkResetButtonVisibility()
+            })
+            map.current.on('zoom', () => {
+                updateMarkerPositions()
+                checkResetButtonVisibility()
+            })
         }
 
         return () => {
@@ -74,10 +97,18 @@ export function MartiniqueMap({ markers, centerOn }: MartiniqueMapProps) {
     useEffect(() => {
         if (loaded) {
             updateMarkerPositions()
+            checkResetButtonVisibility()
         }
     }, [markers, loaded])
 
+    const checkResetButtonVisibility = () => {
+        if (!map.current) return
+        const currentZoom = map.current.getZoom()
+        const initialZoom = getInitialZoom()
 
+        // Show button if zoom is significantly different from initial
+        setShowResetButton(currentZoom > initialZoom + 0.5)
+    }
 
     const updateMarkerPositions = () => {
         if (!map.current) return
@@ -95,9 +126,33 @@ export function MartiniqueMap({ markers, centerOn }: MartiniqueMapProps) {
         }
     }
 
+    const handleResetView = () => {
+        if (map.current) {
+            map.current.flyTo({
+                center: initialCenter,
+                zoom: getInitialZoom(),
+                essential: true
+            })
+            checkResetButtonVisibility()
+        }
+    }
+
     return (
         <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-sm border border-slate-200 bg-slate-100">
             <div ref={mapContainer} className="w-full h-full" />
+
+            {/* Reset View Button */}
+            {showResetButton && (
+                <button
+                    onClick={handleResetView}
+                    className="absolute bottom-4 right-4 bg-white/90 backdrop-blur text-slate-700 p-2 rounded-xl shadow-lg border border-slate-200 hover:bg-white transition-colors z-20 animate-in fade-in zoom-in duration-300"
+                    title="Réinitialiser la vue"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                    </svg>
+                </button>
+            )}
 
             {/* Markers Layer */}
             {projectedMarkers.map((pos, index) => {
