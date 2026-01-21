@@ -397,12 +397,14 @@ function PrevisionContent() {
     if (initializedFromUrl.current) return
 
     const cityName = searchParams.get("city")
-    const lat = searchParams.get("lat")
-    const lon = searchParams.get("lon")
 
-    if (cityName && lat && lon) {
-      setSelectedCity({ name: cityName, lat: Number.parseFloat(lat), lon: Number.parseFloat(lon) })
-      setSearchQuery(cityName)
+    // VALIDATION: Only accept cities from our known list
+    const validCity = cityName ? CITY_SUGGESTIONS.find(c => c.name.toLowerCase() === cityName.toLowerCase()) : null
+
+    if (validCity) {
+      // Use the trusted coordinates from our list, ignore URL lat/lon to prevent spoofing
+      setSelectedCity(validCity)
+      setSearchQuery(validCity.name)
     }
     initializedFromUrl.current = true
   }, []) // Empty dependency - run once on mount

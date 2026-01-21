@@ -15,7 +15,13 @@ export const MARTINIQUE_CITIES = [
     { name: "Sainte-Luce", lat: 14.4692, lon: -60.9257 },
     { name: "Le Vauclin", lat: 14.5453, lon: -60.8358 },
     { name: "Les Trois-Îlets", lat: 14.5388, lon: -61.0336 },
-    { name: "Le Prêcheur", lat: 14.8016, lon: -61.2166 }
+    { name: "Le Prêcheur", lat: 14.8016, lon: -61.2166 },
+    { name: "Grand'Rivière", lat: 14.8732, lon: -61.1812 },
+    { name: "Le Morne-Rouge", lat: 14.7733, lon: -61.1350 },
+    { name: "Tartane", lat: 14.7610, lon: -60.9120 },
+    { name: "Bellefontaine", lat: 14.6738, lon: -61.1633 },
+    { name: "Basse-Pointe", lat: 14.8696, lon: -61.1172 },
+    { name: "Le Lorrain", lat: 14.8327, lon: -61.0558 }
 ]
 
 export const BEACH_LOCATIONS = [

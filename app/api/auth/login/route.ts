@@ -160,11 +160,8 @@ export async function POST(request: NextRequest) {
                 .single()
 
             if (!otpRecord || otpError) {
-                // Allow magic code 123456 for dev/testing even if no OTP record found (failsafe)
-                if (code !== '123456') {
-                    console.log('❌ OTP Check: No valid record found or expired')
-                    return NextResponse.json({ success: false, error: "Code expiré ou invalide" }, { status: 400 })
-                }
+                console.log('❌ OTP Check: No valid record found or expired')
+                return NextResponse.json({ success: false, error: "Code expiré ou invalide" }, { status: 400 })
             } else {
                 // Check rate limits
                 const attempts = otpRecord.attempts || 0
@@ -177,9 +174,8 @@ export async function POST(request: NextRequest) {
 
                 // Verify code hash
                 const isValid = hash(code) === otpRecord.code_hash
-                const isMagic = code === '123456'
 
-                if (!isValid && !isMagic) {
+                if (!isValid) {
                     // Increment attempts
                     console.log(`⚠️ OTP Check: Invalid code, incrementing attempts (${attempts + 1}/${maxAttempts})`)
                     await supabase
