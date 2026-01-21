@@ -246,13 +246,13 @@ export function Header() {
               )}
             </Link>
             <Link
-              href="/meteo-marine"
-              className={`font-bold transition whitespace-nowrap animate-slide-in-left relative ${pathname === "/meteo-marine" ? "text-slate-800" : "text-slate-600 hover:text-slate-800"
+              href="/cartes/plages"
+              className={`font-bold transition whitespace-nowrap animate-slide-in-left relative ${pathname === "/cartes/plages" ? "text-slate-800" : "text-slate-600 hover:text-slate-800"
                 }`}
               style={{ animationDelay: "0.35s" }}
             >
               Météo des Plages
-              {pathname === "/meteo-marine" && (
+              {pathname === "/cartes/plages" && (
                 <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-slate-800 rounded-full" />
               )}
             </Link>
@@ -307,6 +307,20 @@ export function Header() {
                         className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/pluie" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
                       >
                         Pluie
+                      </Link>
+                      <Link
+                        href="/cartes/uv"
+                        onClick={() => setMapsMenuOpen(false)}
+                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/uv" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
+                      >
+                        Indice UV
+                      </Link>
+                      <Link
+                        href="/cartes/plages"
+                        onClick={() => setMapsMenuOpen(false)}
+                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/plages" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
+                      >
+                        Plages
                       </Link>
                     </div>
                   </div>
@@ -527,6 +541,18 @@ export function Header() {
                 className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/pluie" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
               >
                 Pluie
+              </Link>
+              <Link
+                href="/cartes/uv"
+                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/uv" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+              >
+                Indice UV
+              </Link>
+              <Link
+                href="/cartes/plages"
+                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/plages" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+              >
+                Plages
               </Link>
             </div>
             <div className="pt-3 border-t border-slate-200 space-y-3">

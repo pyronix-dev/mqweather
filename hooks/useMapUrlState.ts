@@ -12,13 +12,20 @@ export function useMapUrlState() {
     // Initialize state from URL params
     const initialDay = parseInt(searchParams.get("jour") || "0")
     const initialCityName = searchParams.get("ville")
+    const latParam = parseFloat(searchParams.get("lat") || "")
+    const lonParam = parseFloat(searchParams.get("lon") || "")
+
     const initialCity = initialCityName
         ? MARTINIQUE_CITIES.find(c => c.name.toLowerCase() === initialCityName.toLowerCase())
         : null
 
     const [selectedDay, setSelectedDay] = useState(isNaN(initialDay) ? 0 : initialDay)
     const [centerOn, setCenterOn] = useState<{ lat: number; lon: number } | null>(
-        initialCity ? { lat: initialCity.lat, lon: initialCity.lon } : null
+        !isNaN(latParam) && !isNaN(lonParam)
+            ? { lat: latParam, lon: lonParam }
+            : initialCity
+                ? { lat: initialCity.lat, lon: initialCity.lon }
+                : null
     )
 
     // Update URL when state changes
@@ -39,12 +46,15 @@ export function useMapUrlState() {
         }
     }, [selectedDay, router, pathname, searchParams])
 
-    const handleSearch = useCallback((city: typeof MARTINIQUE_CITIES[0]) => {
-        setCenterOn({ lat: city.lat, lon: city.lon })
+    const handleSearch = useCallback((location: { name: string; lat: number; lon: number }) => {
+        setCenterOn({ lat: location.lat, lon: location.lon })
 
         // Update URL immediately for better UX
         const params = new URLSearchParams(searchParams.toString())
-        params.set("ville", city.name)
+        params.set("ville", location.name)
+        params.set("lat", location.lat.toString())
+        params.set("lon", location.lon.toString())
+
         if (selectedDay !== 0) params.set("jour", selectedDay.toString())
 
         router.replace(`${pathname}?${params.toString()}`, { scroll: false })

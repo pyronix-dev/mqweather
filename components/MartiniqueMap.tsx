@@ -41,7 +41,7 @@ export function MartiniqueMap({ markers, centerOn }: MartiniqueMapProps) {
 
     // Handle centerOn changes
     useEffect(() => {
-        if (map.current && centerOn) {
+        if (map.current && centerOn && !isNaN(centerOn.lat) && !isNaN(centerOn.lon)) {
             map.current.flyTo({
                 center: [centerOn.lon, centerOn.lat],
                 zoom: 12,

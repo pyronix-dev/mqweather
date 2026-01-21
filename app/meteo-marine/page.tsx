@@ -67,7 +67,9 @@ export default function MarinePage() {
     const searchParams = useSearchParams()
 
     // Default to a coastal city (Le Diamant) if none provided
-    const cityName = searchParams.get("city") || "Le Diamant"
+    const rawCityName = searchParams.get("city")
+    const isValidCity = rawCityName && MARTINIQUE_CITIES.some(c => c.name.toLowerCase() === rawCityName.toLowerCase())
+    const cityName = isValidCity ? rawCityName : "Le Diamant"
     const lat = searchParams.get("lat") || "14.478"
     const lon = searchParams.get("lon") || "-61.029"
     const dayIndex = 0 // Today
@@ -182,8 +184,8 @@ export default function MarinePage() {
                                 key={city}
                                 onClick={() => router.push(`/meteo-marine?city=${encodeURIComponent(city)}&lat=${cityData.lat}&lon=${cityData.lon}`)}
                                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${isActive
-                                        ? 'bg-cyan-600 text-white shadow-md shadow-cyan-200'
-                                        : 'bg-white text-slate-600 border border-slate-200 hover:border-cyan-300 hover:text-cyan-600'
+                                    ? 'bg-cyan-600 text-white shadow-md shadow-cyan-200'
+                                    : 'bg-white text-slate-600 border border-slate-200 hover:border-cyan-300 hover:text-cyan-600'
                                     }`}
                             >
                                 {city}
