@@ -1,6 +1,6 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Suspense, useEffect, useState } from "react"
 import Link from "next/link"
 import { Header } from "@/components/header"
@@ -24,6 +24,7 @@ const LoadingSpinner = () => (
 
 function SuccessContent() {
     const searchParams = useSearchParams()
+    const router = useRouter()
     const plan = searchParams.get("plan") || "subscription"
     const sessionId = searchParams.get("session_id")
 
@@ -51,6 +52,7 @@ function SuccessContent() {
                     setReferenceCode(data.user.reference_code)
                     if (data.user.full_name) setUserName(data.user.full_name)
                     setStatus('success')
+                    router.refresh() // Refresh Server Components to update Header auth state
                 } else if (data.status === 'pending') {
                     // Payment not confirmed yet
                     setStatus('verifying') // Keep verifying or show pending message
