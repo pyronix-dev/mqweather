@@ -64,8 +64,8 @@ export function Footer() {
                 <button
                   type="submit"
                   className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${subscribed
-                      ? "bg-slate-600 text-white"
-                      : "bg-slate-800 text-white hover:bg-slate-700 hover:shadow-md"
+                    ? "bg-slate-600 text-white"
+                    : "bg-slate-800 text-white hover:bg-slate-700 hover:shadow-md"
                     }`}
                 >
                   {subscribed ? (

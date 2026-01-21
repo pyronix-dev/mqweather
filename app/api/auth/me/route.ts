@@ -73,9 +73,14 @@ export async function GET() {
             }
         }
 
+        // Extract first name
+        const firstName = user.full_name ? user.full_name.split(' ')[0] : ''
+
         return NextResponse.json({
-            reference: user.reference_code,
+            name: user.full_name, // Keep for backward compatibility if needed, or just use full_name
+            first_name: firstName,
             full_name: user.full_name,
+            reference: user.reference_code,
             email: user.email,
             phone: user.phone,
             subscription: subscriptionData

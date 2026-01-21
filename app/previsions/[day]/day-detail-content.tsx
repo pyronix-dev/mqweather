@@ -6,6 +6,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { getDayIndexFromSlug } from "@/lib/utils"
+import { useWeather } from "@/hooks/useWeather"
 
 const BackIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,58 +209,11 @@ export default function DayDetailContent() {
   const dayParam = Array.isArray(params.day) ? params.day[0] : params.day
   const dayIndex = getDayIndexFromSlug(dayParam || "today")
 
-  const [weather, setWeather] = useState<any>(null)
-  const [hourlyData, setHourlyData] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
   const cityName = searchParams.get("city") || "Fort-de-France"
   const lat = searchParams.get("lat") || "14.6161"
   const lon = searchParams.get("lon") || "-61.059"
 
-  useEffect(() => {
-    const fetchWeather = async () => {
-      setLoading(true)
-      try {
-        const response = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,pressure_msl,visibility&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,sunrise,sunset,wind_speed_10m_max,uv_index_max&timezone=America/Martinique`,
-        )
-        const data = await response.json()
-
-        if (data.daily && dayIndex < data.daily.time.length) {
-          const dayData = {
-            date: data.daily.time[dayIndex],
-            maxTemp: data.daily.temperature_2m_max[dayIndex],
-            minTemp: data.daily.temperature_2m_min[dayIndex],
-            precipitation: data.daily.precipitation_probability_max[dayIndex],
-            precipSum: data.daily.precipitation_sum[dayIndex],
-            sunrise: data.daily.sunrise[dayIndex],
-            sunset: data.daily.sunset[dayIndex],
-            windMax: data.daily.wind_speed_10m_max[dayIndex],
-            uvIndex: data.daily.uv_index_max[dayIndex],
-          }
-          setWeather(dayData)
-        }
-
-        // Get hourly data for this specific day
-        if (data.hourly) {
-          const startIndex = dayIndex * 24
-          const dayHourlyData = data.hourly.time.slice(startIndex, startIndex + 24).map((time: string, i: number) => ({
-            time: new Date(time).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
-            temp: data.hourly.temperature_2m[startIndex + i],
-            humidity: data.hourly.relative_humidity_2m[startIndex + i],
-            precipitation: data.hourly.precipitation_probability[startIndex + i] || 0,
-            wind: data.hourly.wind_speed_10m[startIndex + i],
-          }))
-          setHourlyData(dayHourlyData)
-        }
-      } catch (error) {
-        console.log("[v0] Weather fetch error:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchWeather()
-  }, [lat, lon, dayIndex])
+  const { weather, hourlyData, loading } = useWeather(lat, lon, dayIndex)
 
   const handleBack = () => {
     router.push(`/previsions?city=${encodeURIComponent(cityName)}&lat=${lat}&lon=${lon}`)
@@ -417,8 +371,14 @@ export default function DayDetailContent() {
             </div>
 
             {/* Hourly Temperature Chart */}
-            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 mb-6">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">Température horaire</h3>
+            <div
+              onClick={() => router.push(`/previsions/${dayParam}/temperature?city=${encodeURIComponent(cityName)}&lat=${lat}&lon=${lon}`)}
+              className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 mb-6 cursor-pointer hover:border-orange-300 hover:shadow-md transition-all group"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-slate-800 group-hover:text-orange-500 transition-colors">Température horaire</h3>
+                <span className="text-sm text-slate-400 group-hover:text-orange-500">Voir détails →</span>
+              </div>
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={hourlyData} margin={{ top: 10, right: 0, left: -30, bottom: 0 }}>
                   <defs>
@@ -449,8 +409,14 @@ export default function DayDetailContent() {
 
             {/* Hourly Precipitation & Wind Chart */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200">
-                <h3 className="text-lg font-bold text-slate-800 mb-4">Probabilité de pluie</h3>
+              <div
+                onClick={() => router.push(`/previsions/${dayParam}/pluie?city=${encodeURIComponent(cityName)}&lat=${lat}&lon=${lon}`)}
+                className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 cursor-pointer hover:border-blue-300 hover:shadow-md transition-all group"
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-500 transition-colors">Probabilité de pluie</h3>
+                  <span className="text-sm text-slate-400 group-hover:text-blue-500">Voir détails →</span>
+                </div>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={hourlyData} margin={{ top: 10, right: 0, left: -30, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -465,10 +431,16 @@ export default function DayDetailContent() {
                 </ResponsiveContainer>
               </div>
 
-              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200">
-                <h3 className="text-lg font-bold text-slate-800 mb-4">Vitesse du vent</h3>
+              <div
+                onClick={() => router.push(`/previsions/${dayParam}/vent?city=${encodeURIComponent(cityName)}&lat=${lat}&lon=${lon}`)}
+                className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 cursor-pointer hover:border-teal-300 hover:shadow-md transition-all group"
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-slate-800 group-hover:text-teal-500 transition-colors">Vitesse du vent</h3>
+                  <span className="text-sm text-slate-400 group-hover:text-teal-500">Voir détails →</span>
+                </div>
                 <ResponsiveContainer width="100%" height={200}>
-                  <AreaChart data={hourlyData} margin={{ top: 10, right: 0, left: -30, bottom: 0 }}>
+                  <AreaChart data={hourlyData} margin={{ top: 10, right: 0, left: -10, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorWind" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
@@ -492,6 +464,27 @@ export default function DayDetailContent() {
                     />
                   </AreaChart>
                 </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Plage / Marine Link */}
+            <div
+              onClick={() => router.push(`/previsions/${dayParam}/plage?city=${encodeURIComponent(cityName)}&lat=${lat}&lon=${lon}`)}
+              className="mt-6 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl p-6 text-white cursor-pointer hover:shadow-lg transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center gap-4">
+                <div className="bg-white/20 p-3 rounded-full">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Conditions Plage & Marine</h3>
+                  <p className="text-cyan-100">Voir la houle, les vagues et la température de l'eau</p>
+                </div>
+              </div>
+              <div className="bg-white/20 px-4 py-2 rounded-lg font-medium">
+                Voir →
               </div>
             </div>
           </>

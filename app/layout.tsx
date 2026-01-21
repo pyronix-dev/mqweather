@@ -19,6 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
+      <head>
+        <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+      </head>
       <body className={`font-sans antialiased`} suppressHydrationWarning>
         {children}
       </body>

@@ -70,42 +70,7 @@ const CrosshairIcon = () => (
   </svg>
 )
 
-const MARTINIQUE_CITIES = [
-  { name: "Fort-de-France", lat: 14.6161, lon: -61.059 },
-  { name: "Le Lamentin", lat: 14.59, lon: -61.0 },
-  { name: "Saint-Joseph", lat: 14.67, lon: -61.04 },
-  { name: "Schœlcher", lat: 14.61, lon: -61.09 },
-  { name: "L'Ajoupa-Bouillon", lat: 14.82, lon: -61.11 },
-  { name: "Basse-Pointe", lat: 14.87, lon: -61.11 },
-  { name: "Grand'Rivière", lat: 14.88, lon: -61.18 },
-  { name: "Gros-Morne", lat: 14.73, lon: -61.03 },
-  { name: "Le Lorrain", lat: 14.83, lon: -61.06 },
-  { name: "Macouba", lat: 14.88, lon: -61.13 },
-  { name: "Le Marigot", lat: 14.78, lon: -61.01 },
-  { name: "Le Robert", lat: 14.68, lon: -60.94 },
-  { name: "Sainte-Marie", lat: 14.78, lon: -61.01 },
-  { name: "La Trinité", lat: 14.74, lon: -60.97 },
-  { name: "Bellefontaine", lat: 14.67, lon: -61.15 },
-  { name: "Le Carbet", lat: 14.71, lon: -61.18 },
-  { name: "Case-Pilote", lat: 14.64, lon: -61.13 },
-  { name: "Fonds-Saint-Denis", lat: 14.73, lon: -61.1 },
-  { name: "Le Morne-Rouge", lat: 14.77, lon: -61.11 },
-  { name: "Le Morne-Vert", lat: 14.72, lon: -61.13 },
-  { name: "Le Prêcheur", lat: 14.8, lon: -61.22 },
-  { name: "Saint-Pierre", lat: 14.74, lon: -61.18 },
-  { name: "Les Anses-d'Arlet", lat: 14.49, lon: -61.08 },
-  { name: "Le Diamant", lat: 14.47, lon: -61.03 },
-  { name: "Ducos", lat: 14.55, lon: -60.97 },
-  { name: "Le François", lat: 14.62, lon: -60.9 },
-  { name: "Le Marin", lat: 14.47, lon: -60.87 },
-  { name: "Rivière-Pilote", lat: 14.48, lon: -60.9 },
-  { name: "Rivière-Salée", lat: 14.53, lon: -60.99 },
-  { name: "Saint-Esprit", lat: 14.55, lon: -60.93 },
-  { name: "Sainte-Anne", lat: 14.43, lon: -60.88 },
-  { name: "Sainte-Luce", lat: 14.47, lon: -60.93 },
-  { name: "Les Trois-Îlets", lat: 14.54, lon: -61.04 },
-  { name: "Le Vauclin", lat: 14.55, lon: -60.83 },
-]
+import { MARTINIQUE_CITIES } from "@/lib/constants"
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -114,6 +79,7 @@ export function Header() {
   const [locating, setLocating] = useState(false)
   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [mapsMenuOpen, setMapsMenuOpen] = useState(false)
 
   const searchRef = useRef<HTMLDivElement>(null)
   const mobileSearchRef = useRef<HTMLDivElement>(null)
@@ -137,7 +103,8 @@ export function Header() {
           // We can patch /api/auth/me later or now. 
           // If we recently updated DB, we should update /api/auth/me too.
           // For now, let's use a safe fallback.
-          const name = data.name || data.reference
+          // Construct display name: First Name -> Full Name -> Reference
+          const name = data.first_name || data.full_name || data.reference
           setUser({ name: name, email: data.email || '' })
         }
       } catch (e) {
@@ -279,16 +246,73 @@ export function Header() {
               )}
             </Link>
             <Link
-              href="/carte"
-              className={`font-bold transition whitespace-nowrap animate-slide-in-left relative ${pathname === "/carte" || pathname === "/" ? "text-slate-800" : "text-slate-600 hover:text-slate-800"
+              href="/meteo-marine"
+              className={`font-bold transition whitespace-nowrap animate-slide-in-left relative ${pathname === "/meteo-marine" ? "text-slate-800" : "text-slate-600 hover:text-slate-800"
                 }`}
-              style={{ animationDelay: "0.4s" }}
+              style={{ animationDelay: "0.35s" }}
             >
-              Carte
-              {(pathname === "/carte" || pathname === "/") && (
+              Météo des Plages
+              {pathname === "/meteo-marine" && (
                 <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-slate-800 rounded-full" />
               )}
             </Link>
+            {/* Maps Dropdown */}
+            <div
+              className="relative group"
+              onMouseEnter={() => setMapsMenuOpen(true)}
+              onMouseLeave={() => setMapsMenuOpen(false)}
+            >
+              <button
+                className={`font-bold transition whitespace-nowrap animate-slide-in-left relative flex items-center gap-1 ${pathname === "/carte" || pathname === "/" || pathname.startsWith("/cartes/")
+                  ? "text-slate-800"
+                  : "text-slate-600 hover:text-slate-800"
+                  }`}
+                style={{ animationDelay: "0.4s" }}
+              >
+                Cartes
+                <svg className={`w-4 h-4 transition-transform duration-200 ${mapsMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                {(pathname === "/carte" || pathname === "/" || pathname.startsWith("/cartes/")) && (
+                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-slate-800 rounded-full" />
+                )}
+              </button>
+
+              {mapsMenuOpen && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 z-50 animate-fade-in-up">
+                  <div className="bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden">
+                    <div className="py-2">
+                      <Link
+                        href="/carte"
+                        onClick={() => setMapsMenuOpen(false)}
+                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/carte" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
+                      >
+                        Observations
+                      </Link>
+                      <Link
+                        href="/cartes/temperature"
+                        onClick={() => setMapsMenuOpen(false)}
+                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/temperature" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
+                      >
+                        Températures
+                      </Link>
+                      <Link
+                        href="/cartes/vent"
+                        onClick={() => setMapsMenuOpen(false)}
+                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/vent" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
+                      >
+                        Vent
+                      </Link>
+                      <Link
+                        href="/cartes/pluie"
+                        onClick={() => setMapsMenuOpen(false)}
+                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/pluie" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
+                      >
+                        Pluie
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Right Section */}
@@ -478,12 +502,33 @@ export function Header() {
             >
               Vigilance
             </Link>
-            <Link
-              href="/carte"
-              className={`font-bold hover:text-slate-600 transition block ${pathname === "/carte" || pathname === "/" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
-            >
-              Carte
-            </Link>
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide px-2 mb-2">Cartes</p>
+              <Link
+                href="/carte"
+                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/carte" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+              >
+                Observations
+              </Link>
+              <Link
+                href="/cartes/temperature"
+                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/temperature" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+              >
+                Températures
+              </Link>
+              <Link
+                href="/cartes/vent"
+                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/vent" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+              >
+                Vent
+              </Link>
+              <Link
+                href="/cartes/pluie"
+                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/pluie" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+              >
+                Pluie
+              </Link>
+            </div>
             <div className="pt-3 border-t border-slate-200 space-y-3">
               <div className="relative" ref={mobileSearchRef}>
                 <div className="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
