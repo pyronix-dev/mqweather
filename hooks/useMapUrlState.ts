@@ -20,6 +20,7 @@ export function useMapUrlState() {
         : null
 
     const [selectedDay, setSelectedDay] = useState(isNaN(initialDay) ? 0 : initialDay)
+    const [selectedCity, setSelectedCity] = useState<string | null>(initialCity?.name || null)
     const [centerOn, setCenterOn] = useState<{ lat: number; lon: number } | null>(
         !isNaN(latParam) && !isNaN(lonParam)
             ? { lat: latParam, lon: lonParam }
@@ -48,6 +49,7 @@ export function useMapUrlState() {
 
     const handleSearch = useCallback((location: { name: string; lat: number; lon: number }) => {
         setCenterOn({ lat: location.lat, lon: location.lon })
+        setSelectedCity(location.name)
 
         // Update URL immediately for better UX
         const params = new URLSearchParams(searchParams.toString())
@@ -64,10 +66,24 @@ export function useMapUrlState() {
         setSelectedDay(dayIndex)
     }, [])
 
+    const resetView = useCallback(() => {
+        setSelectedCity(null)
+        setCenterOn(null)
+
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete("ville")
+        params.delete("lat")
+        params.delete("lon")
+
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    }, [router, pathname, searchParams])
+
     return {
         selectedDay,
+        selectedCity,
         centerOn,
         handleSearch,
-        handleDaySelect
+        handleDaySelect,
+        resetView
     }
 }

@@ -8,22 +8,12 @@ import { MapControls } from "@/components/MapControls"
 import { MARTINIQUE_CITIES } from "@/lib/constants"
 import { useMapUrlState } from "@/hooks/useMapUrlState"
 
-interface UVData {
-    latitude: number
-    longitude: number
-    daily: {
-        time: string[]
-        uv_index_max: number[]
-    }
-}
-
-// UV Color Scale Helper
 const getUVColor = (uv: number) => {
-    if (uv >= 11) return "bg-purple-600 text-white" // Extreme
-    if (uv >= 8) return "bg-red-500 text-white"     // Very High
-    if (uv >= 6) return "bg-orange-500 text-white"  // High
-    if (uv >= 3) return "bg-yellow-400 text-slate-900" // Moderate
-    return "bg-emerald-500 text-white"              // Low
+    if (uv >= 11) return "bg-gradient-to-br from-violet-600 to-purple-700 text-white shadow-violet-500/40"
+    if (uv >= 8) return "bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-rose-500/40"
+    if (uv >= 6) return "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-amber-500/40"
+    if (uv >= 3) return "bg-gradient-to-br from-lime-400 to-green-500 text-white shadow-lime-500/40"
+    return "bg-gradient-to-br from-sky-400 to-cyan-500 text-white shadow-sky-500/40"
 }
 
 const getUVLabel = (uv: number) => {
@@ -36,44 +26,35 @@ const getUVLabel = (uv: number) => {
 
 export default function UVMapPage() {
     const { selectedDay, centerOn, handleSearch, handleDaySelect } = useMapUrlState()
-    const [uvData, setUvData] = useState<Record<string, UVData>>({})
+    const [allData, setAllData] = useState<any[]>([])
     const [markers, setMarkers] = useState<MapMarker[]>([])
     const [loading, setLoading] = useState(true)
 
-    // Fetch UV data for all cities
     useEffect(() => {
-        const fetchAllData = async () => {
+        async function fetchData() {
             setLoading(true)
-            const data: Record<string, UVData> = {}
-
-            // Build bulk request or parallelize
-            // Open-Meteo allows multiple points but let's stick to parallel fetch for simplicity with this small list
-            await Promise.all(MARTINIQUE_CITIES.map(async (city) => {
-                try {
-                    const res = await fetch(
-                        `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=uv_index_max&timezone=America/Martinique`
-                    )
-                    const json = await res.json()
-                    data[city.name] = json
-                } catch (error) {
-                    console.error(`Failed to fetch UV for ${city.name}`, error)
-                }
-            }))
-
-            setUvData(data)
-            setLoading(false)
+            try {
+                const lats = MARTINIQUE_CITIES.map(c => c.lat).join(",")
+                const lons = MARTINIQUE_CITIES.map(c => c.lon).join(",")
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&daily=uv_index_max&timezone=America/Martinique`)
+                const data = await res.json()
+                const results = Array.isArray(data) ? data : [data]
+                setAllData(results)
+            } catch (e) {
+                console.error("Error fetching UV data", e)
+            } finally {
+                setLoading(false)
+            }
         }
-
-        fetchAllData()
+        fetchData()
     }, [])
 
-    // Update markers when day changes or data loads
     useEffect(() => {
-        if (loading) return
+        if (!allData.length) return
 
-        const newMarkers: MapMarker[] = MARTINIQUE_CITIES.map((city) => {
-            const cityData = uvData[city.name]
-            if (!cityData) return null
+        const newMarkers: MapMarker[] = MARTINIQUE_CITIES.map((city, index) => {
+            const cityData = allData[index]
+            if (!cityData || !cityData.daily) return null
 
             const uvIndex = Math.round(cityData.daily.uv_index_max[selectedDay] || 0)
             const colorClass = getUVColor(uvIndex)
@@ -85,21 +66,22 @@ export default function UVMapPage() {
                 component: (
                     <div
                         onClick={() => handleSearch(city)}
-                        className="group relative cursor-pointer transform hover:scale-110 transition-transform"
+                        className="group relative cursor-pointer transition-all duration-300 hover:scale-110 hover:z-[100] animate-fade-in-up"
                     >
-                        {/* Marker Circle */}
-                        <div className={`w-10 h-10 rounded-full shadow-lg flex items-center justify-center border-2 border-white ${colorClass}`}>
-                            <span className="font-bold text-sm">{uvIndex}</span>
+                        {/* Tooltip - positioned ABOVE the marker */}
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-white/95 backdrop-blur-md text-slate-800 rounded-xl shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap z-[200] pointer-events-none transform group-hover:translate-y-0 -translate-y-1">
+                            <div className="font-black text-sm mb-1">{city.name}</div>
+                            <div className="flex items-center gap-2 text-xs">
+                                <span className="text-slate-500">Indice UV:</span>
+                                <span className="font-black">{uvIndex}</span>
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getUVColor(uvIndex)}`}>
+                                    {getUVLabel(uvIndex)}
+                                </span>
+                            </div>
                         </div>
 
-                        {/* Tooltip */}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-slate-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
-                            <div className="font-bold mb-0.5">{city.name}</div>
-                            <div className="flex items-center gap-1">
-                                <span className="opacity-80">Indice UV:</span>
-                                <span className="font-bold">{uvIndex}</span>
-                            </div>
-                            <div className="text-slate-300 mt-1">{getUVLabel(uvIndex)}</div>
+                        <div className={`w-9 h-9 rounded-full shadow-lg flex items-center justify-center border-2 border-white/70 ${colorClass} transition-all duration-300 hover:shadow-xl`}>
+                            <span className="font-black text-sm">{uvIndex}</span>
                         </div>
                     </div>
                 )
@@ -107,68 +89,66 @@ export default function UVMapPage() {
         }).filter(Boolean) as MapMarker[]
 
         setMarkers(newMarkers)
-    }, [selectedDay, uvData, loading, handleSearch])
+    }, [selectedDay, allData, handleSearch])
 
     return (
-        <div className="min-h-screen bg-stone-100 flex flex-col">
+        <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 flex flex-col">
             <Header />
-
-            <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex flex-col gap-6 h-[calc(100vh-12rem)] min-h-[600px]">
-                    {/* Header & Controls */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <h1 className="text-3xl font-black text-slate-800 flex items-center gap-3">
-                                <span className="p-2 bg-amber-100 rounded-xl text-amber-600">
-                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 7a5 5 0 110 10 5 5 0 010-10z" />
-                                    </svg>
-                                </span>
-                                Carte UV
-                            </h1>
-                            <p className="text-slate-500 font-medium mt-1">Indice UV maximum prévu</p>
+            <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
+                {/* Hero Header */}
+                <div className="mb-8 animate-fade-in-up">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl shadow-lg shadow-amber-500/20">
+                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight">
+                                    Carte UV
+                                </h1>
+                                <p className="text-slate-500 font-medium mt-1">Indice UV maximum prévu</p>
+                            </div>
                         </div>
-
-                        <MapControls
-                            onDaySelect={handleDaySelect}
-                            selectedDay={selectedDay}
-                            selectedCity={null}
-                            onCitySelect={() => { }}
-                        />
                     </div>
+                </div>
 
-                    {/* Map Container */}
-                    <div className="group relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100">
-                        <MartiniqueMap
-                            markers={markers}
-                            centerOn={centerOn}
-                        />
+                <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                    <MapControls
+                        onDaySelect={handleDaySelect}
+                        selectedDay={selectedDay}
+                        selectedCity={null}
+                        onCitySelect={() => { }}
+                    />
+                </div>
 
-                        {/* Legend */}
-                        <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur p-4 rounded-2xl border border-slate-200 shadow-lg max-w-[160px] md:max-w-xs z-10 text-xs md:text-sm">
-                            <div className="font-bold text-slate-800 mb-2">Indices UV</div>
-                            <div className="space-y-1.5">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-emerald-500 border border-white shadow-sm flex items-center justify-center text-[10px] font-bold text-white">1-2</div>
-                                    <span className="text-slate-600">Faible</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-yellow-400 border border-white shadow-sm flex items-center justify-center text-[10px] font-bold text-slate-900">3-5</div>
-                                    <span className="text-slate-600">Modéré</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-orange-500 border border-white shadow-sm flex items-center justify-center text-[10px] font-bold text-white">6-7</div>
-                                    <span className="text-slate-600">Élevé</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-red-500 border border-white shadow-sm flex items-center justify-center text-[10px] font-bold text-white">8-10</div>
-                                    <span className="text-slate-600">Très Élevé</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-purple-600 border border-white shadow-sm flex items-center justify-center text-[10px] font-bold text-white">11+</div>
-                                    <span className="text-slate-600">Extrême</span>
-                                </div>
+                <div className="h-[650px] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50 relative mt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                    <MartiniqueMap markers={markers} centerOn={centerOn} />
+
+                    {/* Legend */}
+                    <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
+                        <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Indices UV</div>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-3">
+                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">1-2</div>
+                                <span className="text-xs text-slate-600 font-medium">Faible</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-lime-400 to-green-500 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">3-5</div>
+                                <span className="text-xs text-slate-600 font-medium">Modéré</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">6-7</div>
+                                <span className="text-xs text-slate-600 font-medium">Élevé</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-rose-500 to-red-600 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">8-10</div>
+                                <span className="text-xs text-slate-600 font-medium">Très Élevé</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-600 to-purple-700 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">11+</div>
+                                <span className="text-xs text-slate-600 font-medium">Extrême</span>
                             </div>
                         </div>
                     </div>

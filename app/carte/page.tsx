@@ -461,9 +461,9 @@ export default function CartePage() {
             style={
               isDesktop
                 ? {
-                    flexBasis: `40%`,
-                    maxWidth: `40%`,
-                  }
+                  flexBasis: `40%`,
+                  maxWidth: `40%`,
+                }
                 : {}
             }
           >
@@ -519,11 +519,10 @@ export default function CartePage() {
                             <button
                               key={type.id}
                               onClick={() => setSelectedWeather(type.id)}
-                              className={`p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-1.5 hover:scale-105 ${
-                                selectedWeather === type.id
-                                  ? "border-amber-500 bg-amber-50"
-                                  : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                              }`}
+                              className={`p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-1.5 hover:scale-105 ${selectedWeather === type.id
+                                ? "border-amber-500 bg-amber-50"
+                                : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                                }`}
                             >
                               <IconComponent />
                               <span className="text-xs font-medium text-slate-700">{type.label}</span>

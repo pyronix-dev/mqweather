@@ -8,6 +8,7 @@ import { Footer } from "@/components/footer"
 import maplibregl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
 import { getSlugFromIndex } from "@/lib/utils"
+import { MARTINIQUE_CITIES } from "@/lib/constants"
 
 const SearchIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,46 +203,7 @@ const CloudRainIcon = () => (
   </svg>
 )
 
-const CITY_SUGGESTIONS = [
-  // Arrondissement de Fort-de-France
-  { name: "Fort-de-France", lat: 14.6161, lon: -61.059 },
-  { name: "Le Lamentin", lat: 14.59, lon: -61.0 },
-  { name: "Saint-Joseph", lat: 14.67, lon: -61.04 },
-  { name: "Schœlcher", lat: 14.61, lon: -61.09 },
-  // Arrondissement de La Trinité
-  { name: "L'Ajoupa-Bouillon", lat: 14.82, lon: -61.11 },
-  { name: "Basse-Pointe", lat: 14.87, lon: -61.11 },
-  { name: "Grand'Rivière", lat: 14.88, lon: -61.18 },
-  { name: "Gros-Morne", lat: 14.73, lon: -61.03 },
-  { name: "Le Lorrain", lat: 14.83, lon: -61.06 },
-  { name: "Macouba", lat: 14.88, lon: -61.13 },
-  { name: "Le Marigot", lat: 14.78, lon: -61.01 },
-  { name: "Le Robert", lat: 14.68, lon: -60.94 },
-  { name: "Sainte-Marie", lat: 14.78, lon: -61.01 },
-  { name: "La Trinité", lat: 14.74, lon: -60.97 },
-  // Arrondissement de Saint-Pierre
-  { name: "Bellefontaine", lat: 14.67, lon: -61.15 },
-  { name: "Le Carbet", lat: 14.71, lon: -61.18 },
-  { name: "Case-Pilote", lat: 14.64, lon: -61.13 },
-  { name: "Fonds-Saint-Denis", lat: 14.73, lon: -61.1 },
-  { name: "Le Morne-Rouge", lat: 14.77, lon: -61.11 },
-  { name: "Le Morne-Vert", lat: 14.72, lon: -61.13 },
-  { name: "Le Prêcheur", lat: 14.8, lon: -61.22 },
-  { name: "Saint-Pierre", lat: 14.74, lon: -61.18 },
-  // Arrondissement du Marin
-  { name: "Les Anses-d'Arlet", lat: 14.49, lon: -61.08 },
-  { name: "Le Diamant", lat: 14.47, lon: -61.03 },
-  { name: "Ducos", lat: 14.55, lon: -60.97 },
-  { name: "Le François", lat: 14.62, lon: -60.9 },
-  { name: "Le Marin", lat: 14.47, lon: -60.87 },
-  { name: "Rivière-Pilote", lat: 14.48, lon: -60.9 },
-  { name: "Rivière-Salée", lat: 14.53, lon: -60.99 },
-  { name: "Saint-Esprit", lat: 14.55, lon: -60.93 },
-  { name: "Sainte-Anne", lat: 14.43, lon: -60.88 },
-  { name: "Sainte-Luce", lat: 14.47, lon: -60.93 },
-  { name: "Les Trois-Îlets", lat: 14.54, lon: -61.04 },
-  { name: "Le Vauclin", lat: 14.55, lon: -60.83 },
-]
+// Replaced by MARTINIQUE_CITIES from lib/constants
 
 const getWeatherIcon = (precipitation: number) => {
   if (precipitation > 60) return <CloudRainIcon />
@@ -369,7 +331,7 @@ function PrevisionContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCity, setSelectedCity] = useState(CITY_SUGGESTIONS[0])
+  const [selectedCity, setSelectedCity] = useState(MARTINIQUE_CITIES[0])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [weather, setWeather] = useState<any>(null)
   const [dailyData, setDailyData] = useState<any[]>([])
@@ -399,7 +361,7 @@ function PrevisionContent() {
     const cityName = searchParams.get("city")
 
     // VALIDATION: Only accept cities from our known list
-    const validCity = cityName ? CITY_SUGGESTIONS.find(c => c.name.toLowerCase() === cityName.toLowerCase()) : null
+    const validCity = cityName ? MARTINIQUE_CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase()) : null
 
     if (validCity) {
       // Use the trusted coordinates from our list, ignore URL lat/lon to prevent spoofing
@@ -505,7 +467,7 @@ function PrevisionContent() {
     }
   }, [selectedCity.lat, selectedCity.lon, zoom]) // Use specific properties instead of object
 
-  const filteredSuggestions = CITY_SUGGESTIONS.filter((city) =>
+  const filteredSuggestions = MARTINIQUE_CITIES.filter((city) =>
     city.name.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
@@ -523,7 +485,7 @@ function PrevisionContent() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords
-          const nearest = CITY_SUGGESTIONS.reduce((prev, curr) => {
+          const nearest = MARTINIQUE_CITIES.reduce((prev, curr) => {
             const prevDist = Math.abs(prev.lat - latitude) + Math.abs(prev.lon - longitude)
             const currDist = Math.abs(curr.lat - latitude) + Math.abs(curr.lon - longitude)
             return currDist < prevDist ? curr : prev

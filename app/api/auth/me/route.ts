@@ -24,26 +24,38 @@ export async function GET() {
         const authSession = cookieStore.get('auth_session')?.value
 
         if (!authSession) {
+            console.log('❌ Auth/Me: No auth_session cookie found')
             return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
         }
 
-        const session = JSON.parse(authSession)
+        let session
+        try {
+            session = JSON.parse(authSession)
+        } catch (e) {
+            console.log('❌ Auth/Me: Failed to parse auth_session cookie')
+            return NextResponse.json({ error: 'Invalid session format' }, { status: 401 })
+        }
+
         const userId = session.userId
 
         if (!userId) {
+            console.log('❌ Auth/Me: No userId in session', session)
             return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
         }
+
+        console.log('✅ Auth/Me: Checking user', userId)
 
         const supabase = createSupabaseAdmin()
 
         // Fetch user data
         const { data: user, error: userError } = await supabase
             .from('users')
-            .select('id, reference_code, email, phone, full_name')
+            .select('id, reference_code, email, phone, full_name, notifications_enabled')
             .eq('id', userId)
             .single()
 
         if (!user || userError) {
+            console.log('❌ Auth/Me: User not found in DB', userError)
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
@@ -83,6 +95,7 @@ export async function GET() {
             reference: user.reference_code,
             email: user.email,
             phone: user.phone,
+            notifications_enabled: user.notifications_enabled,
             subscription: subscriptionData
         })
 

@@ -430,6 +430,11 @@ export function getVigilanceAlertEmailHtml(colorName: string): string {
             <a href="https://mqweather.vercel.app/vigilance" class="btn" style="display: inline-block; background-color: ${theme.color}; color: white; padding: 18px 40px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
                 Voir la carte vigilance
             </a>
+            
+            <!-- Unsubscribe Link -->
+            <p style="margin: 32px 0 0 0; font-size: 13px;">
+                <a href="https://mqweather.vercel.app/unsubscribe" style="color: #94a3b8; text-decoration: underline;">Se désinscrire de ces alertes</a>
+            </p>
         </div>
 
         <!-- Footer -->

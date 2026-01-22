@@ -203,7 +203,7 @@ export function Header() {
         <div className="hidden sm:flex items-center justify-between gap-4">
           {/* Logo Section */}
           <div className="flex-shrink-0 animate-fade-in-up">
-            <Link href="/carte">
+            <Link href="/">
               <img
                 src="https://raw.githubusercontent.com/pyronix-dev/upwork/main/logo-text.png"
                 alt="Météo Martinique"
@@ -214,13 +214,12 @@ export function Header() {
 
           {/* Navigation */}
           <nav className="flex items-center gap-4 lg:gap-6 flex-wrap justify-center flex-1">
-            <Link
-              href="#"
-              className="flex items-center gap-1 text-red-500 font-bold text-sm hover:text-red-600 transition whitespace-nowrap animate-slide-in-left"
+            <span
+              className="flex items-center gap-1 text-red-500 font-bold text-sm animate-slide-in-left"
               style={{ animationDelay: "0.1s" }}
             >
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> EN DIRECT
-            </Link>
+            </span>
             <Link
               href="/previsions"
               className={`font-bold transition whitespace-nowrap animate-slide-in-left relative ${pathname === "/previsions" || pathname.startsWith("/previsions/")
@@ -280,48 +279,24 @@ export function Header() {
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 z-50 animate-fade-in-up">
                   <div className="bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden">
                     <div className="py-2">
-                      <Link
-                        href="/carte"
-                        onClick={() => setMapsMenuOpen(false)}
-                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/carte" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
-                      >
-                        Observations
-                      </Link>
-                      <Link
-                        href="/cartes/temperature"
-                        onClick={() => setMapsMenuOpen(false)}
-                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/temperature" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
-                      >
-                        Températures
-                      </Link>
-                      <Link
-                        href="/cartes/vent"
-                        onClick={() => setMapsMenuOpen(false)}
-                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/vent" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
-                      >
-                        Vent
-                      </Link>
-                      <Link
-                        href="/cartes/pluie"
-                        onClick={() => setMapsMenuOpen(false)}
-                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/pluie" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
-                      >
-                        Pluie
-                      </Link>
-                      <Link
-                        href="/cartes/uv"
-                        onClick={() => setMapsMenuOpen(false)}
-                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/uv" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
-                      >
-                        Indice UV
-                      </Link>
-                      <Link
-                        href="/cartes/plages"
-                        onClick={() => setMapsMenuOpen(false)}
-                        className={`block px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors ${pathname === "/cartes/plages" ? "text-slate-900 bg-slate-50" : "text-slate-700"}`}
-                      >
-                        Plages
-                      </Link>
+                      {[
+                        { label: 'Observations', href: '/carte', icon: <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg> },
+                        { label: 'Températures', href: '/cartes/temperature', icon: <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 9a4 4 0 00-2 7.5M12 3v2M6.6 18.4l-1.4 1.4M20 4v10.54a4 4 0 11-4 0V4a2 2 0 014 0z" /><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M4 13H2" /></svg> },
+                        { label: 'Vent', href: '/cartes/vent', icon: <svg className="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2" /></svg> },
+                        { label: 'Pluie', href: '/cartes/pluie', icon: <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 19v2m4-2v2m4-2v2" /></svg> },
+                        { label: 'Indice UV', href: '/cartes/uv', icon: <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg> },
+                        { label: 'Plages', href: '/cartes/plages', icon: <svg className="w-6 h-6 text-blue-500" fill="currentColor" viewBox="-5.0 -10.0 110.0 120.0"><path d="m31.473 44.984c0 4.6523-3.7734 8.4258-8.4258 8.4258-4.6562 0-8.4297-3.7734-8.4297-8.4258 0-4.6562 3.7734-8.4258 8.4297-8.4258 4.6523 0 8.4258 3.7695 8.4258 8.4258z" /><path d="m23.047 56.145c-1.3086 0-2.3711 1.0625-2.3711 2.3711v4.6406c0 1.3086 1.0625 2.3711 2.3711 2.3711s2.3711-1.0625 2.3711-2.3711v-4.6406c0-1.3086-1.0625-2.3711-2.3711-2.3711z" /><path d="m11.801 52.879-3.2812 3.2812c-0.92578 0.92578-0.92578 2.4258 0 3.3555 0.46484 0.46484 1.0703 0.69531 1.6758 0.69531 0.60938 0 1.2148-0.23047 1.6758-0.69531l3.2812-3.2812c0.92578-0.92578 0.92578-2.4258 0-3.3555-0.92578-0.92578-2.4258-0.92969-3.3555 0z" /><path d="m11.887 44.984c0-1.3086-1.0625-2.3711-2.3711-2.3711h-4.6406c-1.3086 0-2.3711 1.0625-2.3711 2.3711 0 1.3125 1.0625 2.3711 2.3711 2.3711h4.6406c1.3086 0 2.3711-1.0625 2.3711-2.3711z" /><path d="m11.801 37.094c0.46484 0.46484 1.0703 0.69141 1.6758 0.69141 0.60938 0 1.2148-0.23047 1.6758-0.69531 0.92578-0.92578 0.92578-2.4258 0-3.3516l-3.2812-3.2812c-0.92578-0.92578-2.4258-0.92578-3.3555 0-0.92578 0.92578-0.92578 2.4258 0 3.3555l3.2812 3.2812z" /><path d="m23.047 33.824c1.3086 0 2.3711-1.0625 2.3711-2.3711v-4.6406c0-1.3086-1.0625-2.3711-2.3711-2.3711s-2.3711 1.0625-2.3711 2.3711v4.6406c0 1.3086 1.0625 2.3711 2.3711 2.3711z" /><path d="m32.613 37.785c0.60547 0 1.2148-0.23047 1.6758-0.69531l3.2812-3.2812c0.92578-0.92578 0.92578-2.4258 0-3.3555-0.92578-0.92578-2.4258-0.92578-3.3555 0l-3.2812 3.2812c-0.92578 0.92578-0.92578 2.4258 0 3.3555 0.46484 0.46484 1.0703 0.69531 1.6758 0.69531z" /><path d="m41.223 42.613h-4.6406c-1.3086 0-2.3711 1.0625-2.3711 2.3711 0 1.3125 1.0625 2.3711 2.3711 2.3711h4.6406c1.3086 0 2.3711-1.0625 2.3711-2.3711 0-1.3125-1.0625-2.3711-2.3711-2.3711z" /><path d="m34.293 52.875c-0.92578-0.92578-2.4258-0.92578-3.3555 0-0.92578 0.92578-0.92578 2.4258 0 3.3555l3.2812 3.2812c0.46484 0.46484 1.0703 0.69141 1.6758 0.69141 0.60938 0 1.2148-0.23047 1.6758-0.69531 0.92578-0.92578 0.92578-2.4258 0-3.3516l-3.2812-3.2812z" /><path d="m77.977 19.695 0.75781-2.8203c0.30859-1.1406-0.36719-2.3203-1.5117-2.6289-1.1445-0.30859-2.3203 0.37109-2.6289 1.5117l-0.76172 2.8203c-13.668-2.7031-27.191 4.0234-31.41 15.977-0.23047 0.65234 0.007813 1.3789 0.57422 1.7734 0.57031 0.39453 1.332 0.35156 1.8594-0.09375 2.2109-1.8789 5.1992-2.5547 7.9922-1.8008 3.1562 0.85156 5.5664 3.3672 6.2891 6.5664 0.25 1.1094 1.8438 1.5352 2.6172 0.70312 2.2305-2.4023 5.5781-3.3633 8.7383-2.5156 3.1562 0.85156 5.5664 3.3672 6.2891 6.5664 0.125 0.55469 0.54688 0.99219 1.0977 1.1406 0.54688 0.14844 1.1328-0.019531 1.5195-0.4375 2.2305-2.4023 5.5781-3.3672 8.7383-2.5156 2.793 0.75391 5.0391 2.8398 6.0078 5.5742 0.23047 0.65234 0.87109 1.0703 1.5625 1.0195 0.69141-0.054687 1.2578-0.5625 1.3906-1.2422 2.3633-12.453-5.9492-25.066-19.125-29.598z" /><path d="m64.09 72.359 7.0391-27.309c0.30469-1.1367-0.37109-2.3125-1.5078-2.6211-1.1367-0.30469-2.3125 0.37109-2.6172 1.5078l-7.1562 27.738c-3.7383-0.49219-7.6797-0.76172-11.758-0.76172-16.746 0-31.262 4.457-38.355 10.973-1.5273 1.4023-0.58203 3.9375 1.4922 3.9375h73.727c2.0742 0 3.0195-2.5352 1.4922-3.9375-4.6992-4.3125-12.66-7.7148-22.359-9.5273z" /></svg> }
+                      ].map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-cyan-600 transition-colors"
+                          onClick={() => setMapsMenuOpen(false)}
+                        >
+                          <div className="shrink-0">{item.icon}</div>
+                          <span className={`${pathname === item.href ? "text-slate-900 font-bold" : ""}`}>{item.label}</span>
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -475,7 +450,7 @@ export function Header() {
         {/* Mobile Header */}
         <div className="sm:hidden flex items-center justify-between gap-3">
           <div className="flex-shrink-0 animate-fade-in-up">
-            <Link href="/carte">
+            <Link href="/">
               <img
                 src="https://raw.githubusercontent.com/pyronix-dev/upwork/main/logo.png"
                 alt="Météo Martinique"
@@ -496,175 +471,176 @@ export function Header() {
         </div>
 
         {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <nav className="sm:hidden mt-4 space-y-3 animate-slide-in-left border-t border-slate-200 pt-4">
-            <Link
-              href="#"
-              className="flex items-center gap-1 text-red-500 font-bold text-sm hover:text-red-600 transition block"
-            >
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> EN DIRECT
-            </Link>
-            <Link
-              href="/previsions"
-              className={`font-bold hover:text-slate-600 transition block ${pathname === "/previsions" || pathname.startsWith("/previsions/") ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
-            >
-              Prévisions
-            </Link>
-            <Link
-              href="/vigilance"
-              className={`font-bold hover:text-slate-600 transition block ${pathname === "/vigilance" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
-            >
-              Vigilance
-            </Link>
-            <div className="space-y-1">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide px-2 mb-2">Cartes</p>
-              <Link
-                href="/carte"
-                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/carte" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+        {
+          mobileMenuOpen && (
+            <nav className="sm:hidden mt-4 space-y-3 animate-slide-in-left border-t border-slate-200 pt-4">
+              <span
+                className="flex items-center gap-1 text-red-500 font-bold text-sm"
               >
-                Observations
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> EN DIRECT
+              </span>
+              <Link
+                href="/previsions"
+                className={`font-bold hover:text-slate-600 transition block ${pathname === "/previsions" || pathname.startsWith("/previsions/") ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+              >
+                Prévisions
               </Link>
               <Link
-                href="/cartes/temperature"
-                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/temperature" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+                href="/vigilance"
+                className={`font-bold hover:text-slate-600 transition block ${pathname === "/vigilance" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
               >
-                Températures
+                Vigilance
               </Link>
-              <Link
-                href="/cartes/vent"
-                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/vent" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
-              >
-                Vent
-              </Link>
-              <Link
-                href="/cartes/pluie"
-                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/pluie" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
-              >
-                Pluie
-              </Link>
-              <Link
-                href="/cartes/uv"
-                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/uv" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
-              >
-                Indice UV
-              </Link>
-              <Link
-                href="/cartes/plages"
-                className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/plages" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
-              >
-                Plages
-              </Link>
-            </div>
-            <div className="pt-3 border-t border-slate-200 space-y-3">
-              <div className="relative" ref={mobileSearchRef}>
-                <div className="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
-                  <SearchIcon />
-                  <input
-                    type="text"
-                    placeholder="Chercher une ville..."
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value)
-                      setShowCitySuggestions(true)
-                    }}
-                    onFocus={() => setShowCitySuggestions(true)}
-                    className="bg-transparent text-sm outline-none text-slate-800 placeholder:text-slate-400 w-full"
-                  />
+              <div className="space-y-1">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide px-2 mb-2">Cartes</p>
+                <Link
+                  href="/carte"
+                  className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/carte" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+                >
+                  Observations
+                </Link>
+                <Link
+                  href="/cartes/temperature"
+                  className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/temperature" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+                >
+                  Températures
+                </Link>
+                <Link
+                  href="/cartes/vent"
+                  className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/vent" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+                >
+                  Vent
+                </Link>
+                <Link
+                  href="/cartes/pluie"
+                  className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/pluie" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+                >
+                  Pluie
+                </Link>
+                <Link
+                  href="/cartes/uv"
+                  className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/uv" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+                >
+                  Indice UV
+                </Link>
+                <Link
+                  href="/cartes/plages"
+                  className={`font-bold hover:text-slate-600 transition block px-2 ${pathname === "/cartes/plages" ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}
+                >
+                  Plages
+                </Link>
+              </div>
+              <div className="pt-3 border-t border-slate-200 space-y-3">
+                <div className="relative" ref={mobileSearchRef}>
+                  <div className="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
+                    <SearchIcon />
+                    <input
+                      type="text"
+                      placeholder="Chercher une ville..."
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value)
+                        setShowCitySuggestions(true)
+                      }}
+                      onFocus={() => setShowCitySuggestions(true)}
+                      className="bg-transparent text-sm outline-none text-slate-800 placeholder:text-slate-400 w-full"
+                    />
+                  </div>
+
+                  {showCitySuggestions && (
+                    <div className="absolute top-full mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-60 overflow-hidden">
+                      {/* Ma localisation button */}
+                      <button
+                        onClick={() => {
+                          handleGetLocation()
+                          setMobileMenuOpen(false)
+                        }}
+                        disabled={locating}
+                        className={`w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors text-sm text-blue-600 border-b border-slate-200 flex items-center gap-3 font-medium ${locating ? "opacity-50" : ""}`}
+                      >
+                        <CrosshairIcon />
+                        <span>{locating ? "Localisation en cours..." : "Ma localisation"}</span>
+                      </button>
+
+                      <div className="max-h-48 overflow-y-auto">
+                        {filteredCities.length > 0 ? (
+                          filteredCities.slice(0, 6).map((city) => (
+                            <button
+                              key={city.name}
+                              onClick={() => {
+                                handleCitySelect(city)
+                                setMobileMenuOpen(false)
+                              }}
+                              className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors text-sm text-slate-700 border-b border-slate-100 last:border-b-0 flex items-center gap-3"
+                            >
+                              <MapPinIcon />
+                              <span>{city.name}</span>
+                            </button>
+                          ))
+                        ) : searchQuery ? (
+                          <div className="px-4 py-3 text-sm text-slate-500 text-center">Aucune ville trouvée</div>
+                        ) : (
+                          MARTINIQUE_CITIES.slice(0, 6).map((city) => (
+                            <button
+                              key={city.name}
+                              onClick={() => {
+                                handleCitySelect(city)
+                                setMobileMenuOpen(false)
+                              }}
+                              className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors text-sm text-slate-700 border-b border-slate-100 last:border-b-0 flex items-center gap-3"
+                            >
+                              <MapPinIcon />
+                              <span>{city.name}</span>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {showCitySuggestions && (
-                  <div className="absolute top-full mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-60 overflow-hidden">
-                    {/* Ma localisation button */}
-                    <button
-                      onClick={() => {
-                        handleGetLocation()
-                        setMobileMenuOpen(false)
-                      }}
-                      disabled={locating}
-                      className={`w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors text-sm text-blue-600 border-b border-slate-200 flex items-center gap-3 font-medium ${locating ? "opacity-50" : ""}`}
-                    >
-                      <CrosshairIcon />
-                      <span>{locating ? "Localisation en cours..." : "Ma localisation"}</span>
-                    </button>
+                <Link
+                  href="/alertes"
+                  className="w-full flex items-center gap-2 justify-center bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-bold text-sm transition"
+                >
+                  <AlertIcon />
+                  Alertes
+                </Link>
 
-                    <div className="max-h-48 overflow-y-auto">
-                      {filteredCities.length > 0 ? (
-                        filteredCities.slice(0, 6).map((city) => (
-                          <button
-                            key={city.name}
-                            onClick={() => {
-                              handleCitySelect(city)
-                              setMobileMenuOpen(false)
-                            }}
-                            className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors text-sm text-slate-700 border-b border-slate-100 last:border-b-0 flex items-center gap-3"
-                          >
-                            <MapPinIcon />
-                            <span>{city.name}</span>
-                          </button>
-                        ))
-                      ) : searchQuery ? (
-                        <div className="px-4 py-3 text-sm text-slate-500 text-center">Aucune ville trouvée</div>
-                      ) : (
-                        MARTINIQUE_CITIES.slice(0, 6).map((city) => (
-                          <button
-                            key={city.name}
-                            onClick={() => {
-                              handleCitySelect(city)
-                              setMobileMenuOpen(false)
-                            }}
-                            className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors text-sm text-slate-700 border-b border-slate-100 last:border-b-0 flex items-center gap-3"
-                          >
-                            <MapPinIcon />
-                            <span>{city.name}</span>
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  </div>
+                {/* Mobile Espace Membre */}
+                {user ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="w-full flex items-center gap-3 justify-center px-4 py-2.5 rounded-xl bg-slate-800 text-white font-bold text-sm"
+                    >
+                      <div className="w-6 h-6 rounded-full bg-slate-600 border border-slate-500 flex items-center justify-center text-[10px]">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      Mon Tableau de bord
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 justify-center text-red-600 font-bold px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 transition"
+                    >
+                      Se déconnecter
+                    </button>
+                  </>
+
+                ) : (
+                  <Link
+                    href="/login"
+                    className="w-full flex items-center gap-2 justify-center text-slate-700 font-bold px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50"
+                  >
+                    <UserIcon />
+                    Espace Membre
+                  </Link>
                 )}
               </div>
-
-              <Link
-                href="/alertes"
-                className="w-full flex items-center gap-2 justify-center bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-bold text-sm transition"
-              >
-                <AlertIcon />
-                Alertes
-              </Link>
-
-              {/* Mobile Espace Membre */}
-              {user ? (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="w-full flex items-center gap-3 justify-center px-4 py-2.5 rounded-xl bg-slate-800 text-white font-bold text-sm"
-                  >
-                    <div className="w-6 h-6 rounded-full bg-slate-600 border border-slate-500 flex items-center justify-center text-[10px]">
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                    Mon Tableau de bord
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2 justify-center text-red-600 font-bold px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 transition"
-                  >
-                    Se déconnecter
-                  </button>
-                </>
-
-              ) : (
-                <Link
-                  href="/login"
-                  className="w-full flex items-center gap-2 justify-center text-slate-700 font-bold px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50"
-                >
-                  <UserIcon />
-                  Espace Membre
-                </Link>
-              )}
-            </div>
-          </nav>
-        )}
-      </div>
-    </header>
+            </nav>
+          )
+        }
+      </div >
+    </header >
   )
 }

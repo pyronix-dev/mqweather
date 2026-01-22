@@ -25,6 +25,7 @@ export interface User {
     email: string | null
     phone: string | null
     created_at: string
+    notifications_enabled?: boolean // Optional initially until DB migration is confirmed
 }
 
 export interface Subscription {

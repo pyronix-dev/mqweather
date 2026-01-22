@@ -464,12 +464,12 @@ function AlertesContent() {
     }
   }
 
-  // Email Subscription View
+  // Email Subscription View - Redesigned to match SMS flow
   if (showEmailSubscription) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
+      <div className="min-h-screen bg-stone-50">
         <Header />
-        <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           <button
             onClick={() => setShowEmailSubscription(false)}
             className="flex items-center gap-2 text-slate-600 hover:text-slate-800 font-medium mb-6 transition-colors group"
@@ -477,228 +477,210 @@ function AlertesContent() {
             <span className="group-hover:-translate-x-1 transition-transform">
               <ArrowLeftIcon />
             </span>
-            Retour aux alertes
+            Retour aux formules
           </button>
 
-          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl animate-fade-in-up">
-            <div className="relative bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 px-6 py-10 text-center text-white overflow-hidden">
-              <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full animate-pulse" />
-                <div
-                  className="absolute -bottom-10 -right-10 w-60 h-60 bg-white/10 rounded-full animate-pulse"
-                  style={{ animationDelay: "0.5s" }}
-                />
-              </div>
-              <div className="relative">
-                <div
-                  className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4 animate-bounce"
-                  style={{ animationDuration: "2s" }}
-                >
-                  <EmailIcon />
-                </div>
-                <h1 className="text-3xl sm:text-4xl font-black italic mb-2 tracking-tight">Alertes Email</h1>
-                <p className="text-white/90 font-medium mb-5 text-lg">Alertes météo détaillées dans votre boîte mail</p>
-                <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
-                  <span className="text-4xl font-black">
-                    10€<span className="text-lg font-medium opacity-90"> / an</span>
-                  </span>
-                  <span className="bg-white text-emerald-600 text-xs font-black px-3 py-1.5 rounded-full animate-pulse">
-                    ÉCONOMIQUE
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+            <div className="flex-1">
+              <div className="relative bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm animate-fade-in-up overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white">
+                    <EmailIcon />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-800">Alertes Email</h2>
+                  <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">
+                    10€/an
                   </span>
                 </div>
-              </div>
-            </div>
+                <p className="text-slate-500 font-medium mb-8 ml-14">
+                  Couverture{" "}
+                  <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Martinique entière</span>{" "}
+                  — tous les <span className="font-bold text-emerald-700">phénomènes</span> météo à risque sont traités
+                  automatiquement.
+                </p>
 
-            <div className="p-6 sm:p-8 space-y-6">
-
-              {/* Step Indicator for Email */}
-              <div className="flex items-center gap-4 mb-8">
-                <button
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${!phoneVerified ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-400 border border-slate-200"}`}
-                >
-                  {!phoneVerified ? (
-                    <span className="w-6 h-6 flex items-center justify-center bg-white/20 rounded-full">1</span>
-                  ) : <CheckIcon />}
-                  <span>Vérifier l'email</span>
-                </button>
-                <div className="flex-1 h-0.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full bg-slate-600 transition-all duration-500 ${phoneVerified ? "w-full" : "w-0"}`}
-                  />
+                {/* Steps Indicator */}
+                <div className="flex items-center gap-4 mb-10">
+                  <button
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${!phoneVerified ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600 border border-slate-300"}`}
+                  >
+                    {phoneVerified ? <CheckIcon /> : <span className="w-6 h-6 flex items-center justify-center bg-white/20 rounded-full">1</span>}
+                    <span>Vérifier l'email</span>
+                  </button>
+                  <div className="flex-1 h-0.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div className={`h-full bg-slate-600 transition-all duration-500 ${phoneVerified ? "w-full" : "w-0"}`} />
+                  </div>
+                  <button
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${phoneVerified ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-400 border border-slate-200"}`}
+                  >
+                    <span className="w-6 h-6 flex items-center justify-center bg-white/20 rounded-full">2</span>
+                    <span>Confirmer et payer</span>
+                  </button>
                 </div>
-                <button
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${phoneVerified ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-400 border border-slate-200"}`}
-                >
-                  <span className="w-6 h-6 flex items-center justify-center bg-white/20 rounded-full">2</span>
-                  <span>Payer</span>
-                </button>
-              </div>
 
-              <div>
-                <label className="block text-sm font-black text-slate-700 mb-2">Adresse email</label>
-                {user?.email ? (
-                  <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3">
+                {/* Form Fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                  <div className="space-y-3">
+                    <label className="block text-sm font-black text-slate-700 uppercase tracking-wide">
+                      Adresse email
+                    </label>
+                    {user?.email ? (
+                      <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3">
+                        <div className="p-2 bg-emerald-100 rounded-full text-emerald-600">
+                          <UserIcon />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-bold text-emerald-800 text-sm">Connecté</p>
+                          <p className="text-xs text-emerald-600">{user.email}</p>
+                        </div>
+                        <span className="bg-emerald-200 text-emerald-800 text-xs font-bold px-2 py-1 rounded">Vérifié</span>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <input
+                          type="email"
+                          placeholder="votre@email.fr"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          disabled={phoneVerified || codeSent}
+                          className="w-full px-5 py-4 border border-slate-200 rounded-xl bg-white text-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:bg-slate-100 disabled:text-slate-500"
+                        />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                          {phoneVerified ? <span className="text-emerald-500 font-bold">✓</span> : <EmailIcon />}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="block text-sm font-black text-slate-700 uppercase tracking-wide">Profil</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {PROFILES.map((profile) => {
+                        const Icon = profile.icon
+                        return (
+                          <button
+                            key={profile.id}
+                            onClick={() => setEmailProfile(profile.id)}
+                            className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all ${emailProfile === profile.id ? "border-emerald-500 bg-emerald-50 text-emerald-800" : "border-slate-200 text-slate-500 bg-white hover:border-slate-300"}`}
+                          >
+                            <Icon />
+                            <span className="text-xs font-bold">{profile.label}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Verification Code - Only show if not logged in */}
+                {!user?.email && !phoneVerified && (
+                  <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-200">
+                    <h3 className="text-sm font-black text-slate-700 mb-4 uppercase tracking-wide">
+                      Code de vérification
+                    </h3>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                        <input
+                          type="text"
+                          placeholder="• • • • • •"
+                          value={verificationCode}
+                          onChange={(e) => setVerificationCode(e.target.value)}
+                          maxLength={6}
+                          className="flex-1 px-5 py-4 border border-slate-200 rounded-xl bg-white text-center text-xl tracking-[0.5em] font-mono font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                        />
+                        {!codeSent ? (
+                          <button
+                            onClick={handleSendEmailCode}
+                            disabled={!email || isSendingCode}
+                            className="px-8 py-4 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-300 text-white font-black rounded-xl transition-all hover:shadow-lg active:scale-95"
+                          >
+                            {isSendingCode ? 'Envoi...' : 'Envoyer le code'}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={handleVerifyEmailCode}
+                            disabled={!verificationCode || isVerifyingCode}
+                            className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white font-black rounded-xl transition-all hover:shadow-lg active:scale-95"
+                          >
+                            {isVerifyingCode ? 'Vérif...' : 'Vérifier'}
+                          </button>
+                        )}
+                      </div>
+                      {codeSent && (
+                        <div className="text-center">
+                          <p className="text-xs text-slate-500 mb-2">Code non reçu ?</p>
+                          <button
+                            onClick={handleSendEmailCode}
+                            disabled={isSendingCode}
+                            className="text-sm font-bold text-slate-700 underline hover:text-slate-900 disabled:opacity-50"
+                          >
+                            {isSendingCode ? 'Envoi...' : 'Renvoyer un nouveau code'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {phoneVerified && !user?.email && (
+                  <div className="mb-8 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3">
                     <div className="p-2 bg-emerald-100 rounded-full text-emerald-600">
-                      <UserIcon />
+                      <CheckIcon />
                     </div>
                     <div>
-                      <p className="font-bold text-emerald-800">Connecté en tant que</p>
-                      <p className="text-sm text-emerald-600">{user.email}</p>
-                    </div>
-                    <div className="ml-auto">
-                      <span className="bg-emerald-200 text-emerald-800 text-xs font-bold px-2 py-1 rounded">Vérifié</span>
+                      <p className="font-bold text-emerald-800">Email vérifié avec succès !</p>
+                      <p className="text-sm text-emerald-600">Vous pouvez maintenant procéder au paiement.</p>
                     </div>
                   </div>
-                ) : (
-                  <>
-                    <div className="relative group mb-4">
-                      <input
-                        type="email"
-                        placeholder="votre@email.fr"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={phoneVerified || codeSent}
-                        className="w-full px-5 py-4 border-2 border-slate-200 rounded-xl bg-white text-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-emerald-100 focus:border-emerald-400 transition-all pr-14 disabled:bg-slate-100"
-                      />
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                        {phoneVerified ? <span className="text-emerald-500 font-bold">✓</span> : <EmailIcon />}
-                      </div>
-                    </div>
-
-                    {/* Verification Area */}
-                    {!phoneVerified && (
-                      <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-200">
-                        <h3 className="text-sm font-black text-slate-700 mb-4 uppercase tracking-wide">
-                          Code de vérification
-                        </h3>
-                        <div className="flex flex-col gap-4">
-                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                            <input
-                              type="text"
-                              placeholder="• • • • • •"
-                              value={verificationCode}
-                              onChange={(e) => setVerificationCode(e.target.value)}
-                              maxLength={6}
-                              className="flex-1 px-5 py-4 border border-slate-200 rounded-xl bg-white text-center text-xl tracking-[0.5em] font-mono font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:bg-slate-100"
-                            />
-                            {!codeSent ? (
-                              <button
-                                onClick={handleSendEmailCode}
-                                disabled={!email || isSendingCode}
-                                className="px-8 py-4 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-300 text-white font-black rounded-xl transition-all hover:shadow-lg active:scale-95 whitespace-nowrap"
-                              >
-                                {isSendingCode ? 'Envoi...' : 'Envoyer le code'}
-                              </button>
-                            ) : (
-                              <button
-                                onClick={handleVerifyEmailCode}
-                                disabled={!verificationCode || isVerifyingCode}
-                                className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white font-black rounded-xl transition-all hover:shadow-lg active:scale-95 whitespace-nowrap"
-                              >
-                                {isVerifyingCode ? 'Vérif...' : 'Vérifier'}
-                              </button>
-                            )}
-                          </div>
-                          {codeSent && (
-                            <div className="text-center">
-                              <p className="text-xs text-slate-500 mb-2">Code non reçu ?</p>
-                              <button
-                                onClick={handleSendEmailCode}
-                                disabled={isSendingCode}
-                                className="text-sm font-bold text-slate-700 underline hover:text-slate-900 disabled:opacity-50"
-                              >
-                                {isSendingCode ? 'Envoi...' : 'Renvoyer un nouveau code'}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {phoneVerified && (
-                      <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3">
-                        <div className="p-2 bg-emerald-100 rounded-full text-emerald-600">
-                          <CheckIcon />
-                        </div>
-                        <div>
-                          <p className="font-bold text-emerald-800">Email vérifié avec succès !</p>
-                          <p className="text-sm text-emerald-600">Vous pouvez maintenant procéder au paiement.</p>
-                        </div>
-                      </div>
-                    )}
-
-                  </>
                 )}
-              </div>
 
-              <div>
-                <label className="block text-sm font-black text-slate-700 mb-3">Choisissez votre profil</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {PROFILES.map((profile) => {
-                    const Icon = profile.icon
-                    return (
-                      <button
-                        key={profile.id}
-                        onClick={() => setEmailProfile(profile.id)}
-                        className={`flex flex-col items-center gap-3 p-5 rounded-xl border-2 transition-all duration-300 ${emailProfile === profile.id ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-800 shadow-md" : "border-slate-200 hover:border-slate-300 text-slate-500 bg-white"}`}
-                      >
-                        <div
-                          className={`p-2 rounded-lg ${emailProfile === profile.id ? "bg-emerald-100" : "bg-slate-100"}`}
-                        >
-                          <Icon />
-                        </div>
-                        <span className="text-sm font-bold">{profile.label}</span>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-
-              <div>
-                <label className="block text-sm font-black text-slate-700 mb-2">Paiement sécurisé</label>
-                <div className="border-2 border-slate-200 rounded-xl p-5 bg-gradient-to-br from-slate-50 to-white flex items-center gap-4">
-                  <div className="p-3 bg-slate-100 rounded-lg">
-                    <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-700">Paiement via Stripe</p>
-                    <p className="text-sm text-slate-500">Carte bancaire sécurisée</p>
+                {/* Payment section */}
+                <div className="mb-8">
+                  <h3 className="text-sm font-black text-slate-700 mb-4 uppercase tracking-wide">
+                    Paiement sécurisé
+                  </h3>
+                  <div className="border-2 border-slate-200 rounded-xl p-5 bg-gradient-to-br from-slate-50 to-white flex items-center gap-4">
+                    <div className="p-3 bg-slate-100 rounded-lg">
+                      <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-700">Paiement via Stripe</p>
+                      <p className="text-sm text-slate-500">Carte bancaire sécurisée</p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-5 border-2 border-emerald-100">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={acceptTerms}
-                    onChange={(e) => setAcceptTerms(e.target.checked)}
-                    className="w-6 h-6 mt-0.5 rounded-lg border-2 border-emerald-300 text-emerald-600"
-                  />
-                  <span className="text-sm text-emerald-700 font-medium leading-relaxed">
-                    J'accepte de recevoir des alertes météo par email. Je peux me désinscrire à tout moment via le lien
-                    dans chaque email.
-                  </span>
-                </label>
-              </div>
+                {/* Terms checkbox */}
+                <div className="bg-emerald-50 rounded-xl p-5 border border-emerald-100 mb-8">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={acceptTerms}
+                      onChange={(e) => setAcceptTerms(e.target.checked)}
+                      className="w-6 h-6 mt-0.5 rounded-lg border-2 border-emerald-300 text-emerald-600"
+                    />
+                    <span className="text-sm text-emerald-700 font-medium leading-relaxed">
+                      J'accepte de recevoir des alertes météo par email. Je peux me désinscrire à tout moment via le lien
+                      dans chaque email.
+                    </span>
+                  </label>
+                </div>
 
-              <button
-                disabled={!email || !acceptTerms || isLoading || (!phoneVerified && !user?.email)}
-                onClick={() => handleCheckout('email-annual')}
-                className="w-full py-5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:from-slate-300 disabled:to-slate-300 disabled:cursor-not-allowed text-white font-black text-lg rounded-xl transition-all duration-300 hover:shadow-xl active:scale-[0.98]"
-              >
-                {isLoading ? 'Chargement...' : "Payer 10€ et s'abonner pour 1 an"}
-              </button>
+                {/* Submit button */}
+                <button
+                  disabled={!email || !acceptTerms || isLoading || (!phoneVerified && !user?.email)}
+                  onClick={() => handleCheckout('email-annual')}
+                  className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:from-slate-300 disabled:to-slate-300 disabled:cursor-not-allowed text-white font-black text-lg rounded-xl transition-all duration-300 hover:shadow-xl active:scale-[0.98]"
+                >
+                  {isLoading ? 'Chargement...' : "Payer 10€ et s'abonner pour 1 an"}
+                </button>
+              </div>
             </div>
+
+
           </div>
         </main>
         <Footer />
@@ -1145,6 +1127,7 @@ function AlertesContent() {
                   <div className="space-y-2">
                     <label className="block text-sm font-black text-slate-700 uppercase tracking-wide">Numéro</label>
                     <input
+                      id="manage-phone"
                       type="tel"
                       placeholder="Ex : +596 696 12 34 56"
                       className="w-full px-5 py-4 border border-slate-200 rounded-xl bg-white text-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300"
@@ -1155,6 +1138,7 @@ function AlertesContent() {
                       Code / Référence
                     </label>
                     <input
+                      id="manage-ref"
                       type="text"
                       placeholder="Ex : MM-4F9A2"
                       className="w-full px-5 py-4 border border-slate-200 rounded-xl bg-white text-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300"
@@ -1162,11 +1146,37 @@ function AlertesContent() {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-4">
-                  <button className="flex items-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl font-black text-sm transition-all">
+                  <button className="flex items-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl font-black text-sm transition-all opacity-50 cursor-not-allowed" disabled title="Fonctionnalité en cours de développement">
                     <PhoneIcon />
                     Mettre à jour
                   </button>
-                  <button className="flex items-center gap-2 px-6 py-3 border border-red-200 text-red-600 hover:bg-red-50 rounded-xl font-black text-sm transition-all">
+                  <button
+                    onClick={async () => {
+                      const ref = (document.getElementById('manage-ref') as HTMLInputElement)?.value
+                      const phone = (document.getElementById('manage-phone') as HTMLInputElement)?.value
+                      if (!ref) { alert("Veuillez entrer une référence"); return; }
+
+                      if (confirm("Voulez-vous vraiment vous désinscrire ?")) {
+                        try {
+                          const res = await fetch('/api/subscription/unsubscribe', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ref, id: undefined }) // We use ref for public form
+                          })
+                          if (res.ok) {
+                            alert("Désabonnement confirmé.")
+                            window.location.reload()
+                          } else {
+                            const data = await res.json()
+                            alert(data.error || "Erreur")
+                          }
+                        } catch (e) {
+                          alert("Erreur de connexion")
+                        }
+                      }
+                    }}
+                    className="flex items-center gap-2 px-6 py-3 border border-red-200 text-red-600 hover:bg-red-50 rounded-xl font-black text-sm transition-all"
+                  >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -1190,22 +1200,31 @@ function AlertesContent() {
                 </div>
                 <div className="space-y-3">
                   {FAQ_DATA.map((faq, index) => (
-                    <div key={index} className="border border-slate-200 rounded-xl overflow-hidden">
+                    <div key={index} className="border border-slate-200 rounded-xl overflow-hidden bg-white">
                       <button
                         onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                        className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 transition-colors"
+                        className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 transition-colors group"
                       >
-                        <span className="font-bold text-slate-800">{faq.question}</span>
-                        <ChevronDownIcon />
+                        <span className="font-bold text-slate-800 group-hover:text-slate-900 transition-colors">{faq.question}</span>
+                        <div className={`transition-transform duration-300 ${openFaq === index ? "rotate-180" : ""}`}>
+                          <ChevronDownIcon />
+                        </div>
                       </button>
-                      {openFaq === index && (
-                        <div className="px-4 pb-4 text-sm text-slate-600 leading-relaxed">{faq.answer}</div>
-                      )}
+                      <div
+                        className={`grid transition-all duration-300 ease-in-out ${openFaq === index ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                      >
+                        <div className="overflow-hidden">
+                          <div className="px-4 pb-4 text-sm text-slate-600 leading-relaxed">
+                            {faq.answer}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
           </div>
         </div>
       </main>

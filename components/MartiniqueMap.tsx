@@ -14,9 +14,10 @@ export interface MapMarker {
 interface MartiniqueMapProps {
     markers: MapMarker[]
     centerOn?: { lat: number; lon: number } | null
+    onReset?: () => void
 }
 
-export function MartiniqueMap({ markers, centerOn }: MartiniqueMapProps) {
+export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps) {
     const mapContainer = useRef<HTMLDivElement>(null)
     const map = useRef<maplibregl.Map | null>(null)
     const [loaded, setLoaded] = useState(false)
@@ -134,6 +135,7 @@ export function MartiniqueMap({ markers, centerOn }: MartiniqueMapProps) {
                 essential: true
             })
             checkResetButtonVisibility()
+            onReset?.()
         }
     }
 
@@ -162,7 +164,7 @@ export function MartiniqueMap({ markers, centerOn }: MartiniqueMapProps) {
                 return (
                     <div
                         key={pos.id}
-                        className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10"
+                        className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10 hover:z-[100]"
                         style={{ left: pos.x, top: pos.y }}
                     >
                         {markerData.component}

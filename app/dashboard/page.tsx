@@ -53,6 +53,7 @@ interface UserData {
     full_name: string | null
     email: string | null
     phone: string | null
+    notifications_enabled?: boolean
     subscription: {
         plan: string
         price: string
@@ -285,10 +286,37 @@ export default function DashboardPage() {
                                     <UserIcon />
                                     Modifier mon profil
                                 </button>
-                                <button className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-sm font-medium group">
-                                    <BellIcon />
-                                    Préférences de notification
-                                </button>
+
+                                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 rounded-xl">
+                                    <div className="flex items-center gap-3 text-slate-700 text-sm font-medium">
+                                        <BellIcon />
+                                        Notifications
+                                    </div>
+                                    <button
+                                        onClick={async () => {
+                                            const newState = !user.notifications_enabled
+                                            // Optimistic update
+                                            setUser({ ...user, notifications_enabled: newState })
+                                            try {
+                                                const res = await fetch('/api/user/notifications', {
+                                                    method: 'PATCH',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ enabled: newState })
+                                                })
+                                                if (!res.ok) throw new Error('Failed')
+                                            } catch (e) {
+                                                // Revert
+                                                setUser({ ...user, notifications_enabled: !newState })
+                                                alert("Erreur de mise à jour")
+                                            }
+                                        }}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${user.notifications_enabled !== false ? 'bg-emerald-500' : 'bg-slate-200'}`}
+                                    >
+                                        <span
+                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${user.notifications_enabled !== false ? 'translate-x-6' : 'translate-x-1'}`}
+                                        />
+                                    </button>
+                                </div>
                                 <button className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-sm font-medium group">
                                     <MessageIcon />
                                     Support client

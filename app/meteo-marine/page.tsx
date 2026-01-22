@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { useWeather } from "@/hooks/useWeather"
+import { MARTINIQUE_CITIES } from "@/lib/constants"
 
 // --- ICONS (Blue/Teal/Cyan Theme) ---
 const WaveIcon = () => (
@@ -39,27 +40,8 @@ const MapPinIcon = () => (
     </svg>
 )
 
-// --- CITY DATA (Duplicated from Header for independence) ---
-const MARTINIQUE_CITIES = [
-    { name: "Fort-de-France", lat: 14.6161, lon: -61.059 },
-    { name: "Le Lamentin", lat: 14.59, lon: -61.0 },
-    { name: "Sainte-Anne", lat: 14.43, lon: -60.88 },
-    { name: "Le Diamant", lat: 14.47, lon: -61.03 },
-    { name: "Les Trois-Îlets", lat: 14.54, lon: -61.04 },
-    { name: "Le Marin", lat: 14.47, lon: -60.87 },
-    { name: "Tartane", lat: 14.761, lon: -60.912 }, // Added Tartane manually
-    { name: "Le Robert", lat: 14.68, lon: -60.94 },
-    { name: "Sainte-Marie", lat: 14.78, lon: -61.01 },
-    { name: "La Trinité", lat: 14.74, lon: -60.97 },
-    { name: "Le Vauclin", lat: 14.55, lon: -60.83 },
-    { name: "Grand'Rivière", lat: 14.88, lon: -61.18 },
-    { name: "Saint-Pierre", lat: 14.74, lon: -61.18 },
-    { name: "Le Prêcheur", lat: 14.8, lon: -61.22 },
-    { name: "Case-Pilote", lat: 14.64, lon: -61.13 },
-    { name: "Bellefontaine", lat: 14.67, lon: -61.15 },
-    { name: "Le Carbet", lat: 14.71, lon: -61.18 },
-    { name: "Les Anses-d'Arlet", lat: 14.49, lon: -61.08 },
-]
+// --- CITY DATA ---
+// Imported from @/lib/constants
 
 
 export default function MarinePage() {

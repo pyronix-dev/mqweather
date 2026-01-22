@@ -26,10 +26,17 @@ export const MARTINIQUE_CITIES = [
 
 export const BEACH_LOCATIONS = [
     { name: "Les Salines", city: "Sainte-Anne", lat: 14.4026, lon: -60.8787 },
+    { name: "Pointe Marin", city: "Sainte-Anne", lat: 14.4410, lon: -60.8840 },
+    { name: "Anse Michel", city: "Sainte-Anne", lat: 14.4170, lon: -60.8330 },
     { name: "Grande Anse", city: "Le Diamant", lat: 14.4735, lon: -61.0322 },
+    { name: "Grande Anse d'Arlet", city: "Les Anses-d'Arlet", lat: 14.5020, lon: -61.0850 },
     { name: "Anse Noire", city: "Les Anses-d'Arlet", lat: 14.5283, lon: -61.0877 },
     { name: "Pointe Faula", city: "Le Vauclin", lat: 14.5447, lon: -60.8353 },
     { name: "Anse Mitan", city: "Les Trois-Îlets", lat: 14.5519, lon: -61.0543 },
+    { name: "Plage du Bourg", city: "Sainte-Luce", lat: 14.4680, lon: -60.9230 },
+    { name: "La Brèche", city: "Tartane", lat: 14.7590, lon: -60.9080 },
     { name: "Anse Couleuvre", city: "Le Prêcheur", lat: 14.8322, lon: -61.2227 },
-    { name: "Anse Turin", city: "Le Carbet", lat: 14.7180, lon: -61.1850 }
+    { name: "Anse Céron", city: "Le Prêcheur", lat: 14.8140, lon: -61.2260 },
+    { name: "Anse Turin", city: "Le Carbet", lat: 14.7180, lon: -61.1850 },
+    { name: "La Française", city: "Fort-de-France", lat: 14.6040, lon: -61.0620 }
 ]

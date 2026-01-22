@@ -73,8 +73,9 @@ export async function GET(request: Request) {
                 // We'll join users and subscriptions.
                 const { data: users, error: usersError } = await supabase
                     .from('users')
-                    .select('email, id, subscriptions(status)')
-                    .eq('subscriptions.status', 'active');
+                    .select('email, id, subscriptions(status), notifications_enabled')
+                    .eq('subscriptions.status', 'active')
+                    .neq('notifications_enabled', false); // Only send if not disabled (null/true is ok)
 
                 // Note: The above query assumes 1:1 or 1:many. If multiple subscriptions, might duplicate?
                 // Better: Get distinct users with at least one active subscription.
