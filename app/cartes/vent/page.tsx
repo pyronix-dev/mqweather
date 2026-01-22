@@ -11,7 +11,7 @@ import { useMapUrlState } from "@/hooks/useMapUrlState"
 export default function WindMapPage() {
     const [markers, setMarkers] = useState<MapMarker[]>([])
     const [loading, setLoading] = useState(true)
-    const { selectedDay, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
+    const { selectedDay, selectedCity, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [allData, setAllData] = useState<any[]>([])
 
     useEffect(() => {
