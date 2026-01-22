@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const CEREBRAS_API_KEY = 'csk-n2c2jk8ndjpr4ce6kn9hkxyj3krw8ped6n5jyreteejmcyjr'
+const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY
 const CEREBRAS_MODEL = 'gpt-oss-120b'
 
 export async function POST(request: NextRequest) {

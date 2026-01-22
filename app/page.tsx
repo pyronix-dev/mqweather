@@ -196,7 +196,7 @@ export default function HomePage() {
         {/* Two Column Layout like Vigilance Page */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch max-w-[1600px] mx-auto">
 
-          <div className="lg:col-span-2 relative w-full h-auto min-h-[350px] md:min-h-[650px] lg:min-h-[700px] animate-fade-in-up">
+          <div className="lg:col-span-2 relative w-full h-auto min-h-[800px] md:min-h-[650px] lg:min-h-[700px] animate-fade-in-up">
             <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
               {/* Map Header */}
               <div className="p-5 border-b border-slate-200 flex-shrink-0">
