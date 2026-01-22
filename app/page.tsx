@@ -417,25 +417,25 @@ export default function HomePage() {
                     name: 'Températures',
                     href: '/cartes/temperature',
                     color: 'from-red-400 to-orange-500',
-                    icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    icon: <i className="bi bi-thermometer-sun text-xl text-orange-500" />
                   },
                   {
                     name: 'Vent',
                     href: '/cartes/vent',
                     color: 'from-teal-400 to-cyan-500',
-                    icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    icon: <i className="bi bi-wind text-xl text-teal-500" />
                   },
                   {
                     name: 'Pluie',
                     href: '/cartes/pluie',
                     color: 'from-blue-400 to-indigo-500',
-                    icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
+                    icon: <i className="bi bi-cloud-drizzle-fill text-xl text-blue-500" />
                   },
                   {
                     name: 'UV',
                     href: '/cartes/uv',
                     color: 'from-amber-400 to-yellow-500',
-                    icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    icon: <i className="bi bi-sun-fill text-xl text-amber-500" />
                   },
                 ].map((item) => (
                   <a
