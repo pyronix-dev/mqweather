@@ -92,7 +92,7 @@ export default function RainMapPage() {
     return (
         <div className="min-h-screen bg-white flex flex-col">
             <Header />
-            <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
+            <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
                     {/* Map Section */}
                     <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
