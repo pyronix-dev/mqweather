@@ -319,18 +319,23 @@ export default function DashboardPage() {
                                     </div>
                                     <button
                                         onClick={async () => {
-                                            const isCurrentlyOn = user.notifications?.sms || user.notifications?.email || user.notifications_enabled
+                                            // Prioritize granular settings if they exist
+                                            const hasGranular = user.notifications && (typeof user.notifications.sms === 'boolean' || typeof user.notifications.email === 'boolean')
+                                            const isCurrentlyOn = hasGranular
+                                                ? (user.notifications!.sms || user.notifications!.email)
+                                                : user.notifications_enabled
+
                                             const newState = !isCurrentlyOn
 
                                             // Optimistic update
                                             setUser({
                                                 ...user,
                                                 notifications_enabled: newState,
-                                                notifications: {
-                                                    ...user.notifications!,
+                                                notifications: user.notifications ? {
+                                                    ...user.notifications,
                                                     sms: newState,
                                                     email: newState
-                                                }
+                                                } : undefined
                                             })
 
                                             try {
