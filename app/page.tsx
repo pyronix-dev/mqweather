@@ -307,7 +307,9 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-white">{selectedCity ? `Météo à ${selectedCity}` : "Bulletin Météo"}</h2>
-                    <p className="text-white/60 text-xs">Prévisions du jour</p>
+                    <p className="text-white/60 text-xs">
+                      {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -357,13 +359,13 @@ export default function HomePage() {
                       <div className="p-4 border-t border-slate-100 bg-white z-10">
                         <div className="grid grid-cols-2 gap-3">
                           <div className="bg-red-50 rounded-lg p-3 border border-red-100 text-center">
-                            <span className="text-xs text-red-600 font-bold block mb-1">Max</span>
+                            <span className="text-xs text-red-600 font-bold block mb-1">Après-midi</span>
                             <p className="text-xl font-black text-red-700 leading-none">
                               {Math.round(Math.max(...allData.map(d => d.daily?.temperature_2m_max?.[selectedDay] || 0)))}°C
                             </p>
                           </div>
                           <div className="bg-blue-50 rounded-lg p-3 border border-blue-100 text-center">
-                            <span className="text-xs text-blue-600 font-bold block mb-1">Min</span>
+                            <span className="text-xs text-blue-600 font-bold block mb-1">Matin</span>
                             <p className="text-xl font-black text-blue-700 leading-none">
                               {Math.round(Math.min(...allData.map(d => d.daily?.temperature_2m_min?.[selectedDay] || 99)))}°C
                             </p>
