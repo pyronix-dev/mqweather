@@ -700,7 +700,7 @@ function AlertesContent() {
             <span className="font-bold text-slate-700">Service d'alertes météo</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-800 mb-4 tracking-tight">
-            Inscription aux <span className="text-amber-700">Alertes</span>
+            Inscription aux <span className="text-amber-700">Alertes Météo</span>
           </h1>
           <p className="text-slate-500 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
             Complétez le formulaire ci-dessous pour recevoir les{" "}
@@ -1090,6 +1090,7 @@ function AlertesContent() {
                     onMouseEnter={() => setIsHoveredPro(true)}
                     onMouseLeave={() => setIsHoveredPro(false)}
                   >
+                    <h2 className="text-xl font-black text-red-600 underline mb-2">Professionnels</h2>
                     <h3 className="text-lg font-black text-slate-800 mb-2">SMS Pro</h3>
                     <div className="flex items-baseline gap-1 mb-3">
                       <span className="text-3xl font-black text-slate-700">Sur devis</span>
@@ -1113,78 +1114,7 @@ function AlertesContent() {
               </div>
             )}
 
-            {/* Gérer mon abonnement - only show when not in SMS subscription */}
-            {!showSmsSubscription && (
-              <div
-                className="relative bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm animate-slide-in-left overflow-hidden"
-                style={{ animationDelay: "0.2s" }}
-              >
-                <h2 className="text-xl font-black text-slate-800 mb-2">Gérer mon abonnement</h2>
-                <p className="text-sm text-slate-500 font-bold mb-8">
-                  Changer de profil, revalider le numéro, ou se désinscrire.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-black text-slate-700 uppercase tracking-wide">Numéro</label>
-                    <input
-                      id="manage-phone"
-                      type="tel"
-                      placeholder="Ex : +596 696 12 34 56"
-                      className="w-full px-5 py-4 border border-slate-200 rounded-xl bg-white text-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-black text-slate-700 uppercase tracking-wide">
-                      Code / Référence
-                    </label>
-                    <input
-                      id="manage-ref"
-                      type="text"
-                      placeholder="Ex : MM-4F9A2"
-                      className="w-full px-5 py-4 border border-slate-200 rounded-xl bg-white text-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-4">
-                  <button className="flex items-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl font-black text-sm transition-all opacity-50 cursor-not-allowed" disabled title="Fonctionnalité en cours de développement">
-                    <PhoneIcon />
-                    Mettre à jour
-                  </button>
-                  <button
-                    onClick={async () => {
-                      const ref = (document.getElementById('manage-ref') as HTMLInputElement)?.value
-                      const phone = (document.getElementById('manage-phone') as HTMLInputElement)?.value
-                      if (!ref) { alert("Veuillez entrer une référence"); return; }
 
-                      if (confirm("Voulez-vous vraiment vous désinscrire ?")) {
-                        try {
-                          const res = await fetch('/api/subscription/unsubscribe', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ ref, id: undefined }) // We use ref for public form
-                          })
-                          if (res.ok) {
-                            alert("Désabonnement confirmé.")
-                            window.location.reload()
-                          } else {
-                            const data = await res.json()
-                            alert(data.error || "Erreur")
-                          }
-                        } catch (e) {
-                          alert("Erreur de connexion")
-                        }
-                      }
-                    }}
-                    className="flex items-center gap-2 px-6 py-3 border border-red-200 text-red-600 hover:bg-red-50 rounded-xl font-black text-sm transition-all"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Se désinscrire
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* FAQ Section - only show when not in SMS subscription */}
             {!showSmsSubscription && (
