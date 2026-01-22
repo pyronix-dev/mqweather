@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { MartiniqueMap, MapMarker } from "@/components/MartiniqueMap"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -8,6 +9,7 @@ import { MapControls } from "@/components/MapControls"
 import { BEACH_LOCATIONS } from "@/lib/constants"
 import { useMapUrlState } from "@/hooks/useMapUrlState"
 import { getWeatherIcon } from "@/lib/weather-icons"
+import { getSlugFromIndex } from "@/lib/utils"
 
 interface BeachData {
     weather: {
@@ -76,8 +78,9 @@ export default function BeachMapPage() {
                 lat: beach.lat,
                 lon: beach.lon,
                 component: (
-                    <div
-                        onClick={() => handleSearch(beach)}
+                    <Link
+                        key={beach.name}
+                        href={`/previsions/${getSlugFromIndex(selectedDay)}/plage?city=${encodeURIComponent(beach.city)}&lat=${beach.lat}&lon=${beach.lon}`}
                         className="group relative cursor-pointer transition-all duration-300 hover:scale-105 z-10 hover:z-50 animate-fade-in-up"
                     >
                         {/* Beach Card Marker */}
@@ -107,7 +110,7 @@ export default function BeachMapPage() {
                         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-slate-800/95 backdrop-blur-sm text-white text-xs font-bold rounded-full whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1 shadow-lg">
                             {beach.name}
                         </div>
-                    </div>
+                    </Link>
                 )
             }
         }).filter(Boolean) as MapMarker[]
@@ -198,8 +201,9 @@ export default function BeachMapPage() {
                             const waveHeight = (data.marine?.daily?.wave_height_max?.[selectedDay] || 0.5).toFixed(1)
 
                             return (
-                                <div
+                                <Link
                                     key={beach.name}
+                                    href={`/previsions/${getSlugFromIndex(selectedDay)}/plage?city=${encodeURIComponent(beach.city)}&lat=${beach.lat}&lon=${beach.lon}`}
                                     className="bg-white rounded-2xl p-5 shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 flex items-center justify-between hover:border-cyan-200 group animate-fade-in-up"
                                     style={{ animationDelay: `${0.3 + index * 0.05}s` }}
                                 >
@@ -232,7 +236,7 @@ export default function BeachMapPage() {
                                             <span className={`font-black ${uvIndex >= 6 ? 'text-orange-500' : 'text-emerald-500'}`}>{uvIndex}</span>
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             )
                         })}
                     </div>
