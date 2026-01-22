@@ -774,10 +774,15 @@ function PrevisionContent() {
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="time" stroke="#6b7280" style={{ fontSize: "10px" }} />
-                    <YAxis stroke="#6b7280" style={{ fontSize: "10px" }} />
+                    <YAxis
+                      stroke="#6b7280"
+                      style={{ fontSize: "10px" }}
+                      tickFormatter={(value) => `${value}°C`}
+                    />
                     <Tooltip
                       contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px" }}
                       labelStyle={{ color: "#374151" }}
+                      formatter={(value: number) => [`${Math.round(value)}°C`, "Température"]}
                     />
                     <Area
                       type="monotone"
