@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
             if (!cityData) throw new Error("City data not found")
 
             prompt = `Tu es un météorologue de Martinique. Génère un bulletin météo COURT pour la ville de ${selectedCity}.
-
+            
 Date: ${dayName} ${dateStr}
 
 Données pour ${selectedCity}:
@@ -50,14 +50,14 @@ Données pour ${selectedCity}:
 - Condition: ${cityData.condition}
 
 Instructions:
-1. Maximum 60 mots
-2. Utilise **texte** pour mettre en gras la température et la condition.
-3. Commence directement par "À ${selectedCity}..."
+1. Commence IMPÉRATIVEMENT par la date au format "${dayName} ${dateStr} :" suivi de ton message.
+2. Maximum 60 mots après la date.
+3. Utilise **texte** pour mettre en gras la température et la condition.
 4. Ton professionnel et chaleureux.
-5. Donne un conseil court lié à la météo (plage, parapluie, etc).
+5. Donne un conseil court lié à la météo.
 
 Exemple:
-"À **${selectedCity}**, le temps sera **${cityData.condition}** avec des températures comprises entre **${cityData.tempMin}°C et ${cityData.tempMax}°C**. C'est une journée idéale pour **une promenade au bord de mer**. Profitez-en !"`
+"${dayName} ${dateStr} : À **${selectedCity}**, le temps sera **${cityData.condition}** avec des températures comprises entre **${cityData.tempMin}°C et ${cityData.tempMax}°C**. C'est une journée idéale pour **une promenade au bord de mer**. Profitez-en !"`
         } else {
             const avgTempMax = Math.round(weatherSummary.reduce((acc: number, d: any) => acc + d.tempMax, 0) / weatherSummary.length)
             const avgTempMin = Math.round(weatherSummary.reduce((acc: number, d: any) => acc + d.tempMin, 0) / weatherSummary.length)
@@ -74,13 +74,14 @@ Données globales:
 - Zones ensoleillées: ${sunnyCount}, nuageuses: ${cloudyCount}, pluvieuses: ${rainyCount}
 
 Instructions:
-1. Maximum 80 mots
-2. Utilise **texte** pour mettre en gras les infos importantes.
-3. Structure: salutation courte → conditions générales → conseils pratiques.
-4. Ton professionnel et chaleureux.
+1. Commence IMPÉRATIVEMENT par la date au format "${dayName} ${dateStr} :" suivi de ton message.
+2. Maximum 80 mots après la date.
+3. Utilise **texte** pour mettre en gras les infos importantes.
+4. Structure: salutation courte → conditions générales → conseils pratiques.
+5. Ton professionnel et chaleureux.
 
 Exemple:
-"Bonjour Martinique ! **Temps ensoleillé** sur l'ensemble de l'île avec des températures de **28°C à 31°C**. Quelques averses possibles dans le **nord** en fin d'après-midi. **Pensez à vous hydrater** et à protéger votre peau du soleil. Bonne journée !"`
+"${dayName} ${dateStr} : Bonjour Martinique ! **Temps ensoleillé** sur l'ensemble de l'île avec des températures de **28°C à 31°C**. Quelques averses possibles dans le **nord** en fin d'après-midi. **Pensez à vous hydrater**. Bonne journée !"`
         }
 
         const response = await fetch('https://api.cerebras.ai/v1/chat/completions', {

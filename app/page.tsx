@@ -353,10 +353,6 @@ export default function HomePage() {
                     <div className="flex-1 overflow-y-auto scrollbar-thin px-5 py-1">
                       <div className="bg-gradient-to-br from-slate-50 to-sky-50 rounded-2xl p-4 border border-slate-100">
                         <p className="text-slate-700 text-sm leading-relaxed">
-                          <span className="font-bold text-slate-800 capitalize">
-                            {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-                          </span>
-                          {" : "}
                           {(aiBulletin || weatherSummary).split(/(\*\*[^*]+\*\*)/).map((part, i) => {
                             if (part.startsWith('**') && part.endsWith('**')) {
                               return (
