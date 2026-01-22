@@ -99,7 +99,7 @@ export default function WindMapPage() {
     }, [selectedDay, allData, handleSearch, selectedCity])
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-sky-50 flex flex-col">
+        <div className="min-h-screen bg-white flex flex-col">
             <Header />
             <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
                 {/* Hero Header */}

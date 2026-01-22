@@ -89,7 +89,7 @@ export default function TemperatureMapPage() {
     }, [selectedDay, timeOfDay, allData, handleSearch, selectedCity])
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 flex flex-col">
+        <div className="min-h-screen bg-white flex flex-col">
             <Header />
             <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
                 {/* Hero Header */}
