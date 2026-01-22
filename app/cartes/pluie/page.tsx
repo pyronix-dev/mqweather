@@ -36,8 +36,14 @@ export default function RainMapPage() {
     useEffect(() => {
         if (!allData.length) return
 
-        const newMarkers = MARTINIQUE_CITIES.map((city, index) => {
-            const cityData = allData[index]
+        // Filter to show only default cities + the currently selected/searched city
+        const visibleCities = MARTINIQUE_CITIES.filter((city) =>
+            city.isDefault || city.name === selectedCity
+        )
+
+        const newMarkers = visibleCities.map((city) => {
+            const originalIndex = MARTINIQUE_CITIES.findIndex(c => c.name === city.name)
+            const cityData = allData[originalIndex]
             if (!cityData || !cityData.daily) return null
 
             const precip = cityData.daily.precipitation_sum[selectedDay]
@@ -81,7 +87,7 @@ export default function RainMapPage() {
         }).filter(Boolean) as MapMarker[]
 
         setMarkers(newMarkers)
-    }, [selectedDay, allData, handleSearch])
+    }, [selectedDay, allData, handleSearch, selectedCity])
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-sky-50 flex flex-col">

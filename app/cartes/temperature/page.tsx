@@ -38,8 +38,15 @@ export default function TemperatureMapPage() {
     useEffect(() => {
         if (!allData.length) return
 
-        const newMarkers = MARTINIQUE_CITIES.map((city, index) => {
-            const cityData = allData[index]
+        // Filter to show only default cities + the currently selected/searched city
+        const visibleCities = MARTINIQUE_CITIES.filter((city, index) =>
+            city.isDefault || city.name === selectedCity
+        )
+
+        const newMarkers = visibleCities.map((city) => {
+            // Find the original index in MARTINIQUE_CITIES for data lookup
+            const originalIndex = MARTINIQUE_CITIES.findIndex(c => c.name === city.name)
+            const cityData = allData[originalIndex]
             if (!cityData || !cityData.hourly) return null
 
             const baseIndex = selectedDay * 24
@@ -79,7 +86,7 @@ export default function TemperatureMapPage() {
         }).filter(Boolean) as MapMarker[]
 
         setMarkers(newMarkers)
-    }, [selectedDay, timeOfDay, allData, handleSearch])
+    }, [selectedDay, timeOfDay, allData, handleSearch, selectedCity])
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 flex flex-col">

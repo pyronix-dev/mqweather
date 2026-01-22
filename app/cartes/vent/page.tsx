@@ -36,8 +36,14 @@ export default function WindMapPage() {
     useEffect(() => {
         if (!allData.length) return
 
-        const newMarkers = MARTINIQUE_CITIES.map((city, index) => {
-            const cityData = allData[index]
+        // Filter to show only default cities + the currently selected/searched city
+        const visibleCities = MARTINIQUE_CITIES.filter((city) =>
+            city.isDefault || city.name === selectedCity
+        )
+
+        const newMarkers = visibleCities.map((city) => {
+            const originalIndex = MARTINIQUE_CITIES.findIndex(c => c.name === city.name)
+            const cityData = allData[originalIndex]
             if (!cityData || !cityData.daily) return null
 
             const speed = Math.round(cityData.daily.wind_speed_10m_max[selectedDay])
@@ -90,7 +96,7 @@ export default function WindMapPage() {
         }).filter(Boolean) as MapMarker[]
 
         setMarkers(newMarkers)
-    }, [selectedDay, allData, handleSearch])
+    }, [selectedDay, allData, handleSearch, selectedCity])
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-sky-50 flex flex-col">
