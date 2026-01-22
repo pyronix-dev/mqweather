@@ -139,10 +139,10 @@ const weatherTypes = [
   { id: "brume", label: "Brume", icon: FogIcon },
 ]
 
-const sampleMarkers: Marker[] = []
+
 
 interface Marker {
-  id: number
+  id: string | number
   x: number
   y: number
   type: string
@@ -166,7 +166,7 @@ export default function CartePage() {
   const [selectedWeather, setSelectedWeather] = useState<string | null>(null)
   const [temperature, setTemperature] = useState("")
   const [details, setDetails] = useState("")
-  const [markers, setMarkers] = useState<Marker[]>(sampleMarkers)
+  const [markers, setMarkers] = useState<Marker[]>([])
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [clickPosition, setClickPosition] = useState<{ x: number; y: number } | null>(null)
 
@@ -177,6 +177,27 @@ export default function CartePage() {
 
   // Responsive check
   const [isDesktop, setIsDesktop] = useState(false)
+
+  // Auth state
+  const [user, setUser] = useState<{ email: string } | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me")
+        if (res.ok) {
+          const data = await res.json()
+          setUser(data)
+        }
+      } catch (e) {
+        console.error("Auth check failed", e)
+      } finally {
+        setAuthLoading(false)
+      }
+    }
+    checkAuth()
+  }, [])
 
   useEffect(() => {
     const checkDesktop = () => setIsDesktop(window.innerWidth >= 1280)
@@ -247,10 +268,82 @@ export default function CartePage() {
     return () => window.removeEventListener("resize", calculateImageBounds)
   }, [mapLoaded])
 
+  // Fetch markers on mount
+  useEffect(() => {
+    const fetchMarkers = async () => {
+      try {
+        const res = await fetch('/api/observations')
+        if (res.ok) {
+          const data = await res.json()
+          // Transform API data to Marker interface
+          const loadedMarkers = data.map((obs: any) => ({
+            id: obs.id, // UUID string
+            x: Number(obs.x),
+            y: Number(obs.y),
+            type: obs.type,
+            temp: obs.temp,
+            details: obs.details,
+            createdAt: new Date(obs.created_at)
+          }))
+          setMarkers(loadedMarkers)
+        }
+      } catch (e) {
+        console.error('Failed to fetch observations', e)
+      }
+    }
+    fetchMarkers()
+  }, [])
+
+  const handlePublish = async () => {
+    if (selectedWeather && clickPosition && details.trim()) {
+      setLoading(true) // Re-use loading state or add a publishing state
+      try {
+        const res = await fetch('/api/observations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: selectedWeather,
+            x: clickPosition.x,
+            y: clickPosition.y,
+            temp: temperature,
+            details: details
+          })
+        })
+
+        if (res.ok) {
+          const newObs = await res.json()
+          const newMarker: Marker = {
+            id: newObs.id,
+            x: Number(newObs.x),
+            y: Number(newObs.y),
+            type: newObs.type,
+            temp: newObs.temp,
+            details: newObs.details,
+            createdAt: new Date(newObs.created_at)
+          }
+          setMarkers([newMarker, ...markers])
+
+          // Reset form
+          setSelectedWeather(null)
+          setTemperature("")
+          setDetails("")
+          setClickPosition(null)
+        } else {
+          alert("Erreur lors de la publication")
+        }
+      } catch (e) {
+        console.error("Error publishing", e)
+        alert("Erreur de connexion")
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
   const isMarkerOld = (createdAt?: Date) => {
     if (!createdAt) return false
     const hoursDiff = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60)
-    return hoursDiff > 48
+    return hoursDiff > 12 // Fade after 12h
   }
 
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -285,24 +378,7 @@ export default function CartePage() {
     setSelectedMarker(selectedMarker?.id === marker.id ? null : marker)
   }
 
-  const handlePublish = () => {
-    if (selectedWeather && clickPosition && details.trim()) {
-      const newMarker: Marker = {
-        id: Date.now(),
-        x: clickPosition.x,
-        y: clickPosition.y,
-        type: selectedWeather,
-        temp: temperature,
-        details: details,
-        createdAt: new Date(),
-      }
-      setMarkers([...markers, newMarker])
-      setSelectedWeather(null)
-      setTemperature("")
-      setDetails("")
-      setClickPosition(null)
-    }
-  }
+
 
   const handleRefresh = () => {
     setIsRefreshing(true)
@@ -412,7 +488,7 @@ export default function CartePage() {
                       >
                         <button
                           onClick={(e) => handleMarkerClick(e, marker)}
-                          className={`w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full shadow-lg border-2 border-slate-200 flex items-center justify-center hover:scale-110 transition-transform cursor-pointer ${isOld ? "opacity-50" : ""}`}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full shadow-lg border-2 border-slate-200 flex items-center justify-center hover:scale-110 transition-transform cursor-pointer ${isOld ? "opacity-50" : ""}`}
                         >
                           <IconComponent />
                         </button>
@@ -573,13 +649,31 @@ export default function CartePage() {
                       />
                     </div>
 
-                    <button
-                      onClick={handlePublish}
-                      disabled={!selectedWeather || !clickPosition || !details.trim()}
-                      className="w-full py-3 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      Publier l'observation
-                    </button>
+
+
+                    {authLoading ? (
+                      <Skeleton className="h-12 w-full rounded-xl" />
+                    ) : user ? (
+                      <button
+                        onClick={handlePublish}
+                        disabled={!selectedWeather || !clickPosition || !details.trim()}
+                        className="w-full py-3 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                      >
+                        Publier l'observation
+                      </button>
+                    ) : (
+                      <div className="bg-slate-100 rounded-xl p-4 text-center border border-slate-200">
+                        <p className="text-sm text-slate-600 font-medium mb-3">
+                          Vous devez être connecté pour signaler un événement.
+                        </p>
+                        <a
+                          href="/login"
+                          className="inline-block w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm transition-colors"
+                        >
+                          Se connecter
+                        </a>
+                      </div>
+                    )}
 
                     {(!selectedWeather || !clickPosition || !details.trim()) && (
                       <p className="text-xs text-slate-500 text-center">
