@@ -32,7 +32,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
     }, [])
 
     const initialCenter: [number, number] = [-61.0242, 14.6415]
-    const getInitialZoom = () => (window.innerWidth < 768 ? 8.9 : 9.6)
+    const getInitialZoom = () => 9.6
 
     // Store marker positions (x, y) in pixels to render React components
     const [projectedMarkers, setProjectedMarkers] = useState<{ id: string, x: number, y: number }[]>([])
@@ -136,7 +136,6 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
 
     const handleResetView = () => {
         if (map.current) {
-            map.current.resize() // Force resize check before resetting
             map.current.flyTo({
                 center: initialCenter,
                 zoom: getInitialZoom(),
