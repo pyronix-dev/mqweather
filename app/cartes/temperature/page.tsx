@@ -92,77 +92,120 @@ export default function TemperatureMapPage() {
         <div className="min-h-screen bg-white flex flex-col">
             <Header />
             <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
-                {/* Hero Header */}
-                <div className="mb-8 animate-fade-in-up">
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                        <div className="flex items-start gap-4">
-                            <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl shadow-lg shadow-orange-500/20">
-                                <i className="bi bi-thermometer-sun text-white text-3xl"></i>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
+                    {/* Map Section */}
+                    <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
+                        <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
+                            <div className="p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Carte des Températures</h2>
+                                        <p className="text-slate-500 text-xs sm:text-sm mt-1 font-medium">
+                                            Températures en temps réel sur toute l'île
+                                        </p>
+                                    </div>
+                                    <div className="p-2 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl shadow-lg shadow-orange-500/20 text-white">
+                                        <i className="bi bi-thermometer-sun text-xl"></i>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <h1 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight">
-                                    Carte des Températures
-                                </h1>
-                                <p className="text-slate-500 font-medium mt-1">Températures en temps réel sur toute l'île</p>
-                            </div>
-                        </div>
 
-                        {/* Time Toggle */}
-                        <div className="bg-white/80 backdrop-blur-sm p-1.5 rounded-2xl flex items-center shadow-lg border border-white/50">
-                            <button
-                                onClick={() => setTimeOfDay('morning')}
-                                className={`px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${timeOfDay === 'morning'
-                                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg'
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'}`}
-                            >
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1z" />
-                                </svg>
-                                <span>Matin</span>
-                                <span className="text-xs font-medium opacity-80">08h</span>
-                            </button>
-                            <button
-                                onClick={() => setTimeOfDay('afternoon')}
-                                className={`px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${timeOfDay === 'afternoon'
-                                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'}`}
-                            >
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" />
-                                </svg>
-                                <span>Après-midi</span>
-                                <span className="text-xs font-medium opacity-80">14h</span>
-                            </button>
+                            <div className="flex-1 relative overflow-hidden">
+                                <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
+
+                                {/* Legend */}
+                                <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
+                                    <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Légende</div>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500" />
+                                            <span className="text-xs text-slate-600">&lt; 28°C</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-orange-500 to-amber-500" />
+                                            <span className="text-xs text-slate-600">28-30°C</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-red-500 to-orange-500" />
+                                            <span className="text-xs text-slate-600">&gt; 30°C</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                    <MapControls
-                        onSearch={handleSearch}
-                        onDaySelect={handleDaySelect}
-                        selectedDay={selectedDay}
-                    />
-                </div>
-
-                <div className="h-[800px] md:h-[650px] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50 relative mt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                    <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
-
-                    {/* Legend */}
-                    <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
-                        <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Légende</div>
-                        <div className="flex flex-col gap-2">
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500" />
-                                <span className="text-xs text-slate-600">&lt; 28°C</span>
+                    {/* Sidebar Section */}
+                    <div className="w-full space-y-4 sm:space-y-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                        {/* Controls Card */}
+                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <div className="mb-6">
+                                <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>
+                                <p className="text-sm text-slate-500">Sélectionnez le jour et l'heure</p>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-orange-500 to-amber-500" />
-                                <span className="text-xs text-slate-600">28-30°C</span>
+
+                            <div className="space-y-6">
+                                {/* Time Toggle */}
+                                <div className="bg-slate-50 p-1.5 rounded-2xl flex items-center border border-slate-200">
+                                    <button
+                                        onClick={() => setTimeOfDay('morning')}
+                                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${timeOfDay === 'morning'
+                                            ? 'bg-white text-orange-600 shadow-sm border border-slate-100'
+                                            : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1z" />
+                                        </svg>
+                                        <span>Matin (08h)</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setTimeOfDay('afternoon')}
+                                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${timeOfDay === 'afternoon'
+                                            ? 'bg-white text-red-600 shadow-sm border border-slate-100'
+                                            : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" />
+                                        </svg>
+                                        <span>Après-midi (14h)</span>
+                                    </button>
+                                </div>
+
+                                <MapControls
+                                    onSearch={handleSearch}
+                                    onDaySelect={handleDaySelect}
+                                    selectedDay={selectedDay}
+                                />
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-red-500 to-orange-500" />
-                                <span className="text-xs text-slate-600">&gt; 30°C</span>
+                        </div>
+
+                        {/* Info Card */}
+                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="text-orange-500">
+                                    <i className="bi bi-info-circle text-xl"></i>
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-800">À propos des températures</h3>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                                    <p className="text-sm text-slate-700 font-medium">
+                                        Les températures affichées correspondent aux relevés sous abri à 2m du sol.
+                                        Les ressentis peuvent être supérieurs en raison de l'humidité.
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Moyenne Saison</p>
+                                        <p className="text-xl font-black text-slate-800">27.5°C</p>
+                                    </div>
+                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Record Max</p>
+                                        <p className="text-xl font-black text-red-600">35.4°C</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

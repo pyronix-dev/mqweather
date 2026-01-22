@@ -102,66 +102,99 @@ export default function WindMapPage() {
         <div className="min-h-screen bg-white flex flex-col">
             <Header />
             <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
-                {/* Hero Header */}
-                <div className="mb-8 animate-fade-in-up">
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                        <div className="flex items-start gap-4">
-                            <div className="p-3 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-2xl shadow-lg shadow-teal-500/20">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2" />
-                                </svg>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
+                    {/* Map Section */}
+                    <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
+                        <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
+                            <div className="p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Carte des Vents</h2>
+                                        <p className="text-slate-500 text-xs sm:text-sm mt-1 font-medium">
+                                            Vitesse et direction du vent en Martinique
+                                        </p>
+                                    </div>
+                                    <div className="p-2 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl shadow-lg shadow-teal-500/20 text-white">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <h1 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight">
-                                    Carte des Vents
-                                </h1>
-                                <p className="text-slate-500 font-medium mt-1">Vitesse et direction du vent en Martinique</p>
-                            </div>
-                        </div>
 
-                        {/* Legend Info */}
-                        <div className="bg-white/80 backdrop-blur-sm px-5 py-3 rounded-2xl flex items-center gap-6 shadow-lg border border-white/50">
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
-                                </svg>
-                                <span className="text-sm text-slate-600 font-medium">Direction</span>
-                            </div>
-                            <div className="w-px h-6 bg-slate-200" />
-                            <div className="flex items-center gap-2">
-                                <span className="font-black text-teal-600">km/h</span>
-                                <span className="text-sm text-slate-600 font-medium">Vitesse Max</span>
+                            <div className="flex-1 relative overflow-hidden">
+                                <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
+
+                                {/* Legend */}
+                                <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
+                                    <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Intensité</div>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-4 h-4 rounded-full bg-white border-2 border-slate-300" />
+                                            <span className="text-xs text-slate-600">&lt; 25 km/h (Faible)</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-teal-500 to-cyan-500" />
+                                            <span className="text-xs text-slate-600">25-40 km/h (Modéré)</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-red-500 to-pink-500" />
+                                            <span className="text-xs text-slate-600">&gt; 40 km/h (Fort)</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                    <MapControls
-                        onSearch={handleSearch}
-                        onDaySelect={handleDaySelect}
-                        selectedDay={selectedDay}
-                    />
-                </div>
-
-                <div className="h-[800px] md:h-[650px] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50 relative mt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                    <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
-
-                    {/* Legend */}
-                    <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
-                        <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Intensité</div>
-                        <div className="flex flex-col gap-2">
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-full bg-white border-2 border-slate-300" />
-                                <span className="text-xs text-slate-600">&lt; 25 km/h (Faible)</span>
+                    {/* Sidebar Section */}
+                    <div className="w-full space-y-4 sm:space-y-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                        {/* Controls Card */}
+                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <div className="mb-6">
+                                <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>
+                                <p className="text-sm text-slate-500">Sélectionnez le jour</p>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-teal-500 to-cyan-500" />
-                                <span className="text-xs text-slate-600">25-40 km/h (Modéré)</span>
+
+                            <MapControls
+                                onSearch={handleSearch}
+                                onDaySelect={handleDaySelect}
+                                selectedDay={selectedDay}
+                            />
+                        </div>
+
+                        {/* Info Card */}
+                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="text-teal-500">
+                                    <i className="bi bi-wind text-xl"></i>
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-800">À propos du vent</h3>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-red-500 to-pink-500" />
-                                <span className="text-xs text-slate-600">&gt; 40 km/h (Fort)</span>
+
+                            <div className="space-y-4">
+                                <div className="bg-teal-50 rounded-xl p-4 border border-teal-100 flex items-center gap-4">
+                                    <div className="p-2 bg-white rounded-full shadow-sm">
+                                        <svg className="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-teal-700 uppercase">Indicateur</p>
+                                        <p className="text-sm text-slate-700">La flèche indique la direction du vent.</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Vent Dominant</p>
+                                        <p className="text-lg font-black text-slate-800">Est</p>
+                                    </div>
+                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Rafales Max</p>
+                                        <p className="text-lg font-black text-slate-800">65 km/h</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

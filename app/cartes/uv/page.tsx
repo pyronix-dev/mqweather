@@ -101,60 +101,107 @@ export default function UVMapPage() {
         <div className="min-h-screen bg-white flex flex-col">
             <Header />
             <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
-                {/* Hero Header */}
-                <div className="mb-8 animate-fade-in-up">
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                        <div className="flex items-start gap-4">
-                            <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl shadow-lg shadow-amber-500/20">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
+                    {/* Map Section */}
+                    <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
+                        <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
+                            <div className="p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Carte UV</h2>
+                                        <p className="text-slate-500 text-xs sm:text-sm mt-1 font-medium">
+                                            Indice UV maximum prévu
+                                        </p>
+                                    </div>
+                                    <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl shadow-lg shadow-amber-500/20 text-white">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <h1 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight">
-                                    Carte UV
-                                </h1>
-                                <p className="text-slate-500 font-medium mt-1">Indice UV maximum prévu</p>
+
+                            <div className="flex-1 relative overflow-hidden">
+                                <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
+
+                                {/* Legend */}
+                                <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
+                                    <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Indices UV</div>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">1-2</div>
+                                            <span className="text-xs text-slate-600 font-medium">Faible</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-lime-400 to-green-500 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">3-5</div>
+                                            <span className="text-xs text-slate-600 font-medium">Modéré</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">6-7</div>
+                                            <span className="text-xs text-slate-600 font-medium">Élevé</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-rose-500 to-red-600 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">8-10</div>
+                                            <span className="text-xs text-slate-600 font-medium">Très Élevé</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-600 to-purple-700 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">11+</div>
+                                            <span className="text-xs text-slate-600 font-medium">Extrême</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                    <MapControls
-                        onDaySelect={handleDaySelect}
-                        selectedDay={selectedDay}
-                        selectedCity={null}
-                        onCitySelect={() => { }}
-                    />
-                </div>
+                    {/* Sidebar Section */}
+                    <div className="w-full space-y-4 sm:space-y-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                        {/* Controls Card */}
+                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <div className="mb-6">
+                                <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>
+                                <p className="text-sm text-slate-500">Sélectionnez le jour</p>
+                            </div>
 
-                <div className="h-[800px] md:h-[650px] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50 relative mt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                    <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
+                            <MapControls
+                                onDaySelect={handleDaySelect}
+                                selectedDay={selectedDay}
+                                selectedCity={null}
+                                onCitySelect={() => { }}
+                                onSearch={handleSearch}
+                            />
+                        </div>
 
-                    {/* Legend */}
-                    <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
-                        <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Indices UV</div>
-                        <div className="flex flex-col gap-2">
-                            <div className="flex items-center gap-3">
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">1-2</div>
-                                <span className="text-xs text-slate-600 font-medium">Faible</span>
+                        {/* Info Card */}
+                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="text-amber-500">
+                                    <i className="bi bi-info-circle text-xl"></i>
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-800">À propos des UV</h3>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-lime-400 to-green-500 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">3-5</div>
-                                <span className="text-xs text-slate-600 font-medium">Modéré</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">6-7</div>
-                                <span className="text-xs text-slate-600 font-medium">Élevé</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-rose-500 to-red-600 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">8-10</div>
-                                <span className="text-xs text-slate-600 font-medium">Très Élevé</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-600 to-purple-700 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-black text-white">11+</div>
-                                <span className="text-xs text-slate-600 font-medium">Extrême</span>
+
+                            <div className="space-y-4">
+                                <div className="bg-amber-50 rounded-xl p-4 border border-amber-100 flex items-center gap-4">
+                                    <div className="p-2 bg-white rounded-full shadow-sm">
+                                        <i className="bi bi-sun-fill text-amber-500"></i>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-amber-700 uppercase">Protection</p>
+                                        <p className="text-sm text-slate-700">Crème solaire recommandée dès l'indice 3.</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Moyenne Max</p>
+                                        <p className="text-lg font-black text-slate-800">11+</p>
+                                    </div>
+                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Heures Critiques</p>
+                                        <p className="text-lg font-black text-slate-800">10h - 15h</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

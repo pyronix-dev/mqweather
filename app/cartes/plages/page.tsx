@@ -122,58 +122,98 @@ export default function BeachMapPage() {
         <div className="min-h-screen bg-white flex flex-col">
             <Header />
             <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
-                {/* Hero Header */}
-                <div className="mb-8 animate-fade-in-up">
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                        <div className="flex items-start gap-4">
-                            <div className="p-3 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl shadow-lg shadow-cyan-500/20">
-                                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="-5.0 -10.0 110.0 120.0">
-                                    <path d="m31.473 44.984c0 4.6523-3.7734 8.4258-8.4258 8.4258-4.6562 0-8.4297-3.7734-8.4297-8.4258 0-4.6562 3.7734-8.4258 8.4297-8.4258 4.6523 0 8.4258 3.7695 8.4258 8.4258z" />
-                                    <path d="m23.047 56.145c-1.3086 0-2.3711 1.0625-2.3711 2.3711v4.6406c0 1.3086 1.0625 2.3711 2.3711 2.3711s2.3711-1.0625 2.3711-2.3711v-4.6406c0-1.3086-1.0625-2.3711-2.3711-2.3711z" />
-                                    <path d="m11.801 52.879-3.2812 3.2812c-0.92578 0.92578-0.92578 2.4258 0 3.3555 0.46484 0.46484 1.0703 0.69531 1.6758 0.69531 0.60938 0 1.2148-0.23047 1.6758-0.69531l3.2812-3.2812c0.92578-0.92578 0.92578-2.4258 0-3.3555-0.92578-0.92578-2.4258-0.92969-3.3555 0z" />
-                                    <path d="m11.887 44.984c0-1.3086-1.0625-2.3711-2.3711-2.3711h-4.6406c-1.3086 0-2.3711 1.0625-2.3711 2.3711 0 1.3125 1.0625 2.3711 2.3711 2.3711h4.6406c1.3086 0 2.3711-1.0625 2.3711-2.3711z" />
-                                    <path d="m11.801 37.094c0.46484 0.46484 1.0703 0.69141 1.6758 0.69141 0.60938 0 1.2148-0.23047 1.6758-0.69531 0.92578-0.92578 0.92578-2.4258 0-3.3516l-3.2812-3.2812c-0.92578-0.92578-2.4258-0.92578-3.3555 0-0.92578 0.92578-0.92578 2.4258 0 3.3555l3.2812 3.2812z" />
-                                    <path d="m23.047 33.824c1.3086 0 2.3711-1.0625 2.3711-2.3711v-4.6406c0-1.3086-1.0625-2.3711-2.3711-2.3711s-2.3711 1.0625-2.3711 2.3711v4.6406c0 1.3086 1.0625 2.3711 2.3711 2.3711z" />
-                                    <path d="m32.613 37.785c0.60547 0 1.2148-0.23047 1.6758-0.69531l3.2812-3.2812c0.92578-0.92578 0.92578-2.4258 0-3.3555-0.92578-0.92578-2.4258-0.92578-3.3555 0l-3.2812 3.2812c-0.92578 0.92578-0.92578 2.4258 0 3.3555 0.46484 0.46484 1.0703 0.69531 1.6758 0.69531z" />
-                                    <path d="m41.223 42.613h-4.6406c-1.3086 0-2.3711 1.0625-2.3711 2.3711 0 1.3125 1.0625 2.3711 2.3711 2.3711h4.6406c1.3086 0 2.3711-1.0625 2.3711-2.3711 0-1.3125-1.0625-2.3711-2.3711-2.3711z" />
-                                    <path d="m34.293 52.875c-0.92578-0.92578-2.4258-0.92578-3.3555 0-0.92578 0.92578-0.92578 2.4258 0 3.3555l3.2812 3.2812c0.46484 0.46484 1.0703 0.69141 1.6758 0.69141 0.60938 0 1.2148-0.23047 1.6758-0.69531 0.92578-0.92578 0.92578-2.4258 0-3.3516l-3.2812-3.2812z" />
-                                    <path d="m77.977 19.695 0.75781-2.8203c0.30859-1.1406-0.36719-2.3203-1.5117-2.6289-1.1445-0.30859-2.3203 0.37109-2.6289 1.5117l-0.76172 2.8203c-13.668-2.7031-27.191 4.0234-31.41 15.977-0.23047 0.65234 0.007813 1.3789 0.57422 1.7734 0.57031 0.39453 1.332 0.35156 1.8594-0.09375 2.2109-1.8789 5.1992-2.5547 7.9922-1.8008 3.1562 0.85156 5.5664 3.3672 6.2891 6.5664 0.25 1.1094 1.8438 1.5352 2.6172 0.70312 2.2305-2.4023 5.5781-3.3633 8.7383-2.5156 3.1562 0.85156 5.5664 3.3672 6.2891 6.5664 0.125 0.55469 0.54688 0.99219 1.0977 1.1406 0.54688 0.14844 1.1328-0.019531 1.5195-0.4375 2.2305-2.4023 5.5781-3.3672 8.7383-2.5156 2.793 0.75391 5.0391 2.8398 6.0078 5.5742 0.23047 0.65234 0.87109 1.0703 1.5625 1.0195 0.69141-0.054687 1.2578-0.5625 1.3906-1.2422 2.3633-12.453-5.9492-25.066-19.125-29.598z" />
-                                    <path d="m64.09 72.359 7.0391-27.309c0.30469-1.1367-0.37109-2.3125-1.5078-2.6211-1.1367-0.30469-2.3125 0.37109-2.6172 1.5078l-7.1562 27.738c-3.7383-0.49219-7.6797-0.76172-11.758-0.76172-16.746 0-31.262 4.457-38.355 10.973-1.5273 1.4023-0.58203 3.9375 1.4922 3.9375h73.727c2.0742 0 3.0195-2.5352 1.4922-3.9375-4.6992-4.3125-12.66-7.7148-22.359-9.5273z" />
-                                </svg>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
+                    {/* Map Section */}
+                    <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
+                        <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
+                            <div className="p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Météo des Plages</h2>
+                                        <p className="text-slate-500 text-xs sm:text-sm mt-1 font-medium">
+                                            Température de l'eau, UV et conditions
+                                        </p>
+                                    </div>
+                                    <div className="p-2 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl shadow-lg shadow-cyan-500/20 text-white">
+                                        <svg className="w-6 h-6" fill="currentColor" viewBox="-5.0 -10.0 110.0 120.0">
+                                            <path d="m31.473 44.984c0 4.6523-3.7734 8.4258-8.4258 8.4258-4.6562 0-8.4297-3.7734-8.4297-8.4258 0-4.6562 3.7734-8.4258 8.4297-8.4258 4.6523 0 8.4258 3.7695 8.4258 8.4258z" />
+                                            <path d="m23.047 56.145c-1.3086 0-2.3711 1.0625-2.3711 2.3711v4.6406c0 1.3086 1.0625 2.3711 2.3711 2.3711s2.3711-1.0625 2.3711-2.3711v-4.6406c0-1.3086-1.0625-2.3711-2.3711-2.3711z" />
+                                            <path d="m11.801 52.879-3.2812 3.2812c-0.92578 0.92578-0.92578 2.4258 0 3.3555 0.46484 0.46484 1.0703 0.69531 1.6758 0.69531 0.60938 0 1.2148-0.23047 1.6758-0.69531l3.2812-3.2812c0.92578-0.92578 0.92578-2.4258 0-3.3555-0.92578-0.92578-2.4258-0.92969-3.3555 0z" />
+                                            <path d="m11.887 44.984c0-1.3086-1.0625-2.3711-2.3711-2.3711h-4.6406c-1.3086 0-2.3711 1.0625-2.3711 2.3711 0 1.3125 1.0625 2.3711 2.3711 2.3711h4.6406c1.3086 0 2.3711-1.0625 2.3711-2.3711z" />
+                                            <path d="m11.801 37.094c0.46484 0.46484 1.0703 0.69141 1.6758 0.69141 0.60938 0 1.2148-0.23047 1.6758-0.69531 0.92578-0.92578 0.92578-2.4258 0-3.3516l-3.2812-3.2812c-0.92578-0.92578-2.4258-0.92578-3.3555 0-0.92578 0.92578-0.92578 2.4258 0 3.3555l3.2812 3.2812z" />
+                                            <path d="m23.047 33.824c1.3086 0 2.3711-1.0625 2.3711-2.3711v-4.6406c0-1.3086-1.0625-2.3711-2.3711-2.3711s-2.3711 1.0625-2.3711 2.3711v4.6406c0 1.3086 1.0625 2.3711 2.3711 2.3711z" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <h1 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight">
-                                    Météo des Plages
-                                </h1>
-                                <p className="text-slate-500 font-medium mt-1">Température de l'eau, UV et conditions</p>
+
+                            <div className="flex-1 relative overflow-hidden">
+                                <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
+
+                                {/* Legend */}
+                                <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
+                                    <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Conditions</div>
+                                    <div className="flex flex-col gap-2.5">
+                                        <div className="flex items-center gap-2">
+                                            <i className="bi bi-thermometer-high text-blue-500"></i>
+                                            <span className="text-xs text-slate-600">Temp. de l'eau</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <i className="bi bi-sun-fill text-amber-500"></i>
+                                            <span className="text-xs text-slate-600">Indice UV</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                    <MapControls
-                        onSearch={handleSearch}
-                        onDaySelect={handleDaySelect}
-                        selectedDay={selectedDay}
-                    />
-                </div>
-
-                {/* Map */}
-                <div className="h-[800px] md:h-[650px] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50 relative mt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                    <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
-
-                    {/* Legend */}
-                    <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
-                        <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Légende</div>
-                        <div className="flex flex-col gap-2.5">
-                            <div className="flex items-center gap-2">
-                                <i className="bi bi-thermometer-high text-blue-500"></i>
-                                <span className="text-xs text-slate-600">Temp. de l'eau</span>
+                    {/* Sidebar Section */}
+                    <div className="w-full space-y-4 sm:space-y-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                        {/* Controls Card */}
+                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <div className="mb-6">
+                                <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>
+                                <p className="text-sm text-slate-500">Sélectionnez le jour</p>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <i className="bi bi-sun-fill text-amber-500"></i>
-                                <span className="text-xs text-slate-600">Indice UV</span>
+
+                            <MapControls
+                                onSearch={handleSearch}
+                                onDaySelect={handleDaySelect}
+                                selectedDay={selectedDay}
+                            />
+                        </div>
+
+                        {/* Info Card */}
+                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="text-cyan-500">
+                                    <i className="bi bi-info-circle text-xl"></i>
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-800">Infos Plages</h3>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="bg-cyan-50 rounded-xl p-4 border border-cyan-100 flex items-center gap-4">
+                                    <div className="p-2 bg-white rounded-full shadow-sm">
+                                        <i className="bi bi-water text-cyan-500"></i>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-cyan-700 uppercase">Qualité</p>
+                                        <p className="text-sm text-slate-700">Excellente sur la majorité des sites.</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Temp. Eau Moy.</p>
+                                        <p className="text-lg font-black text-slate-800">28°C</p>
+                                    </div>
+                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Vague Max</p>
+                                        <p className="text-lg font-black text-slate-800">1.2m</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
