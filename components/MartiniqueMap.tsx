@@ -86,6 +86,13 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 updateMarkerPositions()
                 checkResetButtonVisibility()
             })
+
+            // Add ResizeObserver to force map resize when container changes (e.g. mobile/desktop switch)
+            const resizeObserver = new ResizeObserver(() => {
+                map.current?.resize()
+                updateMarkerPositions()
+            })
+            resizeObserver.observe(mapContainer.current)
         }
 
         return () => {
@@ -129,6 +136,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
 
     const handleResetView = () => {
         if (map.current) {
+            map.current.resize() // Force resize check before resetting
             map.current.flyTo({
                 center: initialCenter,
                 zoom: getInitialZoom(),
