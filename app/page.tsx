@@ -311,7 +311,7 @@ export default function HomePage() {
           {/* Sidebar - Right Column (1/3 width) */}
           <div className="space-y-5 animate-slide-in-right">
             {/* AI Weather Bulletin Card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[346px] flex flex-col">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[450px] flex flex-col">
               {/* Header */}
               <div className="bg-slate-800 p-5 flex-shrink-0">
                 <div className="flex items-center gap-3">
@@ -442,26 +442,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Marine Weather Link */}
-            <a
-              href="/meteo-marine"
-              className="group block bg-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/10 rounded-lg">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.25 15.75c5.4 0 8.25-7.5 11.25-7.5s5.85 7.5 11.25 7.5M2.25 19.5c5.4 0 8.25-7.5 11.25-7.5s5.85 7.5 11.25 7.5" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-white font-bold text-sm">Météo Marine</h3>
-                  <p className="text-white/60 text-xs">État de la mer</p>
-                </div>
-                <svg className="w-4 h-4 text-white/40 group-hover:text-white/80 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </a>
+
 
             {/* Vigilance Link */}
             <a
