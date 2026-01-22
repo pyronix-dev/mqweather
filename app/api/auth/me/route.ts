@@ -50,7 +50,7 @@ export async function GET() {
         // Fetch user data
         const { data: user, error: userError } = await supabase
             .from('users')
-            .select('id, reference_code, email, phone, full_name, notifications_enabled')
+            .select('id, reference_code, email, phone, full_name, notifications_enabled, notif_sms, notif_email')
             .eq('id', userId)
             .single()
 
@@ -95,7 +95,12 @@ export async function GET() {
             reference: user.reference_code,
             email: user.email,
             phone: user.phone,
-            notifications_enabled: user.notifications_enabled,
+            notifications: {
+                enabled: user.notifications_enabled, // Keep generic flag
+                sms: user.notif_sms,
+                email: user.notif_email
+            },
+            notifications_enabled: user.notifications_enabled, // Legacy support
             subscription: subscriptionData
         })
 

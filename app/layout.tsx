@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   generator: "v0.app",
 }
 
+import { ToastProvider } from "@/components/ui/toast-context"
+
+// ... imports
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,7 +27,9 @@ export default function RootLayout({
         <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
       </head>
       <body className={`font-sans antialiased`} suppressHydrationWarning>
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   )

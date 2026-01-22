@@ -4,7 +4,9 @@ import { createSupabaseAdmin } from '@/lib/supabase'
 
 export async function PATCH(request: Request) {
     try {
-        const { enabled } = await request.json()
+        const body = await request.json()
+        // Allow updating any combination of these fields
+        const { sms, email, enabled } = body
 
         const cookieStore = await cookies()
         const authSession = cookieStore.get('auth_session')?.value
@@ -22,9 +24,29 @@ export async function PATCH(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
+        const updates: any = {}
+        if (typeof sms === 'boolean') updates.notif_sms = sms
+        if (typeof email === 'boolean') updates.notif_email = email
+
+        // Legacy support or master switch logic if 'enabled' passed
+        if (typeof enabled === 'boolean') {
+            updates.notifications_enabled = enabled
+            // If master switch used, sync granular
+            // But the user requires: "Master OFF -> Both OFF", "Master ON -> Both ON"
+            // Use logic from request body if specific 'sms'/'email' not provided
+            if (enabled === false && sms === undefined && email === undefined) {
+                updates.notif_sms = false
+                updates.notif_email = false
+            }
+            if (enabled === true && sms === undefined && email === undefined) {
+                updates.notif_sms = true
+                updates.notif_email = true
+            }
+        }
+
         const { error } = await supabase
             .from('users')
-            .update({ notifications_enabled: enabled })
+            .update(updates)
             .eq('id', userId)
 
         if (error) {
@@ -32,7 +54,7 @@ export async function PATCH(request: Request) {
             return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 })
         }
 
-        return NextResponse.json({ success: true, enabled })
+        return NextResponse.json({ success: true, ...updates })
 
     } catch (error) {
         console.error('Toggle notification error:', error)

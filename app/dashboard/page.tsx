@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { useToast } from "@/components/ui/toast-context"
 
 const UserIcon = () => (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -54,6 +55,11 @@ interface UserData {
     email: string | null
     phone: string | null
     notifications_enabled?: boolean
+    notifications?: {
+        enabled: boolean
+        sms: boolean
+        email: boolean
+    }
     subscription: {
         plan: string
         price: string
@@ -74,9 +80,13 @@ const PLAN_PRICES: Record<string, string> = {
     'email-annual': '10€'
 }
 
+import { EditProfileDialog } from "@/components/edit-profile-dialog"
+
 export default function DashboardPage() {
+    const { showToast } = useToast()
     const [user, setUser] = useState<UserData | null>(null)
     const [loading, setLoading] = useState(true)
+    const [isEditOpen, setIsEditOpen] = useState(false)
     const router = useRouter()
 
     useEffect(() => {
@@ -282,10 +292,25 @@ export default function DashboardPage() {
                             </div>
 
                             <div className="space-y-3">
-                                <button className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-sm font-medium group">
+
+                                <button
+                                    onClick={() => setIsEditOpen(true)}
+                                    className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-sm font-medium group"
+                                >
                                     <UserIcon />
                                     Modifier mon profil
                                 </button>
+
+                                <Link
+                                    href="/dashboard/settings"
+                                    className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-sm font-medium group"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Paramètres
+                                </Link>
 
                                 <div className="flex items-center justify-between px-4 py-3 bg-slate-50 rounded-xl">
                                     <div className="flex items-center gap-3 text-slate-700 text-sm font-medium">
@@ -294,9 +319,20 @@ export default function DashboardPage() {
                                     </div>
                                     <button
                                         onClick={async () => {
-                                            const newState = !user.notifications_enabled
+                                            const isCurrentlyOn = user.notifications?.sms || user.notifications?.email || user.notifications_enabled
+                                            const newState = !isCurrentlyOn
+
                                             // Optimistic update
-                                            setUser({ ...user, notifications_enabled: newState })
+                                            setUser({
+                                                ...user,
+                                                notifications_enabled: newState,
+                                                notifications: {
+                                                    ...user.notifications!,
+                                                    sms: newState,
+                                                    email: newState
+                                                }
+                                            })
+
                                             try {
                                                 const res = await fetch('/api/user/notifications', {
                                                     method: 'PATCH',
@@ -306,14 +342,22 @@ export default function DashboardPage() {
                                                 if (!res.ok) throw new Error('Failed')
                                             } catch (e) {
                                                 // Revert
-                                                setUser({ ...user, notifications_enabled: !newState })
+                                                setUser({
+                                                    ...user,
+                                                    notifications_enabled: !!isCurrentlyOn,
+                                                    notifications: {
+                                                        ...user.notifications!,
+                                                        sms: !!user.notifications?.sms,
+                                                        email: !!user.notifications?.email
+                                                    }
+                                                })
                                                 alert("Erreur de mise à jour")
                                             }
                                         }}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${user.notifications_enabled !== false ? 'bg-emerald-500' : 'bg-slate-200'}`}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${(user.notifications?.sms || user.notifications?.email || user.notifications_enabled) ? 'bg-emerald-500' : 'bg-slate-200'}`}
                                     >
                                         <span
-                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${user.notifications_enabled !== false ? 'translate-x-6' : 'translate-x-1'}`}
+                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${(user.notifications?.sms || user.notifications?.email || user.notifications_enabled) ? 'translate-x-6' : 'translate-x-1'}`}
                                         />
                                     </button>
                                 </div>
@@ -340,6 +384,13 @@ export default function DashboardPage() {
             </main>
 
             <Footer />
+            {user && (
+                <EditProfileDialog
+                    isOpen={isEditOpen}
+                    onClose={() => setIsEditOpen(false)}
+                    user={user}
+                />
+            )}
         </div>
     )
 }
