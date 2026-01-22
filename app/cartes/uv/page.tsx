@@ -25,7 +25,7 @@ const getUVLabel = (uv: number) => {
 }
 
 export default function UVMapPage() {
-    const { selectedDay, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
+    const { selectedDay, selectedCity, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [allData, setAllData] = useState<any[]>([])
     const [markers, setMarkers] = useState<MapMarker[]>([])
     const [loading, setLoading] = useState(true)

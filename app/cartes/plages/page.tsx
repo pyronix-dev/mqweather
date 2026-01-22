@@ -91,7 +91,7 @@ export default function BeachMapPage() {
                             <div className="flex items-center gap-2 w-full justify-center border-t border-slate-100 pt-1.5">
                                 {/* Water Temp */}
                                 <div className="flex items-center gap-0.5 text-blue-500" title="Température de l'eau">
-                                    <i className="bi bi-water text-xs"></i>
+                                    <i className="bi bi-thermometer-high text-xs"></i>
                                     <span className="text-[10px] font-black">{seaTemp}°</span>
                                 </div>
 
@@ -165,7 +165,7 @@ export default function BeachMapPage() {
                         <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Légende</div>
                         <div className="flex flex-col gap-2.5">
                             <div className="flex items-center gap-2">
-                                <i className="bi bi-water text-blue-500"></i>
+                                <i className="bi bi-thermometer-high text-blue-500"></i>
                                 <span className="text-xs text-slate-600">Temp. de l'eau</span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -218,7 +218,10 @@ export default function BeachMapPage() {
                                     <div className="flex items-center gap-5 text-sm font-medium">
                                         <div className="flex flex-col items-center">
                                             <span className="text-[10px] text-slate-400 uppercase">Eau</span>
-                                            <span className="text-blue-600 font-black text-lg">{seaTemp}°</span>
+                                            <span className="text-blue-600 font-black text-lg flex items-center gap-1">
+                                                <i className="bi bi-thermometer-high"></i>
+                                                {seaTemp}°
+                                            </span>
                                         </div>
                                         <div className="flex flex-col items-center">
                                             <span className="text-[10px] text-slate-400 uppercase">Vagues</span>
