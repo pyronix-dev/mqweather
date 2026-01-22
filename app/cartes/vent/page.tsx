@@ -63,23 +63,23 @@ export default function WindMapPage() {
                         className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
                     >
                         <div className={`
-                            px-2 py-1.5 rounded-xl shadow-lg border backdrop-blur-md flex items-center gap-1.5
+                            px-1.5 py-1 rounded-lg shadow-lg border backdrop-blur-md flex items-center gap-1
                             transition-all duration-300 hover:shadow-xl
                             ${isStrong ? 'bg-gradient-to-br from-red-500/95 to-pink-500/95 border-red-400/50 text-white shadow-red-500/30' :
                                 isModerate ? 'bg-gradient-to-br from-teal-500/95 to-cyan-500/95 border-teal-400/50 text-white shadow-teal-500/30' :
                                     'bg-white/95 border-slate-200/80 text-slate-700 shadow-slate-200/50'}
                         `}>
                             <svg
-                                className={`w-4 h-4 transition-transform duration-500 ${isStrong ? 'text-white animate-pulse' : isModerate ? 'text-white' : 'text-teal-600'}`}
+                                className={`w-3 h-3 transition-transform duration-500 ${isStrong ? 'text-white animate-pulse' : isModerate ? 'text-white' : 'text-teal-600'}`}
                                 style={{ transform: `rotate(${(direction + 180) % 360}deg)` }}
                                 fill="currentColor"
                                 viewBox="0 0 24 24"
                             >
                                 <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
                             </svg>
-                            <span className="font-black text-xs leading-none">
+                            <span className="font-black text-[10px] leading-none">
                                 {speed}
-                                <span className="text-[9px] font-medium opacity-80 ml-0.5">km/h</span>
+                                <span className="text-[8px] font-medium opacity-80 ml-0.5">km/h</span>
                             </span>
                         </div>
                         {/* Hover Details */}

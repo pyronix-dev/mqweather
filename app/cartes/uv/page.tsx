@@ -86,8 +86,8 @@ export default function UVMapPage() {
                             </div>
                         </div>
 
-                        <div className={`w-9 h-9 rounded-full shadow-lg flex items-center justify-center border-2 border-white/70 ${colorClass} transition-all duration-300 hover:shadow-xl`}>
-                            <span className="font-black text-sm">{uvIndex}</span>
+                        <div className={`w-7 h-7 rounded-full shadow-lg flex items-center justify-center border-2 border-white/70 ${colorClass} transition-all duration-300 hover:shadow-xl`}>
+                            <span className="font-black text-xs">{uvIndex}</span>
                         </div>
                     </div>
                 )

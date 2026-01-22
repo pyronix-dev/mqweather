@@ -84,24 +84,24 @@ export default function BeachMapPage() {
                         className="group relative cursor-pointer transition-all duration-300 hover:scale-105 z-10 hover:z-50 animate-fade-in-up"
                     >
                         {/* Beach Card Marker */}
-                        <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-slate-200/50 p-2 flex flex-col items-center gap-1.5 min-w-[70px] transition-all duration-300 hover:shadow-2xl hover:border-amber-200">
+                        <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-slate-200/50 p-1 flex flex-col items-center gap-1 min-w-[55px] transition-all duration-300 hover:shadow-2xl hover:border-amber-200">
                             {/* Weather Icon */}
-                            <div className="text-2xl drop-shadow-sm">
+                            <div className="text-lg drop-shadow-sm">
                                 {icon}
                             </div>
 
                             {/* Stats Row */}
-                            <div className="flex items-center gap-2 w-full justify-center border-t border-slate-100 pt-1.5">
+                            <div className="flex items-center gap-1 w-full justify-center border-t border-slate-100 pt-1">
                                 {/* Water Temp */}
                                 <div className="flex items-center gap-0.5 text-blue-500" title="Température de l'eau">
-                                    <i className="bi bi-thermometer-high text-xs"></i>
-                                    <span className="text-[10px] font-black">{seaTemp}°</span>
+                                    <i className="bi bi-thermometer-high text-[10px]"></i>
+                                    <span className="text-[8px] font-black">{seaTemp}°</span>
                                 </div>
 
                                 {/* UV */}
                                 <div className={`flex items-center gap-0.5 px-1 py-0 rounded-full ${uvIndex >= 6 ? 'bg-orange-100 text-orange-600' : 'bg-emerald-100 text-emerald-600'}`} title="Indice UV">
-                                    <i className="bi bi-sun-fill text-xs"></i>
-                                    <span className="text-[10px] font-black">{uvIndex}</span>
+                                    <i className="bi bi-sun-fill text-[10px]"></i>
+                                    <span className="text-[8px] font-black">{uvIndex}</span>
                                 </div>
                             </div>
                         </div>

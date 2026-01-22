@@ -66,18 +66,18 @@ export default function TemperatureMapPage() {
                         className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
                     >
                         <div className={`
-                            px-2 py-1.5 rounded-xl shadow-lg border border-white/30 backdrop-blur-md flex items-center gap-1.5
+                            px-1.5 py-1 rounded-lg shadow-lg border border-white/30 backdrop-blur-md flex items-center gap-1
                             transition-all duration-300 hover:shadow-xl
                             ${temp >= 30 ? 'bg-gradient-to-br from-red-500/95 to-orange-500/95 text-white shadow-orange-500/30' :
                                 temp >= 28 ? 'bg-gradient-to-br from-orange-500/95 to-amber-500/95 text-white shadow-amber-500/30' :
                                     'bg-gradient-to-br from-cyan-500/95 to-blue-500/95 text-white shadow-blue-500/30'}
                         `}>
-                            <span className="text-lg opacity-90 drop-shadow-sm">
+                            <span className="text-base opacity-90 drop-shadow-sm">
                                 {getWeatherIcon(weatherCode)}
                             </span>
-                            <span className="font-black text-base leading-none tracking-tight drop-shadow-sm">{temp}°</span>
+                            <span className="font-black text-sm leading-none tracking-tight drop-shadow-sm">{temp}°</span>
                         </div>
-                        <span className="text-[10px] font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full mt-2 shadow-md border border-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1">
+                        <span className="text-[9px] font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full mt-1 shadow-md border border-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1">
                             {city.name}
                         </span>
                     </div>

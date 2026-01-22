@@ -61,16 +61,16 @@ export default function RainMapPage() {
                         className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
                     >
                         <div className={`
-                            px-2 py-1.5 rounded-xl shadow-lg border backdrop-blur-md flex items-center gap-1.5
+                            px-1.5 py-1 rounded-lg shadow-lg border backdrop-blur-md flex items-center gap-1
                             transition-all duration-300 hover:shadow-xl
                             ${isHeavy ? 'bg-gradient-to-br from-blue-600/95 to-indigo-600/95 border-blue-400/50 text-white shadow-blue-500/30' :
                                 isRaining ? 'bg-gradient-to-br from-blue-500/95 to-cyan-500/95 border-blue-400/50 text-white shadow-blue-500/30' :
                                     'bg-white/95 border-slate-200/80 text-slate-500 shadow-slate-200/50'}
                         `}>
-                            <i className={`bi ${isHeavy ? 'bi-cloud-rain-heavy-fill' : isRaining ? 'bi-cloud-drizzle-fill' : 'bi-cloud-fill'} ${isRaining ? 'text-white' : 'text-slate-400'} text-lg`}></i>
-                            <span className="font-black text-xs leading-none">
+                            <i className={`bi ${isHeavy ? 'bi-cloud-rain-heavy-fill' : isRaining ? 'bi-cloud-drizzle-fill' : 'bi-cloud-fill'} ${isRaining ? 'text-white' : 'text-slate-400'} text-base`}></i>
+                            <span className="font-black text-[10px] leading-none">
                                 {precip !== null ? precip.toFixed(1) : "--"}
-                                <span className="text-[9px] font-medium opacity-80 ml-0.5">mm</span>
+                                <span className="text-[8px] font-medium opacity-80 ml-0.5">mm</span>
                             </span>
                         </div>
                         {/* Hover Details */}
