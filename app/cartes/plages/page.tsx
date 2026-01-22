@@ -27,7 +27,7 @@ interface BeachData {
 }
 
 export default function BeachMapPage() {
-    const { selectedDay, centerOn, handleSearch, handleDaySelect } = useMapUrlState()
+    const { selectedDay, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [beachData, setBeachData] = useState<Record<string, BeachData>>({})
     const [markers, setMarkers] = useState<MapMarker[]>([])
     const [loading, setLoading] = useState(true)
@@ -175,8 +175,8 @@ export default function BeachMapPage() {
                 </div>
 
                 {/* Map */}
-                <div className="h-[650px] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50 relative mt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                    <MartiniqueMap markers={markers} centerOn={centerOn} />
+                <div className="h-[800px] md:h-[650px] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50 relative mt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                    <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
 
                     {/* Legend */}
                     <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">

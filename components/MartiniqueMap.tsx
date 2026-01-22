@@ -32,7 +32,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
     }, [])
 
     const initialCenter: [number, number] = [-61.0242, 14.6415]
-    const getInitialZoom = () => (window.innerWidth < 768 ? 9.1 : 9.6)
+    const getInitialZoom = () => (window.innerWidth < 768 ? 8.9 : 9.6)
 
     // Store marker positions (x, y) in pixels to render React components
     const [projectedMarkers, setProjectedMarkers] = useState<{ id: string, x: number, y: number }[]>([])

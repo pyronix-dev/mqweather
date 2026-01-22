@@ -383,8 +383,7 @@ export default function CartePage() {
               ) : (
                 <div
                   ref={mapContainerRef}
-                  className="relative cursor-crosshair overflow-hidden bg-slate-100"
-                  style={{ height: "650px" }}
+                  className="relative cursor-crosshair overflow-hidden bg-slate-100 h-[800px] md:h-[650px]"
                   onClick={handleMapClick}
                 >
                   {!mapLoaded && (
