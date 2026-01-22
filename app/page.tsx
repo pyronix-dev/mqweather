@@ -356,15 +356,15 @@ export default function HomePage() {
                     {allData.length > 0 && allData[0]?.daily && (
                       <div className="p-4 border-t border-slate-100 bg-white z-10">
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="bg-slate-50 rounded-lg p-3 border border-slate-200 text-center">
-                            <span className="text-xs text-slate-500 block mb-1">Max</span>
-                            <p className="text-xl font-bold text-slate-800 leading-none">
+                          <div className="bg-red-50 rounded-lg p-3 border border-red-100 text-center">
+                            <span className="text-xs text-red-600 font-bold block mb-1">Max</span>
+                            <p className="text-xl font-black text-red-700 leading-none">
                               {Math.round(Math.max(...allData.map(d => d.daily?.temperature_2m_max?.[selectedDay] || 0)))}°C
                             </p>
                           </div>
-                          <div className="bg-slate-50 rounded-lg p-3 border border-slate-200 text-center">
-                            <span className="text-xs text-slate-500 block mb-1">Min</span>
-                            <p className="text-xl font-bold text-slate-800 leading-none">
+                          <div className="bg-blue-50 rounded-lg p-3 border border-blue-100 text-center">
+                            <span className="text-xs text-blue-600 font-bold block mb-1">Min</span>
+                            <p className="text-xl font-black text-blue-700 leading-none">
                               {Math.round(Math.min(...allData.map(d => d.daily?.temperature_2m_min?.[selectedDay] || 99)))}°C
                             </p>
                           </div>
