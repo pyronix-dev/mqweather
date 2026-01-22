@@ -1,7 +1,5 @@
 "use client"
 import Link from "next/link"
-import { useState } from "react"
-import type React from "react"
 
 const FacebookIcon = () => (
   <i className="bi bi-facebook text-lg"></i>
@@ -16,66 +14,14 @@ const TwitterIcon = () => (
 )
 
 export function Footer() {
-  const [email, setEmail] = useState("")
-  const [subscribed, setSubscribed] = useState(false)
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (email) {
-      setSubscribed(true)
-      setTimeout(() => setSubscribed(false), 3000)
-      setEmail("")
-    }
-  }
 
   return (
     <footer className="relative mt-auto bg-white border-t border-slate-200">
       <div className="py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Newsletter Section */}
-          <div className="mb-12 sm:mb-16 p-6 sm:p-8 rounded-2xl bg-slate-50 border border-slate-200">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">Restez informé de la météo</h3>
-                <p className="text-slate-500 font-medium text-sm sm:text-base">
-                  Recevez nos alertes météo et prévisions directement dans votre boîte mail.
-                </p>
-              </div>
-              <form
-                onSubmit={handleSubscribe}
-                className="flex flex-col sm:flex-row gap-3 min-w-[280px] lg:min-w-[300px]"
-              >
-                <div className="relative flex-1">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Votre email"
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-400 transition-all duration-300"
-                    suppressHydrationWarning
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${subscribed
-                    ? "bg-slate-600 text-white"
-                    : "bg-slate-800 text-white hover:bg-slate-700 hover:shadow-md"
-                    }`}
-                >
-                  {subscribed ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Inscrit!
-                    </span>
-                  ) : (
-                    "S'inscrire"
-                  )}
-                </button>
-              </form>
-            </div>
-          </div>
+
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 mb-12">
             {/* Brand - Full width on mobile */}
