@@ -66,15 +66,16 @@ export default function TemperatureMapPage() {
                         className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
                     >
                         <div className={`
-                            px-3 py-2 rounded-2xl shadow-lg border border-white/50 backdrop-blur-md flex items-center gap-2
-                            transition-all duration-300 hover:scale-110 hover:shadow-xl
-                            bg-white/90
+                            px-2 py-1.5 rounded-xl shadow-lg border border-white/30 backdrop-blur-md flex items-center gap-1.5
+                            transition-all duration-300 hover:shadow-xl
+                            ${temp >= 30 ? 'bg-gradient-to-br from-red-500/95 to-orange-500/95 text-white shadow-orange-500/30' :
+                                temp >= 28 ? 'bg-gradient-to-br from-orange-500/95 to-amber-500/95 text-white shadow-amber-500/30' :
+                                    'bg-gradient-to-br from-cyan-500/95 to-blue-500/95 text-white shadow-blue-500/30'}
                         `}>
-                            <span className="text-2xl drop-shadow-sm filter">
-                                {/* Use generic getWeatherIcon which now returns styled icon or use WeatherIcon directly if imported */}
+                            <span className="text-lg opacity-90 drop-shadow-sm">
                                 {getWeatherIcon(weatherCode)}
                             </span>
-                            <span className="font-black text-lg leading-none tracking-tight text-slate-800">{temp}°</span>
+                            <span className="font-black text-base leading-none tracking-tight drop-shadow-sm">{temp}°</span>
                         </div>
                         <span className="text-[10px] font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full mt-2 shadow-md border border-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1">
                             {city.name}
@@ -106,38 +107,42 @@ export default function TemperatureMapPage() {
                             </div>
                         </div>
 
-                        {/* Header content only - toggle moved below */}
+                        {/* Time Toggle */}
+                        <div className="bg-white/80 backdrop-blur-sm p-1.5 rounded-2xl flex items-center shadow-lg border border-white/50">
+                            <button
+                                onClick={() => setTimeOfDay('morning')}
+                                className={`px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${timeOfDay === 'morning'
+                                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg'
+                                    : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'}`}
+                            >
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1z" />
+                                </svg>
+                                <span>Matin</span>
+                                <span className="text-xs font-medium opacity-80">08h</span>
+                            </button>
+                            <button
+                                onClick={() => setTimeOfDay('afternoon')}
+                                className={`px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${timeOfDay === 'afternoon'
+                                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                                    : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'}`}
+                            >
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" />
+                                </svg>
+                                <span>Après-midi</span>
+                                <span className="text-xs font-medium opacity-80">14h</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-4 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                     <MapControls
                         onSearch={handleSearch}
                         onDaySelect={handleDaySelect}
                         selectedDay={selectedDay}
                     />
-
-                    {/* Time Toggle - Positioned above map */}
-                    <div className="flex justify-center mb-2">
-                        <div className="bg-white/90 backdrop-blur-sm p-1 rounded-xl flex items-center shadow-sm border border-slate-200">
-                            <button
-                                onClick={() => setTimeOfDay('morning')}
-                                className={`px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${timeOfDay === 'morning'
-                                    ? 'bg-amber-100 text-amber-700 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
-                            >
-                                <span>Matin</span>
-                            </button>
-                            <button
-                                onClick={() => setTimeOfDay('afternoon')}
-                                className={`px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${timeOfDay === 'afternoon'
-                                    ? 'bg-orange-100 text-orange-700 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
-                            >
-                                <span>Après-midi</span>
-                            </button>
-                        </div>
-                    </div>
                 </div>
 
                 <div className="h-[800px] md:h-[650px] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50 relative mt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
