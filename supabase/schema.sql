@@ -1,94 +1,132 @@
--- Supabase Schema for MQ Weather
--- Run this in the Supabase SQL Editor (Database → SQL Editor)
-
--- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- =============================================
--- USERS TABLE
--- =============================================
-CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  reference_code TEXT UNIQUE NOT NULL,
-  email TEXT,
-  phone TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
-  -- At least one contact method required
-  CONSTRAINT email_or_phone CHECK (email IS NOT NULL OR phone IS NOT NULL)
-);
+CREATE TABLE IF NOT EXISTS public.users (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  reference_code text NOT NULL,
+  email text NULL,
+  phone text NULL,
+  created_at timestamp with time zone NULL DEFAULT now(),
+  full_name text NULL,
+  country text NULL,
+  billing_details jsonb NULL,
+  notifications_enabled boolean NULL DEFAULT true,
+  notif_sms boolean NULL DEFAULT true,
+  notif_email boolean NULL DEFAULT true,
+  CONSTRAINT users_pkey PRIMARY KEY (id),
+  CONSTRAINT users_reference_code_key UNIQUE (reference_code),
+  CONSTRAINT email_or_phone CHECK ((email IS NOT NULL) OR (phone IS NOT NULL))
+) TABLESPACE pg_default;
 
--- Index for faster lookups
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone);
-CREATE INDEX IF NOT EXISTS idx_users_reference_code ON users(reference_code);
+CREATE INDEX IF NOT EXISTS idx_users_email ON public.users USING btree (email) TABLESPACE pg_default;
+CREATE INDEX IF NOT EXISTS idx_users_phone ON public.users USING btree (phone) TABLESPACE pg_default;
+CREATE INDEX IF NOT EXISTS idx_users_reference_code ON public.users USING btree (reference_code) TABLESPACE pg_default;
 
--- =============================================
--- SUBSCRIPTIONS TABLE
--- =============================================
-CREATE TABLE IF NOT EXISTS subscriptions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  plan TEXT NOT NULL, -- 'sms-monthly', 'sms-annual', 'email-annual'
-  status TEXT NOT NULL DEFAULT 'active', -- 'active', 'cancelled', 'expired'
-  stripe_session_id TEXT,
-  stripe_subscription_id TEXT,
-  amount INTEGER NOT NULL, -- Price in cents
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  expires_at TIMESTAMP WITH TIME ZONE,
-  
+CREATE TABLE IF NOT EXISTS public.otp_codes (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  code_hash text NOT NULL,
+  expires_at timestamp with time zone NOT NULL,
+  used boolean NULL DEFAULT false,
+  created_at timestamp with time zone NULL DEFAULT now(),
+  code text NULL,
+  attempts integer NULL DEFAULT 0,
+  max_attempts integer NULL DEFAULT 3,
+  CONSTRAINT otp_codes_pkey PRIMARY KEY (id),
+  CONSTRAINT otp_codes_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) TABLESPACE pg_default;
+
+CREATE INDEX IF NOT EXISTS idx_otp_codes_user_id ON public.otp_codes USING btree (user_id) TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS public.verification_codes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  phone text NULL,
+  code text NOT NULL,
+  expires_at timestamp with time zone NOT NULL,
+  verified boolean NULL DEFAULT false,
+  created_at timestamp with time zone NULL DEFAULT now(),
+  attempts integer NULL DEFAULT 0,
+  last_attempt_at timestamp with time zone NULL DEFAULT now(),
+  email text NULL,
+  CONSTRAINT phone_verification_codes_pkey PRIMARY KEY (id),
+  CONSTRAINT verification_codes_contact_check CHECK (((phone IS NOT NULL) AND (email IS NULL)) OR ((phone IS NULL) AND (email IS NOT NULL)))
+) TABLESPACE pg_default;
+
+CREATE INDEX IF NOT EXISTS idx_phone_verification_codes_phone ON public.verification_codes USING btree (phone) TABLESPACE pg_default;
+CREATE INDEX IF NOT EXISTS verification_codes_email_idx ON public.verification_codes USING btree (email) TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS public.deleted_users (
+  id uuid NOT NULL,
+  reference_code text NULL,
+  email text NULL,
+  phone text NULL,
+  full_name text NULL,
+  deleted_at timestamp with time zone NULL DEFAULT now(),
+  original_created_at timestamp with time zone NULL,
+  CONSTRAINT deleted_users_pkey PRIMARY KEY (id)
+) TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS public.subscriptions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  plan text NOT NULL,
+  status text NOT NULL DEFAULT 'active',
+  stripe_session_id text NULL,
+  stripe_subscription_id text NULL,
+  amount integer NOT NULL,
+  card_brand text NULL,
+  card_last4 text NULL,
+  created_at timestamp with time zone NULL DEFAULT now(),
+  expires_at timestamp with time zone NULL,
+  CONSTRAINT subscriptions_pkey PRIMARY KEY (id),
+  CONSTRAINT subscriptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT valid_status CHECK (status IN ('active', 'cancelled', 'expired')),
   CONSTRAINT valid_plan CHECK (plan IN ('sms-monthly', 'sms-annual', 'email-annual'))
-);
+) TABLESPACE pg_default;
 
--- Index for user subscriptions
-CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
-CREATE INDEX IF NOT EXISTS idx_subscriptions_stripe_session ON subscriptions(stripe_session_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON public.subscriptions USING btree (user_id) TABLESPACE pg_default;
+CREATE INDEX IF NOT EXISTS idx_subscriptions_stripe_session ON public.subscriptions USING btree (stripe_session_id) TABLESPACE pg_default;
 
--- =============================================
--- OTP CODES TABLE
--- =============================================
-CREATE TABLE IF NOT EXISTS otp_codes (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  code_hash TEXT NOT NULL, -- SHA256 hash of the 6-digit code
-  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  used BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+CREATE TABLE IF NOT EXISTS public.observations (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NULL,
+  type text NOT NULL,
+  x numeric NOT NULL,
+  y numeric NOT NULL,
+  temp text NULL,
+  details text NULL,
+  created_at timestamp with time zone NULL DEFAULT now(),
+  CONSTRAINT observations_pkey PRIMARY KEY (id),
+  CONSTRAINT observations_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) TABLESPACE pg_default;
 
--- Index for faster OTP lookups
-CREATE INDEX IF NOT EXISTS idx_otp_codes_user_id ON otp_codes(user_id);
+CREATE INDEX IF NOT EXISTS idx_observations_created_at ON public.observations USING btree (created_at) TABLESPACE pg_default;
 
--- Auto-delete expired OTP codes (optional, run periodically or use Supabase Edge Functions)
--- DELETE FROM otp_codes WHERE expires_at < NOW();
+CREATE TABLE IF NOT EXISTS public.vigilance_state (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  color_id integer NOT NULL,
+  color_name text NOT NULL,
+  phenomena text[] NULL,
+  last_update timestamp with time zone NULL DEFAULT now(),
+  updated_at timestamp with time zone NULL DEFAULT now(),
+  created_at timestamp with time zone NULL DEFAULT now(),
+  CONSTRAINT vigilance_state_pkey PRIMARY KEY (id)
+) TABLESPACE pg_default;
 
--- =============================================
--- ROW LEVEL SECURITY (RLS)
--- =============================================
--- Enable RLS on all tables
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE otp_codes ENABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_vigilance_state_created_at ON public.vigilance_state USING btree (created_at DESC) TABLESPACE pg_default;
 
--- Policy: Allow service role to do everything (for API routes)
--- Note: Service role bypasses RLS by default, so no explicit policy needed
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.otp_codes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.verification_codes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.deleted_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.observations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vigilance_state ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can only read their own data (if using Supabase Auth)
--- CREATE POLICY "Users can view own data" ON users
---   FOR SELECT USING (auth.uid() = id);
-
--- =============================================
--- HELPER FUNCTIONS
--- =============================================
-
--- Function to clean up expired OTP codes
-CREATE OR REPLACE FUNCTION cleanup_expired_otps()
-RETURNS void AS $$
-BEGIN
-  DELETE FROM otp_codes WHERE expires_at < NOW();
-END;
-$$ LANGUAGE plpgsql;
-
--- Optional: Schedule cleanup (requires pg_cron extension in Supabase)
--- SELECT cron.schedule('cleanup-otps', '*/15 * * * *', 'SELECT cleanup_expired_otps();');
+CREATE POLICY "Public can view observations" ON public.observations FOR SELECT USING (true);
+CREATE POLICY "Public can view vigilance_state" ON public.vigilance_state FOR SELECT USING (true);
+CREATE POLICY "Service can manage otp_codes" ON public.otp_codes FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service can manage vigilance_state" ON public.vigilance_state FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service can manage users" ON public.users FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service can manage subscriptions" ON public.subscriptions FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service can manage verification_codes" ON public.verification_codes FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service can manage deleted_users" ON public.deleted_users FOR ALL USING (true) WITH CHECK (true);

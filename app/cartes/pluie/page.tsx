@@ -61,10 +61,7 @@ export default function RainMapPage() {
                                 isRaining ? 'bg-gradient-to-br from-blue-500/95 to-cyan-500/95 border-blue-400/50 text-white shadow-blue-500/30' :
                                     'bg-white/95 border-slate-200/80 text-slate-500 shadow-slate-200/50'}
                         `}>
-                            <svg className={`w-4 h-4 ${isRaining ? 'text-white' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                                {isRaining && <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 19v2m4-2v2m4-2v2" />}
-                            </svg>
+                            <i className={`bi ${isHeavy ? 'bi-cloud-rain-heavy-fill' : isRaining ? 'bi-cloud-drizzle-fill' : 'bi-cloud-fill'} ${isRaining ? 'text-white' : 'text-slate-400'} text-lg`}></i>
                             <span className="font-black text-xs leading-none">
                                 {precip !== null ? precip.toFixed(1) : "--"}
                                 <span className="text-[9px] font-medium opacity-80 ml-0.5">mm</span>
@@ -95,10 +92,7 @@ export default function RainMapPage() {
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         <div className="flex items-start gap-4">
                             <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl shadow-lg shadow-blue-500/20">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 19v2m4-2v2m4-2v2" />
-                                </svg>
+                                <i className="bi bi-cloud-drizzle-fill text-white text-3xl"></i>
                             </div>
                             <div>
                                 <h1 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight">
@@ -111,9 +105,7 @@ export default function RainMapPage() {
                         {/* Legend Info */}
                         <div className="bg-white/80 backdrop-blur-sm px-5 py-3 rounded-2xl flex items-center gap-6 shadow-lg border border-white/50">
                             <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z M8 19v2m4-2v2m4-2v2" />
-                                </svg>
+                                <i className="bi bi-cloud-drizzle-fill text-blue-500 text-lg"></i>
                                 <span className="font-black text-blue-600">mm</span>
                                 <span className="text-sm text-slate-600 font-medium">Précipitations</span>
                             </div>

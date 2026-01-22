@@ -83,38 +83,21 @@ export default function BeachMapPage() {
                         {/* Beach Card Marker */}
                         <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-slate-200/50 p-2 flex flex-col items-center gap-1.5 min-w-[70px] transition-all duration-300 hover:shadow-2xl hover:border-amber-200">
                             {/* Weather Icon */}
-                            <div className="w-7 h-7 drop-shadow-sm">
-                                <svg className="w-full h-full" viewBox="0 0 24 24" fill="none">
-                                    <circle cx="12" cy="12" r="5" fill="#FBBF24" />
-                                    <g stroke="#FBBF24" strokeWidth="2" strokeLinecap="round">
-                                        <line x1="12" y1="1" x2="12" y2="3" />
-                                        <line x1="12" y1="21" x2="12" y2="23" />
-                                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                                        <line x1="1" y1="12" x2="3" y2="12" />
-                                        <line x1="21" y1="12" x2="23" y2="12" />
-                                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                                    </g>
-                                </svg>
+                            <div className="text-2xl drop-shadow-sm">
+                                {icon}
                             </div>
 
                             {/* Stats Row */}
                             <div className="flex items-center gap-2 w-full justify-center border-t border-slate-100 pt-1.5">
                                 {/* Water Temp */}
                                 <div className="flex items-center gap-0.5 text-blue-500" title="Température de l'eau">
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                                    </svg>
+                                    <i className="bi bi-water text-xs"></i>
                                     <span className="text-[10px] font-black">{seaTemp}°</span>
                                 </div>
 
                                 {/* UV */}
                                 <div className={`flex items-center gap-0.5 px-1 py-0 rounded-full ${uvIndex >= 6 ? 'bg-orange-100 text-orange-600' : 'bg-emerald-100 text-emerald-600'}`} title="Indice UV">
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-                                    </svg>
+                                    <i className="bi bi-sun-fill text-xs"></i>
                                     <span className="text-[10px] font-black">{uvIndex}</span>
                                 </div>
                             </div>
@@ -167,10 +150,9 @@ export default function BeachMapPage() {
 
                 <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                     <MapControls
+                        onSearch={handleSearch}
                         onDaySelect={handleDaySelect}
                         selectedDay={selectedDay}
-                        selectedCity={null}
-                        onCitySelect={() => { }}
                     />
                 </div>
 
@@ -183,15 +165,11 @@ export default function BeachMapPage() {
                         <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Légende</div>
                         <div className="flex flex-col gap-2.5">
                             <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
+                                <i className="bi bi-water text-blue-500"></i>
                                 <span className="text-xs text-slate-600">Temp. de l'eau</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-                                </svg>
+                                <i className="bi bi-sun-fill text-amber-500"></i>
                                 <span className="text-xs text-slate-600">Indice UV</span>
                             </div>
                         </div>
@@ -227,19 +205,9 @@ export default function BeachMapPage() {
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none">
-                                                <circle cx="12" cy="12" r="5" fill="#FBBF24" />
-                                                <g stroke="#FBBF24" strokeWidth="2" strokeLinecap="round">
-                                                    <line x1="12" y1="1" x2="12" y2="3" />
-                                                    <line x1="12" y1="21" x2="12" y2="23" />
-                                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                                                    <line x1="1" y1="12" x2="3" y2="12" />
-                                                    <line x1="21" y1="12" x2="23" y2="12" />
-                                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                                                </g>
-                                            </svg>
+                                            <span className="text-3xl">
+                                                {getWeatherIcon(weatherCode)}
+                                            </span>
                                         </div>
                                         <div>
                                             <div className="font-black text-slate-800">{beach.name}</div>

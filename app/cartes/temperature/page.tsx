@@ -65,9 +65,9 @@ export default function TemperatureMapPage() {
                                 temp >= 28 ? 'bg-gradient-to-br from-orange-500/95 to-amber-500/95 text-white shadow-amber-500/30' :
                                     'bg-gradient-to-br from-cyan-500/95 to-blue-500/95 text-white shadow-blue-500/30'}
                         `}>
-                            <div className="w-5 h-5 opacity-90 drop-shadow-sm">
+                            <span className="text-lg opacity-90 drop-shadow-sm">
                                 {getWeatherIcon(weatherCode)}
-                            </div>
+                            </span>
                             <span className="font-black text-base leading-none tracking-tight drop-shadow-sm">{temp}°</span>
                         </div>
                         <span className="text-[10px] font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full mt-2 shadow-md border border-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1">
@@ -90,9 +90,7 @@ export default function TemperatureMapPage() {
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         <div className="flex items-start gap-4">
                             <div className="p-3 bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl shadow-lg shadow-orange-500/20">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
+                                <i className="bi bi-thermometer-sun text-white text-3xl"></i>
                             </div>
                             <div>
                                 <h1 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight">
