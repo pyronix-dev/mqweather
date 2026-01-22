@@ -38,12 +38,12 @@ async function getOAuthToken(): Promise<string | null> {
   }
 
   if (!METEO_FRANCE_APPLICATION_ID) {
-    console.error("[v0] No METEO_FRANCE_APPLICATION_ID configured")
+    console.error("[MQ] No METEO_FRANCE_APPLICATION_ID configured")
     return null
   }
 
   try {
-    console.log("[v0] Requesting new OAuth2 token...")
+    console.log("[MQ] Requesting new OAuth2 token...")
     const response = await fetch(TOKEN_URL, {
       method: 'POST',
       headers: {
@@ -55,7 +55,7 @@ async function getOAuthToken(): Promise<string | null> {
     })
 
     if (!response.ok) {
-      console.error(`[v0] Token request failed: ${response.status} ${await response.text()}`)
+      console.error(`[MQ] Token request failed: ${response.status} ${await response.text()}`)
       return null
     }
 
@@ -65,10 +65,10 @@ async function getOAuthToken(): Promise<string | null> {
     const expiresIn = data.expires_in || 3600
     tokenExpiration = Date.now() + (expiresIn * 1000)
 
-    console.log("[v0] New OAuth2 token obtained successfully")
+    console.log("[MQ] New OAuth2 token obtained successfully")
     return cachedToken
   } catch (error) {
-    console.error("[v0] Error fetching token:", error)
+    console.error("[MQ] Error fetching token:", error)
     return null
   }
 }
@@ -86,10 +86,10 @@ async function tryFetchWithToken(endpoint: string, token: string): Promise<Respo
     if (response.ok) {
       return response
     }
-    console.log(`[v0] Token failed with status: ${response.status}`)
+    console.log(`[MQ] Token failed with status: ${response.status}`)
     return null
   } catch (error) {
-    console.log(`[v0] Token fetch error:`, error)
+    console.log(`[MQ] Token fetch error:`, error)
     return null
   }
 }
@@ -105,7 +105,7 @@ export async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
       "https://public-api.meteofrance.fr/public/DPVigilance/v1/vigilanceom/flux/dernier",
     ]
     for (const endpoint of endpoints) {
-      console.log(`[v0] Trying Static API_KEY on: ${endpoint}`)
+      console.log(`[MQ] Trying Static API_KEY on: ${endpoint}`)
       const response = await tryFetchWithToken(endpoint, METEO_FRANCE_API_KEY)
       if (response) return await processResponse(response)
     }
@@ -115,13 +115,13 @@ export async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
   const token = await getOAuthToken()
   if (token) {
     const endpoint = "https://public-api.meteofrance.fr/public/DPVigilance/v1/vigilanceom/flux/dernier"
-    console.log(`[v0] Trying OAuth2 Token on: ${endpoint}`)
+    console.log(`[MQ] Trying OAuth2 Token on: ${endpoint}`)
 
     let response = await tryFetchWithToken(endpoint, token)
 
     // Retry logic for 401 (Invalid Token) - force refresh
     if (!response || response.status === 401) {
-      console.log("[v0] Token might be expired (401), refreshing...")
+      console.log("[MQ] Token might be expired (401), refreshing...")
       cachedToken = null // Clear cache
       const newToken = await getOAuthToken()
       if (newToken) {
@@ -135,7 +135,7 @@ export async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
   }
 
   // All failed
-  console.log("[v0] All methods failed, returning error status")
+  console.log("[MQ] All methods failed, returning error status")
   return {
     colorId: -1,
     colorName: "erreur",
@@ -146,27 +146,27 @@ export async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
 }
 
 async function processResponse(response: Response): Promise<VigilanceData> {
-  console.log(`[v0] Success with token`)
+  console.log(`[MQ] Success with token`)
   // Get the response as array buffer for ZIP processing
   const arrayBuffer = await response.arrayBuffer()
   const zip = new JSZip()
   const zipContents = await zip.loadAsync(arrayBuffer)
 
   const allFiles = Object.keys(zipContents.files)
-  console.log(`[v0] ZIP files found:`, allFiles)
+  console.log(`[MQ] ZIP files found:`, allFiles)
 
   // TFFF is the ICAO code for Fort-de-France, Martinique
   const txtFiles = allFiles.filter((f) => f.toLowerCase().endsWith(".txt"))
-  console.log(`[v0] TXT files found:`, txtFiles)
+  console.log(`[MQ] TXT files found:`, txtFiles)
 
   // Look for Martinique file (TFFF = Fort-de-France airport code)
   const martiniqueTxtFile = txtFiles.find((f) => f.includes("TFFF") || f.toLowerCase().includes("martinique"))
 
   if (martiniqueTxtFile) {
-    console.log(`[v0] Found Martinique TXT file: ${martiniqueTxtFile}`)
+    console.log(`[MQ] Found Martinique TXT file: ${martiniqueTxtFile}`)
     const file = zipContents.files[martiniqueTxtFile]
     const content = await file.async("string")
-    console.log(`[v0] File content:\n${content}`)
+    console.log(`[MQ] File content:\n${content}`)
 
     // Parse the TXT content for vigilance data
     const vigilanceData = parseVigilanceTxtContent(content)
@@ -174,15 +174,15 @@ async function processResponse(response: Response): Promise<VigilanceData> {
       return vigilanceData
     }
   } else {
-    console.log(`[v0] No Martinique TXT file found, checking all TXT files...`)
+    console.log(`[MQ] No Martinique TXT file found, checking all TXT files...`)
     // Fallback: check all TXT files for Martinique data
     for (const txtFile of txtFiles) {
       const file = zipContents.files[txtFile]
       const content = await file.async("string")
 
       if (content.toLowerCase().includes("martinique") || content.includes("972")) {
-        console.log(`[v0] Found Martinique data in: ${txtFile}`)
-        console.log(`[v0] File content:\n${content}`)
+        console.log(`[MQ] Found Martinique data in: ${txtFile}`)
+        console.log(`[MQ] File content:\n${content}`)
 
         const vigilanceData = parseVigilanceTxtContent(content)
         if (vigilanceData) {
@@ -215,31 +215,31 @@ function parseVigilanceTxtContent(content: string): VigilanceData | null {
         lowerLine.includes("alerte rouge")
       ) {
         maxColorId = Math.max(maxColorId, 4)
-        console.log(`[v0] Found ROUGE in line: ${line}`)
+        console.log(`[MQ] Found ROUGE in line: ${line}`)
       } else if (
         lowerLine.includes("vigilance orange") ||
         lowerLine.includes("niveau orange") ||
         lowerLine.includes("alerte orange")
       ) {
         maxColorId = Math.max(maxColorId, 3)
-        console.log(`[v0] Found ORANGE in line: ${line}`)
+        console.log(`[MQ] Found ORANGE in line: ${line}`)
       } else if (
         lowerLine.includes("vigilance jaune") ||
         lowerLine.includes("niveau jaune") ||
         lowerLine.includes("alerte jaune")
       ) {
         maxColorId = Math.max(maxColorId, 2)
-        console.log(`[v0] Found JAUNE in line: ${line}`)
+        console.log(`[MQ] Found JAUNE in line: ${line}`)
       } else if (
         lowerLine.includes("vigilance verte") ||
         lowerLine.includes("vigilance vert") ||
         lowerLine.includes("niveau vert")
       ) {
         maxColorId = Math.max(maxColorId, 1)
-        console.log(`[v0] Found VERT in line: ${line}`)
+        console.log(`[MQ] Found VERT in line: ${line}`)
       } else if (lowerLine.includes("vigilance violet") || lowerLine.includes("niveau violet")) {
         maxColorId = Math.max(maxColorId, 5)
-        console.log(`[v0] Found VIOLET in line: ${line}`)
+        console.log(`[MQ] Found VIOLET in line: ${line}`)
       }
 
       // Look for numeric patterns
@@ -248,7 +248,7 @@ function parseVigilanceTxtContent(content: string): VigilanceData | null {
         const colorId = Number.parseInt(numericMatch[1])
         if (colorId >= 1 && colorId <= 5) {
           maxColorId = Math.max(maxColorId, colorId)
-          console.log(`[v0] Found numeric color ${colorId} in line: ${line}`)
+          console.log(`[MQ] Found numeric color ${colorId} in line: ${line}`)
         }
       }
 
@@ -276,7 +276,7 @@ function parseVigilanceTxtContent(content: string): VigilanceData | null {
       }
     }
 
-    console.log(`[v0] Final color ID: ${maxColorId}, phenomena: ${phenomena.join(", ")}`)
+    console.log(`[MQ] Final color ID: ${maxColorId}, phenomena: ${phenomena.join(", ")}`)
 
     const colorName = COLOR_ID_MAP[maxColorId] || "vert"
     return {
@@ -288,7 +288,7 @@ function parseVigilanceTxtContent(content: string): VigilanceData | null {
       rawData: content,
     }
   } catch (e) {
-    console.error(`[v0] Error parsing vigilance TXT content:`, e)
+    console.error(`[MQ] Error parsing vigilance TXT content:`, e)
     return null
   }
 }
@@ -303,7 +303,7 @@ export async function GET() {
       },
     })
   } catch (error) {
-    console.error("[v0] Vigilance API error:", error)
+    console.error("[MQ] Vigilance API error:", error)
 
     return NextResponse.json(
       {

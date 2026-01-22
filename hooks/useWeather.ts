@@ -92,7 +92,7 @@ export function useWeather(lat: string, lon: string, dayIndex: number) {
                     console.log("Marine data unavailable")
                 }
             } catch (error) {
-                console.log("[v0] Weather fetch error:", error)
+                console.log("[MQ] Weather fetch error:", error)
             } finally {
                 setLoading(false)
             }

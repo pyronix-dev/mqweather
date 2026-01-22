@@ -7,9 +7,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "MQ Weather",
-  description: "Météo Martinique",
-  generator: "v0.app",
+  title: "Météo Martinique",
+  description: "Suivez la météo en temps réel en Martinique",
 }
 
 import { ToastProvider } from "@/components/ui/toast-context"

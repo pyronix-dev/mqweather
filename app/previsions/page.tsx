@@ -408,7 +408,7 @@ function PrevisionContent() {
           setDailyData(daily)
         }
       } catch (error) {
-        console.log("[v0] Weather fetch error:", error)
+        console.log("[MQ] Weather fetch error:", error)
       } finally {
         setLoading(false)
       }
