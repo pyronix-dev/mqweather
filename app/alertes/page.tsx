@@ -1090,7 +1090,11 @@ function AlertesContent() {
                     onMouseEnter={() => setIsHoveredPro(true)}
                     onMouseLeave={() => setIsHoveredPro(false)}
                   >
-                    <h2 className="text-xl font-black text-red-600 underline mb-2">Professionnels</h2>
+                    <div className="absolute -top-4 left-6">
+                      <span className="bg-slate-600 text-white text-xs font-black px-4 py-2 rounded-full">
+                        PROFESSIONNELS
+                      </span>
+                    </div>
                     <h3 className="text-lg font-black text-slate-800 mb-2">SMS Pro</h3>
                     <div className="flex items-baseline gap-1 mb-3">
                       <span className="text-3xl font-black text-slate-700">Sur devis</span>
