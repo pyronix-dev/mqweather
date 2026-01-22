@@ -217,6 +217,12 @@ const getWeatherLabel = (precipitation: number) => {
   return "Ensoleillé"
 }
 
+const getWindDirectionLabel = (degrees: number) => {
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+  const index = Math.round(degrees / 45) % 8;
+  return directions[index];
+}
+
 const SmallDropIcon = () => (
   <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
     <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z" />
@@ -605,115 +611,119 @@ function PrevisionContent() {
 
                 {/* Weather Data */}
                 <div className="border border-border rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 animate-slide-in-left shadow-sm bg-white">
-                  {/* Top row - main temp + 4 metrics */}
-                  <div className="flex flex-wrap items-stretch gap-3 sm:gap-4 mb-4">
-                    {/* Main temperature */}
-                    <div className="flex items-center gap-3 pr-4 sm:pr-6 border-r border-border">
-                      <div className="text-amber-500">
+                  <div className="flex flex-col gap-4">
+                    {/* Main Temperature - Enlarged Area */}
+                    <div className="bg-amber-50/50 rounded-2xl p-6 border border-amber-100 flex items-center gap-6">
+                      <div className="p-4 bg-white rounded-full shadow-sm text-amber-500">
                         <ThermometerIcon />
                       </div>
                       <div>
-                        <div className="text-5xl sm:text-6xl font-bold text-foreground">
+                        <div className="text-7xl sm:text-8xl font-black text-slate-800 tracking-tight leading-none">
                           {Math.round(weather?.temperature_2m || 26)}°C
                         </div>
-                        <p className="text-muted-foreground text-sm">Température</p>
+                        <p className="text-slate-500 font-medium text-lg mt-1">Température Actuelle</p>
                       </div>
                     </div>
 
-                    {/* Ressenti */}
-                    <div className="flex-1 min-w-[100px] rounded-xl p-3 sm:p-4 border border-border bg-slate-50/50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="text-orange-500">
-                          <FeelsLikeIcon />
+                    {/* Metrics Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                      {/* Pression */}
+                      <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="text-amber-500">
+                            <PressureIcon />
+                          </div>
+                          <p className="text-muted-foreground text-xs font-bold uppercase tracking-wider">Pression</p>
                         </div>
-                        <p className="text-muted-foreground text-xs font-semibold uppercase">Ressenti</p>
+                        <p className="text-2xl sm:text-3xl font-black text-foreground">
+                          {Math.round(weather?.pressure_msl || 1013)}
+                          <span className="text-sm font-bold text-muted-foreground ml-1">mb</span>
+                        </p>
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-foreground">
-                        {Math.round(weather?.apparent_temperature || 26)}°
-                      </p>
-                    </div>
 
-                    {/* Humidité */}
-                    <div className="flex-1 min-w-[100px] rounded-xl p-3 sm:p-4 border border-border bg-slate-50/50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="text-blue-500">
-                          <HumidityIcon />
+                      {/* Ressenti */}
+                      <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="text-orange-500">
+                            <FeelsLikeIcon />
+                          </div>
+                          <p className="text-muted-foreground text-xs font-bold uppercase tracking-wider">Ressenti</p>
                         </div>
-                        <p className="text-muted-foreground text-xs font-semibold uppercase">Humidité</p>
+                        <p className="text-2xl sm:text-3xl font-black text-foreground">
+                          {Math.round(weather?.apparent_temperature || 26)}°
+                        </p>
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-foreground">{weather?.relative_humidity_2m}%</p>
-                    </div>
 
-                    {/* Vent */}
-                    <div className="flex-1 min-w-[100px] rounded-xl p-3 sm:p-4 border border-border bg-slate-50/50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="text-teal-500">
-                          <WindIcon />
+                      {/* Humidité */}
+                      <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="text-blue-500">
+                            <HumidityIcon />
+                          </div>
+                          <p className="text-muted-foreground text-xs font-bold uppercase tracking-wider">Humidité</p>
                         </div>
-                        <p className="text-muted-foreground text-xs font-semibold uppercase">Vent</p>
+                        <p className="text-2xl sm:text-3xl font-black text-foreground">{weather?.relative_humidity_2m}%</p>
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-foreground">
-                        {Math.round(weather?.wind_speed_10m || 15)}
-                        <span className="text-base font-medium text-muted-foreground ml-1">km/h</span>
-                      </p>
-                    </div>
 
-                    {/* Pression */}
-                    <div className="flex-1 min-w-[100px] rounded-xl p-3 sm:p-4 border border-border bg-slate-50/50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="text-amber-500">
-                          <PressureIcon />
+                      {/* Vent */}
+                      <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="text-teal-500">
+                            <WindIcon />
+                          </div>
+                          <p className="text-muted-foreground text-xs font-bold uppercase tracking-wider">Vent</p>
                         </div>
-                        <p className="text-muted-foreground text-xs font-semibold uppercase">Pression</p>
+                        <p className="text-2xl sm:text-3xl font-black text-foreground">
+                          {Math.round(weather?.wind_speed_10m || 15)}
+                          <span className="text-sm font-bold text-muted-foreground ml-1">km/h</span>
+                        </p>
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-foreground">
-                        {Math.round(weather?.pressure_msl || 1013)}
-                        <span className="text-base font-medium text-muted-foreground ml-1">mb</span>
-                      </p>
-                    </div>
-                  </div>
 
-                  {/* Bottom row - 3 metrics */}
-                  <div className="flex flex-wrap gap-3 sm:gap-4">
-                    {/* Visibilité */}
-                    <div className="flex-1 min-w-[120px] rounded-xl p-3 sm:p-4 border border-border bg-slate-50/50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="text-green-500">
-                          <VisibilityIcon />
+                      {/* Visibilité */}
+                      <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="text-green-500">
+                            <VisibilityIcon />
+                          </div>
+                          <p className="text-muted-foreground text-xs font-bold uppercase tracking-wider">Visibilité</p>
                         </div>
-                        <p className="text-muted-foreground text-xs font-semibold uppercase">Visibilité</p>
+                        <p className="text-2xl sm:text-3xl font-black text-foreground">
+                          {Math.round((weather?.visibility || 10000) / 1000)}
+                          <span className="text-sm font-bold text-muted-foreground ml-1">km</span>
+                        </p>
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-foreground">
-                        {Math.round((weather?.visibility || 10000) / 1000)}
-                        <span className="text-base font-medium text-muted-foreground ml-1">km</span>
-                      </p>
-                    </div>
 
-                    {/* Précip */}
-                    <div className="flex-1 min-w-[120px] rounded-xl p-3 sm:p-4 border border-border bg-slate-50/50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="text-blue-500">
-                          <RainIcon />
+                      {/* Précip */}
+                      <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="text-blue-500">
+                            <RainIcon />
+                          </div>
+                          <p className="text-muted-foreground text-xs font-bold uppercase tracking-wider">Précip.</p>
                         </div>
-                        <p className="text-muted-foreground text-xs font-semibold uppercase">Précip.</p>
+                        <p className="text-2xl sm:text-3xl font-black text-foreground">
+                          {weather?.precipitation || 0}
+                          <span className="text-sm font-bold text-muted-foreground ml-1">mm</span>
+                        </p>
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-foreground">
-                        {weather?.precipitation || 0}
-                        <span className="text-base font-medium text-muted-foreground ml-1">mm</span>
-                      </p>
-                    </div>
 
-                    {/* Direction */}
-                    <div className="flex-1 min-w-[120px] rounded-xl p-3 sm:p-4 border border-border bg-slate-50/50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="text-indigo-500">
-                          <CompassIcon />
+                      {/* Direction */}
+                      <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200 col-span-2 sm:col-span-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="text-indigo-500">
+                            <CompassIcon />
+                          </div>
+                          <p className="text-muted-foreground text-xs font-bold uppercase tracking-wider">Direction</p>
                         </div>
-                        <p className="text-muted-foreground text-xs font-semibold uppercase">Direction</p>
+                        <div className="flex items-center gap-3">
+                          <p className="text-2xl sm:text-3xl font-black text-foreground">
+                            {Math.round(weather?.wind_direction_10m || 0)}°
+                          </p>
+                          <div className="mt-1 px-2 py-0.5 rounded-full bg-slate-100 text-xs font-bold text-slate-500 border border-slate-200">
+                            {getWindDirectionLabel(weather?.wind_direction_10m || 0)}
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-2xl sm:text-3xl font-bold text-foreground">
-                        {Math.round(weather?.wind_direction_10m || 0)}°
-                      </p>
                     </div>
                   </div>
                 </div>

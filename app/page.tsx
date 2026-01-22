@@ -175,14 +175,14 @@ export default function HomePage() {
             className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
           >
             <div className={`
-                px-3 py-2 rounded-2xl shadow-lg border border-white/50 backdrop-blur-md flex items-center gap-2
-                transition-all duration-300 hover:scale-110 hover:shadow-xl
+                px-1.5 py-1 rounded-xl shadow-md border border-white/50 backdrop-blur-md flex items-center gap-1
+                transition-all duration-300 hover:scale-110 hover:shadow-lg
                 bg-white/90
             `}>
-              <span className="text-2xl drop-shadow-sm filter">
+              <span className="text-lg drop-shadow-sm filter">
                 {getWeatherIcon(weatherCode)}
               </span>
-              <span className="font-black text-lg leading-none tracking-tight text-slate-800">{temp}°</span>
+              <span className="font-bold text-xs leading-none tracking-tight text-slate-800">{temp}°</span>
             </div>
 
             {/* City Name Label on hover */}
@@ -233,7 +233,7 @@ export default function HomePage() {
                   />
 
                   {/* Time Toggle - Positioned below day selector */}
-                  <div className="flex justify-center md:justify-start mt-4">
+                  <div className="flex justify-center mt-4">
                     <div className="bg-slate-100 p-1 rounded-xl flex items-center shadow-inner">
                       <button
                         onClick={() => setTimeOfDay('morning')}
@@ -291,30 +291,15 @@ export default function HomePage() {
                   <div className="text-xs font-bold text-slate-600 mb-3 uppercase tracking-wider">Légende</div>
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                          <circle cx="12" cy="12" r="5" />
-                          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
-                        </svg>
-                      </div>
+                      <span className="text-amber-500 text-lg"><i className="bi bi-sun-fill"></i></span>
                       <span className="text-xs text-slate-600 font-medium">Ensoleillé</span>
                     </div>
                     <div className="flex items-center gap-2.5">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" />
-                        </svg>
-                      </div>
+                      <span className="text-slate-400 text-lg"><i className="bi bi-cloud-fill"></i></span>
                       <span className="text-xs text-slate-600 font-medium">Nuageux</span>
                     </div>
                     <div className="flex items-center gap-2.5">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M17.5 19a4.5 4.5 0 100-9 4.5 4.5 0 000 9z" opacity="0.3" />
-                          <path d="M7 14l-1 4M11 14l-1 4M15 14l-1 4M5 18l-1 4M9 18l-1 4M13 18l-1 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-                          <path d="M16.5 8A5.49 5.49 0 0012 4a5.5 5.5 0 00-5.27 4A4 4 0 003 12a4 4 0 004 4h9.5a3.5 3.5 0 000-7z" fill="currentColor" opacity="0.6" />
-                        </svg>
-                      </div>
+                      <span className="text-blue-500 text-lg"><i className="bi bi-cloud-rain-fill"></i></span>
                       <span className="text-xs text-slate-600 font-medium">Pluie</span>
                     </div>
                   </div>
@@ -337,9 +322,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-white">{selectedCity ? `Météo à ${selectedCity}` : "Bulletin Météo"}</h2>
-                    <p className="text-white/60 text-xs">
-                      {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-                    </p>
+                    <p className="text-white/60 text-xs">Prévisions</p>
                   </div>
                 </div>
               </div>
@@ -369,6 +352,9 @@ export default function HomePage() {
                   <>
                     <div className="flex-1 overflow-y-auto scrollbar-thin px-5 py-1">
                       <div className="bg-gradient-to-br from-slate-50 to-sky-50 rounded-2xl p-4 border border-slate-100">
+                        <div className="mb-2 font-bold text-slate-800 text-sm border-b border-slate-200 pb-2">
+                          {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                        </div>
                         <p className="text-slate-700 text-sm leading-relaxed">
                           {(aiBulletin || weatherSummary).split(/(\*\*[^*]+\*\*)/).map((part, i) => {
                             if (part.startsWith('**') && part.endsWith('**')) {
@@ -417,25 +403,25 @@ export default function HomePage() {
                     name: 'Températures',
                     href: '/cartes/temperature',
                     color: 'from-red-400 to-orange-500',
-                    icon: <i className="bi bi-thermometer-sun text-xl text-orange-500" />
+                    icon: <i className="bi bi-thermometer-sun text-4xl text-orange-500" />
                   },
                   {
                     name: 'Vent',
                     href: '/cartes/vent',
                     color: 'from-teal-400 to-cyan-500',
-                    icon: <i className="bi bi-wind text-xl text-teal-500" />
+                    icon: <i className="bi bi-wind text-4xl text-teal-500" />
                   },
                   {
                     name: 'Pluie',
                     href: '/cartes/pluie',
                     color: 'from-blue-400 to-indigo-500',
-                    icon: <i className="bi bi-cloud-drizzle-fill text-xl text-blue-500" />
+                    icon: <i className="bi bi-cloud-drizzle-fill text-4xl text-blue-500" />
                   },
                   {
                     name: 'UV',
                     href: '/cartes/uv',
                     color: 'from-amber-400 to-yellow-500',
-                    icon: <i className="bi bi-sun-fill text-xl text-amber-500" />
+                    icon: <i className="bi bi-sun-fill text-4xl text-amber-500" />
                   },
                 ].map((item) => (
                   <a
