@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 
@@ -433,35 +433,22 @@ function AlertesContent() {
     }
   }
 
-  // Handle Stripe Checkout redirect
-  const handleCheckout = async (plan: 'sms-monthly' | 'sms-annual' | 'email-annual') => {
-    setIsLoading(true)
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan,
-          phone: phone || undefined,
-          email: email || undefined,
-          profile: selectedProfile || emailProfile || undefined,
-        }),
-      })
+  // Handle Stripe Checkout redirect (Embedded)
+  const router = useRouter()
+  const handleCheckout = (plan: 'sms-monthly' | 'sms-annual' | 'email-annual') => {
+    const params = new URLSearchParams()
+    params.set('plan', plan)
 
-      const data = await response.json()
-
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        console.error('Checkout error:', data.error)
-        alert('Erreur lors de la création du paiement. Veuillez réessayer.')
-      }
-    } catch (error) {
-      console.error('Checkout error:', error)
-      alert('Erreur de connexion. Veuillez réessayer.')
-    } finally {
-      setIsLoading(false)
+    // Add relevant data based on plan
+    if (plan.includes('sms')) {
+      if (phone) params.set('phone', phone)
+      if (selectedProfile) params.set('profile', selectedProfile)
+    } else {
+      if (email) params.set('email', email)
+      if (emailProfile) params.set('profile', emailProfile)
     }
+
+    router.push(`/alertes/checkout?${params.toString()}`)
   }
 
   // Email Subscription View - Redesigned to match SMS flow

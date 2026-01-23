@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
         // Create a Stripe Checkout session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
+            ui_mode: 'embedded',
             line_items: [
                 {
                     price_data: {
@@ -66,8 +67,7 @@ export async function POST(request: NextRequest) {
                 },
             ],
             mode: priceConfig.mode,
-            success_url: `${origin}/alertes/success?plan=${plan}&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${origin}/alertes/cancel?reason=canceled`,
+            return_url: `${origin}/alertes/return?session_id={CHECKOUT_SESSION_ID}`,
             metadata: {
                 plan,
                 phone: phone || '',
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
             customer_email: email || undefined,
         })
 
-        return NextResponse.json({ url: session.url })
+        return NextResponse.json({ clientSecret: session.client_secret })
     } catch (error) {
         console.error('Stripe checkout error:', error)
         return NextResponse.json(
