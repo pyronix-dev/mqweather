@@ -76,6 +76,18 @@ export async function POST(request: Request) {
             .update({ verified: true })
             .eq('id', record.id)
 
+        // Log login history (find user by phone)
+        const { data: user } = await supabase
+            .from('users')
+            .select('id')
+            .eq('phone', phone)
+            .single()
+
+        if (user) {
+            const { logUserLogin } = await import('@/lib/login-logger')
+            await logUserLogin(user.id, request)
+        }
+
         return NextResponse.json({ success: true })
 
     } catch (error) {

@@ -51,6 +51,18 @@ export async function POST(request: NextRequest) {
             .update({ verified: true })
             .eq('id', record.id)
 
+        // 5. Log Login History
+        const { data: user } = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', email)
+            .single()
+
+        if (user) {
+            const { logUserLogin } = await import('@/lib/login-logger')
+            await logUserLogin(user.id, request)
+        }
+
         return NextResponse.json({ success: true, message: 'Email vérifié' })
 
     } catch (error: any) {
