@@ -92,8 +92,8 @@ CREATE TABLE IF NOT EXISTS public.observations (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   user_id uuid NULL,
   type text NOT NULL,
-  lat numeric NOT NULL, 
-  lon numeric NOT NULL,
+  x numeric NOT NULL,
+  y numeric NOT NULL,
   temp text NULL,
   details text NULL,
   created_at timestamp with time zone NULL DEFAULT now(),
@@ -180,10 +180,10 @@ BEGIN
         ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT FALSE;
     END IF;
 
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='observations' AND column_name='lat') THEN
-        ALTER TABLE observations ADD COLUMN lat NUMERIC;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='observations' AND column_name='x') THEN
+        ALTER TABLE observations ADD COLUMN x NUMERIC;
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='observations' AND column_name='lon') THEN
-        ALTER TABLE observations ADD COLUMN lon NUMERIC;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='observations' AND column_name='y') THEN
+        ALTER TABLE observations ADD COLUMN y NUMERIC;
     END IF;
 END $$;

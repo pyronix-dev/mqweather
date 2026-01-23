@@ -1,9 +1,10 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import useSWR from "swr"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { VIGILANCE_TEXTS } from "./vigilance-texts"
 
 const SunIcon = () => (
   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,6 +40,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json())
 export default function VigilancePage() {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+  const [randomText, setRandomText] = useState<string>("")
 
   const {
     data: vigilanceData,
@@ -55,6 +57,16 @@ export default function VigilancePage() {
     : VIGILANCE_COLORS[6]
 
   const mapUrl = vigilanceData?.mapUrl || "https://raw.githubusercontent.com/pyronix-dev/upwork/main/error.png"
+
+  useEffect(() => {
+    if (currentVigilance) {
+      const colorKey = currentVigilance.name as keyof typeof VIGILANCE_TEXTS
+      const texts = VIGILANCE_TEXTS[colorKey] || VIGILANCE_TEXTS['erreur']
+
+      const randomIndex = Math.floor(Math.random() * texts.length)
+      setRandomText(texts[randomIndex])
+    }
+  }, [currentVigilance])
 
   const formatLastUpdate = () => {
     if (vigilanceData?.lastUpdate) {
@@ -279,7 +291,7 @@ export default function VigilancePage() {
                             month: 'long',
                             year: 'numeric'
                           })
-                          return `Aujourd'hui ${today}, vigilance ${currentVigilance.name === "vert" ? "verte" : currentVigilance.name}, ce qui signifie qu'il n'y a pas de danger particulier en Martinique.`
+                          return `Aujourd'hui ${today}, vigilance ${currentVigilance.name === "vert" ? "verte" : currentVigilance.name}. ${randomText}`
                         })()}
                       </p>
                     </div>

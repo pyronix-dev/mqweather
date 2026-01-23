@@ -21,13 +21,12 @@ export async function GET() {
             return NextResponse.json({ error: 'Failed to fetch observations' }, { status: 500 })
         }
 
-        // Map database columns back to frontend expected format
-        // stored: lon -> x, lat -> y
+        // Map database columns to frontend expected format
         const formattedObservations = observations.map((obs) => ({
             id: obs.id,
             type: obs.type,
-            x: Number(obs.lon), // x was stored in lon
-            y: Number(obs.lat), // y was stored in lat
+            x: Number(obs.x),
+            y: Number(obs.y),
             user_id: obs.user_id,
             details: obs.details,
             temp: obs.temp,
@@ -52,31 +51,35 @@ export async function POST(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
-        // Store x in lon and y in lat to fit existing schema
+        // Use x and y columns directly
+        const insertData = {
+            type,
+            x: Number(x),
+            y: Number(y),
+            user_id: user_id || null,
+            details: details || '',
+            temp: temp || null
+        }
+
+        console.log('Attempting to insert observation:', JSON.stringify(insertData))
+
         const { data, error } = await supabase
             .from('observations')
-            .insert({
-                type,
-                lon: x, // Store x coordinate in lon column
-                lat: y, // Store y coordinate in lat column
-                user_id: user_id || null, // Allow null for anonymous/system
-                details,
-                temp
-            })
+            .insert(insertData)
             .select()
             .single()
 
         if (error) {
-            console.error('Error saving observation:', error)
-            return NextResponse.json({ error: 'Failed to save observation' }, { status: 500 })
+            console.error('SUPABASE INSERT ERROR:', JSON.stringify(error, null, 2))
+            return NextResponse.json({ error: 'Failed to save observation', details: error.message }, { status: 500 })
         }
 
         // Return in frontend format
         const newObservation = {
             id: data.id,
             type: data.type,
-            x: Number(data.lon),
-            y: Number(data.lat),
+            x: Number(data.x),
+            y: Number(data.y),
             user_id: data.user_id,
             details: data.details,
             temp: data.temp,
