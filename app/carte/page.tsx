@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 
@@ -205,6 +205,23 @@ export default function CartePage() {
     window.addEventListener("resize", checkDesktop)
     return () => window.removeEventListener("resize", checkDesktop)
   }, [])
+
+  // Close marker popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      // If clicking on a marker button or popup, don't close (handled by stopPropagation)
+      const target = e.target as HTMLElement
+      if (target.closest('[data-marker-popup]') || target.closest('[data-marker-button]')) {
+        return
+      }
+      setSelectedMarker(null)
+    }
+
+    if (selectedMarker) {
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
+    }
+  }, [selectedMarker])
 
   const handleSaveConfig = () => {
     console.log("Layout Config:", JSON.stringify(layoutConfig, null, 2))
@@ -474,6 +491,7 @@ export default function CartePage() {
                     className={`w-full h-full object-contain transition-opacity duration-500 ${mapLoaded ? "opacity-100" : "opacity-0"}`}
                     onLoad={() => setMapLoaded(true)}
                     draggable={false}
+                    key="map-image-static"
                   />
 
                   {markers.map((marker) => {
@@ -487,6 +505,7 @@ export default function CartePage() {
                         style={{ left: position.left, top: position.top }}
                       >
                         <button
+                          data-marker-button
                           onClick={(e) => handleMarkerClick(e, marker)}
                           className={`w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full shadow-lg border-2 border-slate-200 flex items-center justify-center hover:scale-110 transition-transform cursor-pointer ${isOld ? "opacity-50" : ""}`}
                         >
@@ -494,7 +513,8 @@ export default function CartePage() {
                         </button>
 
                         {selectedMarker?.id === marker.id && (
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 p-3 animate-fade-in-up z-30">
+                          <div data-marker-popup className={`absolute left-1/2 -translate-x-1/2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 p-3 animate-fade-in-up z-30 ${marker.y < 25 ? 'top-full mt-2' : 'bottom-full mb-2'
+                            }`}>
                             <div className="flex items-center gap-2 mb-2">
                               <IconComponent />
                               <span className="font-bold text-slate-800 text-sm">{getWeatherLabel(marker.type)}</span>
@@ -506,7 +526,11 @@ export default function CartePage() {
                             )}
                             {marker.details && <p className="text-xs text-slate-500">{marker.details}</p>}
                             {isOld && <p className="text-xs text-amber-600 mt-2 font-medium">{"Observation > 48h"}</p>}
-                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white" />
+                            {/* Arrow pointing to marker */}
+                            <div className={`absolute left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-l-transparent border-r-transparent ${marker.y < 25
+                              ? 'bottom-full border-b-8 border-b-white'
+                              : 'top-full border-t-8 border-t-white'
+                              }`} />
                           </div>
                         )}
                       </div>
