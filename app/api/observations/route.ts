@@ -6,8 +6,8 @@ let OBSERVATIONS: any[] = [
     {
         id: '1',
         type: 'rain',
-        lat: 14.6161,
-        lon: -61.0588,
+        x: 50,
+        y: 50,
         user_id: 'system',
         timestamp: new Date().toISOString(),
         details: 'Pluie modérée'
@@ -21,21 +21,20 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        // Allow simplified marker creation for free users
-        const { type, lat, lon, user_id, details } = body
+        const { type, x, y, user_id, details } = body
 
-        if (!type || !lat || !lon) {
+        if (!type || x === undefined || y === undefined) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
         }
 
         const newObservation = {
             id: Math.random().toString(36).substring(7),
             type,
-            lat,
-            lon,
+            x,
+            y,
             user_id: user_id || 'anonymous',
             details,
-            timestamp: new Date().toISOString()
+            created_at: new Date().toISOString() // Changed to created_at to match frontend interface
         }
 
         OBSERVATIONS.push(newObservation)

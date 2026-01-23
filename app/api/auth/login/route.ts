@@ -6,6 +6,7 @@ import { sendSMS, sendEmail } from '@/lib/brevo'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import { getOtpEmailHtml } from '@/lib/email-templates'
 import bcrypt from 'bcrypt'
+import crypto from 'crypto'
 
 // Helper to hash data
 function hash(data: string) {
