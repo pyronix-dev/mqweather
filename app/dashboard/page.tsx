@@ -312,61 +312,63 @@ export default function DashboardPage() {
                                     Paramètres
                                 </Link>
 
-                                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 rounded-xl">
-                                    <div className="flex items-center gap-3 text-slate-700 text-sm font-medium">
-                                        <BellIcon />
-                                        Notifications
-                                    </div>
-                                    <button
-                                        onClick={async () => {
-                                            // Prioritize granular settings if they exist
-                                            const hasGranular = user.notifications && (typeof user.notifications.sms === 'boolean' || typeof user.notifications.email === 'boolean')
-                                            const isCurrentlyOn = hasGranular
-                                                ? (user.notifications!.sms || user.notifications!.email)
-                                                : user.notifications_enabled
+                                {user.subscription && (
+                                    <div className="flex items-center justify-between px-4 py-3 bg-slate-50 rounded-xl">
+                                        <div className="flex items-center gap-3 text-slate-700 text-sm font-medium">
+                                            <BellIcon />
+                                            Notifications
+                                        </div>
+                                        <button
+                                            onClick={async () => {
+                                                // Prioritize granular settings if they exist
+                                                const hasGranular = user.notifications && (typeof user.notifications.sms === 'boolean' || typeof user.notifications.email === 'boolean')
+                                                const isCurrentlyOn = hasGranular
+                                                    ? (user.notifications!.sms || user.notifications!.email)
+                                                    : user.notifications_enabled
 
-                                            const newState = !isCurrentlyOn
+                                                const newState = !isCurrentlyOn
 
-                                            // Optimistic update
-                                            setUser({
-                                                ...user,
-                                                notifications_enabled: newState,
-                                                notifications: user.notifications ? {
-                                                    ...user.notifications,
-                                                    sms: newState,
-                                                    email: newState
-                                                } : undefined
-                                            })
-
-                                            try {
-                                                const res = await fetch('/api/user/notifications', {
-                                                    method: 'PATCH',
-                                                    headers: { 'Content-Type': 'application/json' },
-                                                    body: JSON.stringify({ enabled: newState })
-                                                })
-                                                if (!res.ok) throw new Error('Failed')
-                                                showToast(newState ? "Notifications activées" : "Notifications désactivées", "success")
-                                            } catch (e) {
-                                                // Revert
+                                                // Optimistic update
                                                 setUser({
                                                     ...user,
-                                                    notifications_enabled: !!isCurrentlyOn,
-                                                    notifications: {
-                                                        ...user.notifications!,
-                                                        sms: !!user.notifications?.sms,
-                                                        email: !!user.notifications?.email
-                                                    }
+                                                    notifications_enabled: newState,
+                                                    notifications: user.notifications ? {
+                                                        ...user.notifications,
+                                                        sms: newState,
+                                                        email: newState
+                                                    } : undefined
                                                 })
-                                                showToast("Erreur de mise à jour", "error")
-                                            }
-                                        }}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${(user.notifications ? (user.notifications.sms || user.notifications.email) : user.notifications_enabled) ? 'bg-emerald-500' : 'bg-slate-200'}`}
-                                    >
-                                        <span
-                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${(user.notifications ? (user.notifications.sms || user.notifications.email) : user.notifications_enabled) ? 'translate-x-6' : 'translate-x-1'}`}
-                                        />
-                                    </button>
-                                </div>
+
+                                                try {
+                                                    const res = await fetch('/api/user/notifications', {
+                                                        method: 'PATCH',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({ enabled: newState })
+                                                    })
+                                                    if (!res.ok) throw new Error('Failed')
+                                                    showToast(newState ? "Notifications activées" : "Notifications désactivées", "success")
+                                                } catch (e) {
+                                                    // Revert
+                                                    setUser({
+                                                        ...user,
+                                                        notifications_enabled: !!isCurrentlyOn,
+                                                        notifications: {
+                                                            ...user.notifications!,
+                                                            sms: !!user.notifications?.sms,
+                                                            email: !!user.notifications?.email
+                                                        }
+                                                    })
+                                                    showToast("Erreur de mise à jour", "error")
+                                                }
+                                            }}
+                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${(user.notifications ? (user.notifications.sms || user.notifications.email) : user.notifications_enabled) ? 'bg-emerald-500' : 'bg-slate-200'}`}
+                                        >
+                                            <span
+                                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${(user.notifications ? (user.notifications.sms || user.notifications.email) : user.notifications_enabled) ? 'translate-x-6' : 'translate-x-1'}`}
+                                            />
+                                        </button>
+                                    </div>
+                                )}
                                 <button className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl transition-colors text-sm font-medium group">
                                     <MessageIcon />
                                     Support client

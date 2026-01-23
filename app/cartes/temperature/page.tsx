@@ -8,6 +8,7 @@ import { MapControls } from "@/components/MapControls"
 import { MARTINIQUE_CITIES } from "@/lib/constants"
 import { useMapUrlState } from "@/hooks/useMapUrlState"
 import { getWeatherIcon } from "@/lib/weather-icons"
+import { getWeatherIconClass } from "@/lib/weather-icons"
 
 import { MapErrorDisplay } from "@/components/MapErrorDisplay"
 
@@ -105,6 +106,8 @@ export default function TemperatureMapPage() {
             const temp = Math.round(cityData.hourly.temperature_2m[dataIndex])
             const weatherCode = cityData.hourly.weather_code[dataIndex] || 0
 
+            const iconClass = getWeatherIconClass(weatherCode)
+
             return {
                 id: city.name,
                 lat: city.lat,
@@ -115,16 +118,14 @@ export default function TemperatureMapPage() {
                         className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
                     >
                         <div className={`
-                            px-1.5 py-1 rounded-lg shadow-lg border border-white/30 backdrop-blur-md flex items-center gap-1
+                            px-2 py-1.5 rounded-xl shadow-lg border border-white/30 backdrop-blur-md flex items-center justify-center gap-1.5
                             transition-all duration-300 hover:shadow-xl
                             ${temp >= 30 ? 'bg-gradient-to-br from-red-500/95 to-orange-500/95 text-white shadow-orange-500/30' :
                                 temp >= 28 ? 'bg-gradient-to-br from-orange-500/95 to-amber-500/95 text-white shadow-amber-500/30' :
                                     'bg-gradient-to-br from-cyan-500/95 to-blue-500/95 text-white shadow-blue-500/30'}
                         `}>
-                            <span className="text-base opacity-90 drop-shadow-sm">
-                                {getWeatherIcon(weatherCode)}
-                            </span>
-                            <span className="font-black text-sm leading-none tracking-tight drop-shadow-sm">{temp}°</span>
+                            <i className={`bi ${iconClass} text-lg leading-none drop-shadow-sm`} />
+                            <span className="font-black text-sm leading-none tracking-tight drop-shadow-sm pt-[2px]">{temp}°</span>
                         </div>
                         <span className="text-[9px] font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full mt-1 shadow-md border border-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1">
                             {city.name}

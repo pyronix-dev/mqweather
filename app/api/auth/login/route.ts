@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 import { sendSMS, sendEmail } from '@/lib/brevo'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import { getOtpEmailHtml } from '@/lib/email-templates'
-import crypto from 'crypto'
+import bcrypt from 'bcrypt'
 
 // Helper to hash data
 function hash(data: string) {
@@ -172,8 +172,8 @@ export async function POST(request: NextRequest) {
                     return NextResponse.json({ success: false, error: "Trop de tentatives. Veuillez demander un nouveau code." }, { status: 429 })
                 }
 
-                // Verify code hash
-                const isValid = hash(code) === otpRecord.code_hash
+                // Verify code hash with bcrypt
+                const isValid = await bcrypt.compare(code, otpRecord.code_hash)
 
                 if (!isValid) {
                     // Increment attempts

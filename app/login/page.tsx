@@ -264,7 +264,7 @@ export default function LoginPage() {
                         <div className="p-6 sm:p-8 pt-4">
                             <p className="text-center text-slate-600">
                                 Pas de compte ?{" "}
-                                <Link href="/alertes" className="font-bold text-slate-900 hover:underline">
+                                <Link href="/register" className="font-bold text-slate-900 hover:underline">
                                     Inscrivez-vous
                                 </Link>
                             </p>

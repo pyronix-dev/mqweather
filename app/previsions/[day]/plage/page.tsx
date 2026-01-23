@@ -40,8 +40,14 @@ export default function BeachPage() {
 
     const { weather, loading } = useWeather(lat, lon, dayIndex)
 
+    const source = searchParams.get("source")
+
     const handleBack = () => {
-        router.push(`/previsions/${dayParam}?city=${encodeURIComponent(cityName)}&lat=${lat}&lon=${lon}`)
+        if (source === "map") {
+            router.push("/cartes/plages")
+        } else {
+            router.push(`/previsions/${dayParam}?city=${encodeURIComponent(cityName)}&lat=${lat}&lon=${lon}`)
+        }
     }
 
     const formatDate = (dateString: string) => {

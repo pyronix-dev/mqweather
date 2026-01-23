@@ -102,29 +102,33 @@ export default function VigilancePage() {
                     {isLoading && (
                       <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
                     )}
-                    <div
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${currentVigilance.name === "vert"
-                        ? "bg-green-50 border border-green-200"
-                        : currentVigilance.name === "jaune"
-                          ? "bg-yellow-50 border border-yellow-200"
-                          : currentVigilance.name === "orange"
-                            ? "bg-orange-50 border border-orange-200"
-                            : currentVigilance.name === "rouge"
-                              ? "bg-red-50 border border-red-200"
-                              : currentVigilance.name === "violet"
-                                ? "bg-purple-50 border border-purple-200"
-                                : currentVigilance.name === "erreur"
-                                  ? "bg-red-100 border border-red-300"
-                                  : "bg-gray-50 border border-gray-200"
-                        }`}
-                    >
-                      <div className={`w-2.5 h-2.5 rounded-full ${currentVigilance.color}`} />
-                      <span
-                        className={`text-xs font-bold capitalize ${currentVigilance.name === "erreur" ? "text-red-600" : "text-slate-700"}`}
+                    {isLoading ? (
+                      <div className="w-20 h-6 bg-slate-200 rounded-full animate-pulse" />
+                    ) : (
+                      <div
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${currentVigilance.name === "vert"
+                          ? "bg-green-50 border border-green-200"
+                          : currentVigilance.name === "jaune"
+                            ? "bg-yellow-50 border border-yellow-200"
+                            : currentVigilance.name === "orange"
+                              ? "bg-orange-50 border border-orange-200"
+                              : currentVigilance.name === "rouge"
+                                ? "bg-red-50 border border-red-200"
+                                : currentVigilance.name === "violet"
+                                  ? "bg-purple-50 border border-purple-200"
+                                  : currentVigilance.name === "erreur"
+                                    ? "bg-red-100 border border-red-300"
+                                    : "bg-gray-50 border border-gray-200"
+                          }`}
                       >
-                        {currentVigilance.name === "erreur" ? "Erreur" : currentVigilance.name}
-                      </span>
-                    </div>
+                        <div className={`w-2.5 h-2.5 rounded-full ${currentVigilance.color}`} />
+                        <span
+                          className={`text-xs font-bold capitalize ${currentVigilance.name === "erreur" ? "text-red-600" : "text-slate-700"}`}
+                        >
+                          {currentVigilance.name === "erreur" ? "Erreur" : currentVigilance.name}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -135,12 +139,20 @@ export default function VigilancePage() {
                   className="flex-1 flex items-center justify-center relative overflow-hidden p-4"
                   style={{ backgroundColor: "#f7f7f7" }}
                 >
-                  <img
-                    src={mapUrl || "/placeholder.svg"}
-                    alt="Carte de Martinique"
-                    className="max-h-[380px] sm:max-h-[480px] lg:max-h-[550px] w-auto object-contain"
-                    draggable={false}
-                  />
+                  {isLoading ? (
+                    <div className="w-full h-[380px] sm:h-[480px] lg:h-[550px] flex items-center justify-center">
+                      <div className="w-[80%] h-[80%] bg-slate-200 animate-pulse rounded-2xl opacity-50 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 animate-shimmer" />
+                      </div>
+                    </div>
+                  ) : (
+                    <img
+                      src={mapUrl || "/placeholder.svg"}
+                      alt="Carte de Martinique"
+                      className="max-h-[380px] sm:max-h-[480px] lg:max-h-[550px] w-auto object-contain"
+                      draggable={false}
+                    />
+                  )}
 
                   <div className="absolute top-2 left-2 bg-white/80 backdrop-blur-sm rounded px-2 py-1 shadow-sm">
                     <p className="text-[9px] text-slate-500 font-medium" suppressHydrationWarning>Mise à jour: {formatLastUpdate()}</p>
@@ -149,7 +161,7 @@ export default function VigilancePage() {
                   <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-slate-200">
                     <p className="text-[10px] font-bold text-slate-600 mb-2 uppercase tracking-wide">Légende</p>
                     <div className="flex flex-col gap-1.5 text-[10px] sm:text-xs">
-                      {VIGILANCE_COLORS.filter((c) => c.id !== 0).map((item, i) => (
+                      {VIGILANCE_COLORS.filter((c) => c.id !== 0 && c.id !== -1).map((item, i) => (
                         <div
                           key={i}
                           className={`flex items-center gap-2 group ${currentVigilance.name === item.name ? "font-bold" : ""
@@ -190,60 +202,97 @@ export default function VigilancePage() {
                 </div>
               </div>
               <div className="space-y-4 sm:space-y-6">
-                <div
-                  className={`rounded-xl p-4 ${currentVigilance.name === "vert"
-                    ? "bg-green-50 border-l-4 border-green-500"
-                    : currentVigilance.name === "jaune"
-                      ? "bg-yellow-50 border-l-4 border-yellow-400"
-                      : currentVigilance.name === "orange"
-                        ? "bg-orange-50 border-l-4 border-orange-500"
-                        : currentVigilance.name === "rouge"
-                          ? "bg-red-50 border-l-4 border-red-500"
-                          : currentVigilance.name === "violet"
-                            ? "bg-purple-50 border-l-4 border-purple-600"
-                            : currentVigilance.name === "erreur"
-                              ? "bg-red-100 border-l-4 border-red-600"
-                              : "bg-gray-50 border-l-4 border-gray-500"
-                    }`}
-                >
-                  <p className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Niveau actuel</p>
-                  <p
-                    className={`text-sm font-bold ${currentVigilance.name === "erreur" ? "text-red-600" : "text-slate-800"}`}
-                  >
-                    {currentVigilance.label}
-                  </p>
-                  {vigilanceData?.phenomena && vigilanceData.phenomena.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {vigilanceData.phenomena.map((p, i) => (
-                        <span key={i} className="text-[10px] bg-white/50 px-2 py-0.5 rounded-full text-slate-600">
-                          {p}
-                        </span>
-                      ))}
+                {isLoading ? (
+                  <>
+                    <div className="rounded-xl p-4 bg-gray-50 border-l-4 border-gray-200">
+                      <div className="h-3 w-24 bg-slate-200 rounded animate-pulse mb-2" />
+                      <div className="h-4 w-32 bg-slate-200 rounded animate-pulse mb-2" />
+                      <div className="flex gap-1 mt-2">
+                        <div className="h-4 w-16 bg-slate-200 rounded-full animate-pulse" />
+                        <div className="h-4 w-16 bg-slate-200 rounded-full animate-pulse" />
+                      </div>
                     </div>
-                  )}
-                </div>
-                <div className="group">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Situation</p>
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-                    Situation météorologique pour la matinée du vendredi. Belle journée en perspective avec un
-                    ensoleillement généreux.
-                  </p>
-                </div>
-                <div className="group">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">En Mer</p>
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-                    Vent de travers dans le canal de la Dominique, mer formée.
-                  </p>
-                </div>
-                <div className="bg-amber-50 rounded-xl p-3 sm:p-4 border-l-4 border-amber-400">
-                  <p className="text-xs font-bold text-amber-700 uppercase tracking-wide mb-2">Conseil de Vigilance</p>
-                  <p className="text-xs sm:text-sm text-slate-700 font-medium">
-                    Journée idéale pour les activités en plein air.
-                  </p>
-                </div>
-                <p className="text-xs text-slate-500 border-t border-slate-200 pt-3 sm:pt-4 leading-relaxed font-medium">
-                  La Martinique enregistre en moyenne 2800 mm de pluie par an sur les hauteurs.
-                </p>
+
+                    <div className="space-y-2">
+                      <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
+                      <div className="space-y-1">
+                        <div className="h-3 w-full bg-slate-200 rounded animate-pulse" />
+                        <div className="h-3 w-4/5 bg-slate-200 rounded animate-pulse" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="h-3 w-16 bg-slate-200 rounded animate-pulse" />
+                      <div className="h-3 w-3/4 bg-slate-200 rounded animate-pulse" />
+                    </div>
+
+                    <div className="bg-slate-50 rounded-xl p-3 sm:p-4 border-l-4 border-slate-200">
+                      <div className="h-3 w-32 bg-slate-200 rounded animate-pulse mb-2" />
+                      <div className="h-3 w-full bg-slate-200 rounded animate-pulse" />
+                    </div>
+
+                    <div className="border-t border-slate-200 pt-3 sm:pt-4">
+                      <div className="h-3 w-full bg-slate-200 rounded animate-pulse" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div
+                      className={`rounded-xl p-4 ${currentVigilance.name === "vert"
+                        ? "bg-green-50 border-l-4 border-green-500"
+                        : currentVigilance.name === "jaune"
+                          ? "bg-yellow-50 border-l-4 border-yellow-400"
+                          : currentVigilance.name === "orange"
+                            ? "bg-orange-50 border-l-4 border-orange-500"
+                            : currentVigilance.name === "rouge"
+                              ? "bg-red-50 border-l-4 border-red-500"
+                              : currentVigilance.name === "violet"
+                                ? "bg-purple-50 border-l-4 border-purple-600"
+                                : currentVigilance.name === "erreur"
+                                  ? "bg-red-100 border-l-4 border-red-600"
+                                  : "bg-gray-50 border-l-4 border-gray-500"
+                        }`}
+                    >
+                      <p className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Niveau actuel</p>
+                      <p
+                        className={`text-sm font-bold ${currentVigilance.name === "erreur" ? "text-red-600" : "text-slate-800"}`}
+                      >
+                        {currentVigilance.label}
+                      </p>
+                      {vigilanceData?.phenomena && vigilanceData.phenomena.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {vigilanceData.phenomena.map((p, i) => (
+                            <span key={i} className="text-[10px] bg-white/50 px-2 py-0.5 rounded-full text-slate-600">
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="group">
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Situation</p>
+                      <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                        Situation météorologique pour la matinée du vendredi. Belle journée en perspective avec un
+                        ensoleillement généreux.
+                      </p>
+                    </div>
+                    <div className="group">
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">En Mer</p>
+                      <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                        Vent de travers dans le canal de la Dominique, mer formée.
+                      </p>
+                    </div>
+                    <div className="bg-amber-50 rounded-xl p-3 sm:p-4 border-l-4 border-amber-400">
+                      <p className="text-xs font-bold text-amber-700 uppercase tracking-wide mb-2">Conseil de Vigilance</p>
+                      <p className="text-xs sm:text-sm text-slate-700 font-medium">
+                        Journée idéale pour les activités en plein air.
+                      </p>
+                    </div>
+                    <p className="text-xs text-slate-500 border-t border-slate-200 pt-3 sm:pt-4 leading-relaxed font-medium">
+                      La Martinique enregistre en moyenne 2800 mm de pluie par an sur les hauteurs.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>

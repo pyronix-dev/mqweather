@@ -775,7 +775,7 @@ function PrevisionContent() {
               <div className="border border-border rounded-xl p-4 sm:p-5 animate-slide-in-up shadow-sm">
                 <h3 className="text-base sm:text-lg font-bold text-foreground mb-4">Température (24h)</h3>
                 <ResponsiveContainer width="100%" height={200}>
-                  <AreaChart data={hourlyData}>
+                  <AreaChart data={hourlyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorTemp" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#f97316" stopOpacity={0.4} />
@@ -786,6 +786,7 @@ function PrevisionContent() {
                     <XAxis dataKey="time" stroke="#6b7280" style={{ fontSize: "10px" }} />
                     <YAxis
                       stroke="#6b7280"
+                      width={30}
                       style={{ fontSize: "10px" }}
                       tickFormatter={(value) => `${value}°C`}
                     />
@@ -811,10 +812,10 @@ function PrevisionContent() {
               <div className="border border-border rounded-xl p-4 sm:p-5 animate-slide-in-up shadow-sm">
                 <h3 className="text-base sm:text-lg font-bold text-foreground mb-4">Humidité & Précipitations</h3>
                 <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={hourlyData}>
+                  <LineChart data={hourlyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="time" stroke="#6b7280" style={{ fontSize: "10px" }} />
-                    <YAxis stroke="#6b7280" style={{ fontSize: "10px" }} />
+                    <YAxis stroke="#6b7280" width={30} style={{ fontSize: "10px" }} />
                     <Tooltip
                       contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px" }}
                       labelStyle={{ color: "#374151" }}

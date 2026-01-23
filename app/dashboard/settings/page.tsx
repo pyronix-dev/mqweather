@@ -17,11 +17,7 @@ const MoonIcon = () => (
     </svg>
 )
 
-const BellIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-    </svg>
-)
+
 
 const ShieldExclamationIcon = () => (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,8 +29,7 @@ import { DeleteAccountDialog } from "@/components/delete-account-dialog"
 
 export default function SettingsPage() {
     const [darkMode, setDarkMode] = useState(false)
-    const [emailNotifs, setEmailNotifs] = useState(true)
-    const [smsNotifs, setSmsNotifs] = useState(true)
+
     const [loading, setLoading] = useState(true)
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 
@@ -46,10 +41,7 @@ export default function SettingsPage() {
                 if (res.ok) {
                     const data = await res.json()
                     // If backend sends nested notifications object
-                    if (data.notifications) {
-                        setEmailNotifs(!!data.notifications.email)
-                        setSmsNotifs(!!data.notifications.sms)
-                    }
+
                     // Fallback to legacy if needed, or if nothing set
                 }
             } catch (e) {
@@ -61,20 +53,7 @@ export default function SettingsPage() {
         fetchSettings()
     }, [])
 
-    const updatePreference = async (type: 'sms' | 'email', value: boolean) => {
-        // Optimistic API call
-        try {
-            const res = await fetch('/api/user/notifications', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ [type]: value })
-            })
-            if (!res.ok) throw new Error('Update failed')
-        } catch (e) {
-            alert('Erreur lors de la mise à jour')
-            // Revert would go here
-        }
-    }
+
 
     return (
         <div className="min-h-screen bg-stone-100 flex flex-col">
@@ -120,47 +99,7 @@ export default function SettingsPage() {
                             </p>
                         </section>
 
-                        {/* Notifications Section */}
-                        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <BellIcon />
-                                Préférences de notification
-                            </h2>
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="font-medium text-slate-700">Alertes par Email</p>
-                                        <p className="text-sm text-slate-500">Recevoir les bulletins vigilance par email</p>
-                                    </div>
-                                    <button
-                                        onClick={() => {
-                                            const newState = !emailNotifs
-                                            setEmailNotifs(newState)
-                                            updatePreference('email', newState)
-                                        }}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${emailNotifs ? 'bg-emerald-500' : 'bg-slate-200'}`}
-                                    >
-                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${emailNotifs ? 'translate-x-6' : 'translate-x-1'}`} />
-                                    </button>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="font-medium text-slate-700">Alertes SMS</p>
-                                        <p className="text-sm text-slate-500">Recevoir les alertes urgentes par SMS</p>
-                                    </div>
-                                    <button
-                                        onClick={() => {
-                                            const newState = !smsNotifs
-                                            setSmsNotifs(newState)
-                                            updatePreference('sms', newState)
-                                        }}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${smsNotifs ? 'bg-emerald-500' : 'bg-slate-200'}`}
-                                    >
-                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${smsNotifs ? 'translate-x-6' : 'translate-x-1'}`} />
-                                    </button>
-                                </div>
-                            </div>
-                        </section>
+
 
                         {/* Privacy Section */}
                         <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">

@@ -341,7 +341,7 @@ export default function BeachMapPage() {
                             return (
                                 <Link
                                     key={beach.name}
-                                    href={`/previsions/${getSlugFromIndex(selectedDay)}/plage?city=${encodeURIComponent(beach.city)}&lat=${beach.lat}&lon=${beach.lon}`}
+                                    href={`/previsions/${getSlugFromIndex(selectedDay)}/plage?city=${encodeURIComponent(beach.city)}&lat=${beach.lat}&lon=${beach.lon}&source=map`}
                                     className="bg-white rounded-2xl p-5 shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 flex items-center justify-between hover:border-cyan-200 group animate-fade-in-up"
                                     style={{ animationDelay: `${0.3 + index * 0.05}s` }}
                                 >

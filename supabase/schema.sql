@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS public.users (
   notifications_enabled boolean NULL DEFAULT true,
   notif_sms boolean NULL DEFAULT true,
   notif_email boolean NULL DEFAULT true,
+  password_hash text NULL,
+  is_verified boolean DEFAULT false,
   CONSTRAINT users_pkey PRIMARY KEY (id),
   CONSTRAINT users_reference_code_key UNIQUE (reference_code),
   CONSTRAINT email_or_phone CHECK ((email IS NOT NULL) OR (phone IS NOT NULL))
@@ -90,8 +92,8 @@ CREATE TABLE IF NOT EXISTS public.observations (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   user_id uuid NULL,
   type text NOT NULL,
-  x numeric NOT NULL,
-  y numeric NOT NULL,
+  lat numeric NOT NULL, 
+  lon numeric NOT NULL,
   temp text NULL,
   details text NULL,
   created_at timestamp with time zone NULL DEFAULT now(),
@@ -114,6 +116,17 @@ CREATE TABLE IF NOT EXISTS public.vigilance_state (
 
 CREATE INDEX IF NOT EXISTS idx_vigilance_state_created_at ON public.vigilance_state USING btree (created_at DESC) TABLESPACE pg_default;
 
+CREATE TABLE IF NOT EXISTS public.ip_limit_tracking (
+    ip_address TEXT PRIMARY KEY,
+    attempt_count INTEGER DEFAULT 0,
+    blocked_until TIMESTAMPTZ,
+    suspicion_level INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+) TABLESPACE pg_default;
+
+CREATE INDEX IF NOT EXISTS idx_ip_tracking ON public.ip_limit_tracking(ip_address) TABLESPACE pg_default;
+
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.otp_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.verification_codes ENABLE ROW LEVEL SECURITY;
@@ -121,12 +134,56 @@ ALTER TABLE public.deleted_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.observations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.vigilance_state ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ip_limit_tracking ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Public can view observations" ON public.observations FOR SELECT USING (true);
-CREATE POLICY "Public can view vigilance_state" ON public.vigilance_state FOR SELECT USING (true);
-CREATE POLICY "Service can manage otp_codes" ON public.otp_codes FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Service can manage vigilance_state" ON public.vigilance_state FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Service can manage users" ON public.users FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Service can manage subscriptions" ON public.subscriptions FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Service can manage verification_codes" ON public.verification_codes FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Service can manage deleted_users" ON public.deleted_users FOR ALL USING (true) WITH CHECK (true);
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view observations') THEN
+        CREATE POLICY "Public can view observations" ON public.observations FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view vigilance_state') THEN
+        CREATE POLICY "Public can view vigilance_state" ON public.vigilance_state FOR SELECT USING (true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage otp_codes') THEN
+        CREATE POLICY "Service can manage otp_codes" ON public.otp_codes FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage vigilance_state') THEN
+        CREATE POLICY "Service can manage vigilance_state" ON public.vigilance_state FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage users') THEN
+        CREATE POLICY "Service can manage users" ON public.users FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage subscriptions') THEN
+        CREATE POLICY "Service can manage subscriptions" ON public.subscriptions FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage verification_codes') THEN
+        CREATE POLICY "Service can manage verification_codes" ON public.verification_codes FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage deleted_users') THEN
+        CREATE POLICY "Service can manage deleted_users" ON public.deleted_users FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage ip_limit_tracking') THEN
+        CREATE POLICY "Service can manage ip_limit_tracking" ON public.ip_limit_tracking FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='full_name') THEN
+        ALTER TABLE users ADD COLUMN full_name TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='password_hash') THEN
+        ALTER TABLE users ADD COLUMN password_hash TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='is_verified') THEN
+        ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT FALSE;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='observations' AND column_name='lat') THEN
+        ALTER TABLE observations ADD COLUMN lat NUMERIC;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='observations' AND column_name='lon') THEN
+        ALTER TABLE observations ADD COLUMN lon NUMERIC;
+    END IF;
+END $$;

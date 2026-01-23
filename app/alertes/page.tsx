@@ -309,9 +309,16 @@ function AlertesContent() {
   useEffect(() => {
     const urlEmail = searchParams.get('email')
     const urlPhone = searchParams.get('phone')
+    const mode = searchParams.get('mode')
 
     if (urlEmail) setEmail(urlEmail)
     if (urlPhone) setPhone(urlPhone)
+
+    if (mode === 'sms') {
+      setShowSmsSubscription(true)
+    } else if (mode === 'email') {
+      setShowEmailSubscription(true)
+    }
   }, [searchParams])
 
   const handleSendCode = async () => {
