@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 }
 
 import { ToastProvider } from "@/components/ui/toast-context"
+import { ConfirmDialogProvider } from "@/components/ui/confirm-context"
 
 // ... imports
 
@@ -28,7 +29,9 @@ export default function RootLayout({
       </head>
       <body className={`font-sans antialiased`} suppressHydrationWarning>
         <ToastProvider>
-          {children}
+          <ConfirmDialogProvider>
+            {children}
+          </ConfirmDialogProvider>
         </ToastProvider>
       </body>
     </html>

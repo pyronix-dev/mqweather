@@ -307,9 +307,16 @@ export default function VigilancePage() {
                         Journée idéale pour les activités en plein air.
                       </p>
                     </div>
-                    <p className="text-xs text-slate-500 border-t border-slate-200 pt-3 sm:pt-4 leading-relaxed font-medium">
-                      La Martinique enregistre en moyenne 2800 mm de pluie par an sur les hauteurs.
-                    </p>
+                    <div className="text-xs text-slate-500 border-t border-slate-200 pt-3 sm:pt-4 leading-relaxed font-medium space-y-2">
+                      <p>Nous fournissons une vigilance Martinique en direct aussi fiable que possible, avec des mises à jour régulières.</p>
+                      <p>
+                        Cependant, la météo peut évoluer rapidement : suivez toujours en priorité les consignes et bulletins officiels, notamment :<br />
+                        • Météo-France<br />
+                        • Préfecture de Martinique<br />
+                        • Sécurité Civile / autorités locales
+                      </p>
+                      <p className="font-bold text-slate-700">En cas de danger immédiat, appelez le 18 / 15 / 17 / 112.</p>
+                    </div>
                   </>
                 )}
               </div>

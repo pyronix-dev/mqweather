@@ -187,6 +187,45 @@ export async function POST(request: NextRequest) {
                     return NextResponse.json({ success: false, error: "Code invalide" }, { status: 400 })
                 }
 
+                // --- LOG LOGIN HISTORY & GEOLOCATION ---
+                try {
+                    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+                    const userAgent = request.headers.get('user-agent') || 'Unknown'
+                    let location = { city: 'Inconnue', country: 'Inconnu', isp: 'Inconnu' }
+
+                    if (ip && ip !== '127.0.0.1' && ip !== '::1') {
+                        try {
+                            // Use ip-api.com (Free, non-SSL, ratelimited) - good for MVP
+                            const geoRes = await fetch(`http://ip-api.com/json/${ip}`, { signal: AbortSignal.timeout(3000) })
+                            if (geoRes.ok) {
+                                const geo = await geoRes.json()
+                                if (geo.status === 'success') {
+                                    location = {
+                                        city: geo.city || 'Inconnue',
+                                        country: geo.country || 'Inconnu',
+                                        isp: geo.isp || 'Inconnu'
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Geo lookup failed (timeout or error):', e)
+                        }
+                    }
+
+                    await supabase.from('login_history').insert({
+                        user_id: userId,
+                        ip_address: ip,
+                        user_agent: userAgent,
+                        location_city: location.city,
+                        location_country: location.country,
+                        isp: location.isp
+                    })
+                } catch (logError) {
+                    console.error('Failed to log login history:', logError)
+                    // Don't block login if logging fails
+                }
+                // ---------------------------------------
+
                 // Mark OTP as used
                 await supabase
                     .from('otp_codes')

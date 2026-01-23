@@ -58,7 +58,11 @@ export const BEACH_LOCATIONS = [
     { name: "La Française", city: "Fort-de-France", lat: 14.6040, lon: -61.0620 },
     // East / North-East Beaches
     { name: "Anse l'Etang", city: "Tartane", lat: 14.7660, lon: -60.9060 },
+    { name: "Anse Bonneville (Surfers)", city: "Tartane", lat: 14.7730, lon: -60.8980 },
     { name: "Anse Azerot", city: "Sainte-Marie", lat: 14.7870, lon: -60.9920 },
     { name: "Anse Charpentier", city: "Sainte-Marie", lat: 14.7950, lon: -61.0050 },
-    { name: "Cap Macré", city: "Le Marin", lat: 14.4750, lon: -60.8420 }
+    { name: "Plage de Basse-Pointe", city: "Basse-Pointe", lat: 14.8700, lon: -61.1150 },
+    { name: "Plage du Sinaï", city: "Grand'Rivière", lat: 14.8750, lon: -61.1820 },
+    { name: "Cap Macré", city: "Le Marin", lat: 14.4750, lon: -60.8420 },
+    { name: "Anse Grosse Roche", city: "Le Marin", lat: 14.4770, lon: -60.8350 }
 ]

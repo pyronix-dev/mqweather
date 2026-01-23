@@ -14,9 +14,13 @@ CREATE TABLE IF NOT EXISTS public.users (
   notif_email boolean NULL DEFAULT true,
   password_hash text NULL,
   is_verified boolean DEFAULT false,
+  role text NOT NULL DEFAULT 'user',
+  is_banned boolean DEFAULT false,
+  banned_reason text NULL,
   CONSTRAINT users_pkey PRIMARY KEY (id),
   CONSTRAINT users_reference_code_key UNIQUE (reference_code),
-  CONSTRAINT email_or_phone CHECK ((email IS NOT NULL) OR (phone IS NOT NULL))
+  CONSTRAINT email_or_phone CHECK ((email IS NOT NULL) OR (phone IS NOT NULL)),
+  CONSTRAINT valid_role CHECK (role IN ('user', 'admin', 'super_admin'))
 ) TABLESPACE pg_default;
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON public.users USING btree (email) TABLESPACE pg_default;
@@ -127,6 +131,40 @@ CREATE TABLE IF NOT EXISTS public.ip_limit_tracking (
 
 CREATE INDEX IF NOT EXISTS idx_ip_tracking ON public.ip_limit_tracking(ip_address) TABLESPACE pg_default;
 
+-- Login history for tracking user sessions, IP, location
+CREATE TABLE IF NOT EXISTS public.login_history (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  ip_address text NULL,
+  user_agent text NULL,
+  location_country text NULL,
+  location_city text NULL,
+  isp text NULL,
+  created_at timestamp with time zone NULL DEFAULT now(),
+  CONSTRAINT login_history_pkey PRIMARY KEY (id),
+  CONSTRAINT login_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) TABLESPACE pg_default;
+
+CREATE INDEX IF NOT EXISTS idx_login_history_user_id ON public.login_history USING btree (user_id) TABLESPACE pg_default;
+CREATE INDEX IF NOT EXISTS idx_login_history_created_at ON public.login_history USING btree (created_at DESC) TABLESPACE pg_default;
+
+-- Admin audit log for tracking admin actions
+CREATE TABLE IF NOT EXISTS public.admin_audit_log (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  admin_id uuid NOT NULL,
+  action text NOT NULL,
+  target_type text NULL,
+  target_id uuid NULL,
+  details jsonb NULL,
+  ip_address text NULL,
+  created_at timestamp with time zone NULL DEFAULT now(),
+  CONSTRAINT admin_audit_log_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_audit_log_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE SET NULL
+) TABLESPACE pg_default;
+
+CREATE INDEX IF NOT EXISTS idx_admin_audit_log_admin_id ON public.admin_audit_log USING btree (admin_id) TABLESPACE pg_default;
+CREATE INDEX IF NOT EXISTS idx_admin_audit_log_created_at ON public.admin_audit_log USING btree (created_at DESC) TABLESPACE pg_default;
+
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.otp_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.verification_codes ENABLE ROW LEVEL SECURITY;
@@ -135,6 +173,8 @@ ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.observations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.vigilance_state ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ip_limit_tracking ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.login_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_audit_log ENABLE ROW LEVEL SECURITY;
 
 DO $$
 BEGIN
@@ -166,6 +206,12 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage ip_limit_tracking') THEN
         CREATE POLICY "Service can manage ip_limit_tracking" ON public.ip_limit_tracking FOR ALL USING (true) WITH CHECK (true);
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage login_history') THEN
+        CREATE POLICY "Service can manage login_history" ON public.login_history FOR ALL USING (true) WITH CHECK (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage admin_audit_log') THEN
+        CREATE POLICY "Service can manage admin_audit_log" ON public.admin_audit_log FOR ALL USING (true) WITH CHECK (true);
+    END IF;
 END $$;
 
 DO $$
@@ -185,5 +231,16 @@ BEGIN
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='observations' AND column_name='y') THEN
         ALTER TABLE observations ADD COLUMN y NUMERIC;
+    END IF;
+
+    -- Admin columns migration
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='role') THEN
+        ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='is_banned') THEN
+        ALTER TABLE users ADD COLUMN is_banned BOOLEAN DEFAULT FALSE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='banned_reason') THEN
+        ALTER TABLE users ADD COLUMN banned_reason TEXT;
     END IF;
 END $$;

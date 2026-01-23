@@ -60,6 +60,7 @@ interface UserData {
         sms: boolean
         email: boolean
     }
+    role?: string
     subscription: {
         plan: string
         price: string
@@ -278,6 +279,27 @@ export default function DashboardPage() {
 
                     {/* Sidebar */}
                     <div className="space-y-6">
+
+                        {/* Admin Access Card */}
+                        {(user.role === 'admin' || user.role === 'super_admin') && (
+                            <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl shadow-lg p-6 text-white overflow-hidden relative group">
+                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
+                                    </svg>
+                                </div>
+                                <h3 className="font-black text-xl mb-2 relative z-10">Espace Admin</h3>
+                                <p className="text-indigo-100 text-sm mb-4 relative z-10">
+                                    Gérez les utilisateurs, modérez les observations et consultez les statistiques.
+                                </p>
+                                <Link
+                                    href="/admin"
+                                    className="block w-full text-center py-2.5 bg-white text-indigo-600 font-bold rounded-xl hover:bg-indigo-50 transition-colors shadow-sm relative z-10"
+                                >
+                                    Accéder au Dashboard
+                                </Link>
+                            </div>
+                        )}
 
                         {/* Profile Card */}
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
