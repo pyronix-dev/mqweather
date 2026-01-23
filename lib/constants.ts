@@ -55,5 +55,10 @@ export const BEACH_LOCATIONS = [
     { name: "Anse Couleuvre", city: "Le Prêcheur", lat: 14.8322, lon: -61.2227 },
     { name: "Anse Céron", city: "Le Prêcheur", lat: 14.8140, lon: -61.2260 },
     { name: "Anse Turin", city: "Le Carbet", lat: 14.7180, lon: -61.1850 },
-    { name: "La Française", city: "Fort-de-France", lat: 14.6040, lon: -61.0620 }
+    { name: "La Française", city: "Fort-de-France", lat: 14.6040, lon: -61.0620 },
+    // East / North-East Beaches
+    { name: "Anse l'Etang", city: "Tartane", lat: 14.7660, lon: -60.9060 },
+    { name: "Anse Azerot", city: "Sainte-Marie", lat: 14.7870, lon: -60.9920 },
+    { name: "Anse Charpentier", city: "Sainte-Marie", lat: 14.7950, lon: -61.0050 },
+    { name: "Cap Macré", city: "Le Marin", lat: 14.4750, lon: -60.8420 }
 ]

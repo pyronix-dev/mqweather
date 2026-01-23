@@ -272,8 +272,15 @@ export default function VigilancePage() {
                     <div className="group">
                       <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Situation</p>
                       <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-                        Situation météorologique pour la matinée du vendredi. Belle journée en perspective avec un
-                        ensoleillement généreux.
+                        {(() => {
+                          const today = new Date().toLocaleDateString('fr-FR', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })
+                          return `Aujourd'hui ${today}, vigilance ${currentVigilance.name === "vert" ? "verte" : currentVigilance.name}, ce qui signifie qu'il n'y a pas de danger particulier en Martinique.`
+                        })()}
                       </p>
                     </div>
                     <div className="group">
