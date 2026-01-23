@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { MartiniqueMap, MapMarker } from "@/components/MartiniqueMap"
@@ -8,35 +8,87 @@ import { MapControls } from "@/components/MapControls"
 import { MARTINIQUE_CITIES } from "@/lib/constants"
 import { useMapUrlState } from "@/hooks/useMapUrlState"
 
+import { MapErrorDisplay } from "@/components/MapErrorDisplay"
+
 export default function RainMapPage() {
     const [markers, setMarkers] = useState<MapMarker[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
+    const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon'>('afternoon')
     const { selectedDay, selectedCity, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [allData, setAllData] = useState<any[]>([])
 
-    useEffect(() => {
-        async function fetchData() {
-            setLoading(true)
-            try {
-                const lats = MARTINIQUE_CITIES.map(c => c.lat).join(",")
-                const lons = MARTINIQUE_CITIES.map(c => c.lon).join(",")
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&daily=precipitation_sum,precipitation_probability_max&timezone=America/Martinique`)
-                const data = await res.json()
-                const results = Array.isArray(data) ? data : [data]
-                setAllData(results)
-            } catch (e) {
-                console.error("Error fetching map data", e)
-            } finally {
-                setLoading(false)
-            }
+    const stats = useMemo(() => {
+        if (!allData.length) return { avgPrecip: 0, maxPrecip: 0, analysis: "Chargement en cours..." }
+
+        const baseIndex = selectedDay * 24
+        const hourOffset = timeOfDay === 'morning' ? 8 : 14
+        const dataIndex = baseIndex + hourOffset
+
+        const precipValues = MARTINIQUE_CITIES.map((city, idx) => {
+            const data = allData[idx]
+            if (!data?.hourly?.precipitation) return null
+            return data.hourly.precipitation[dataIndex] as number
+        }).filter((p): p is number => typeof p === 'number')
+
+        if (!precipValues.length && !loading && !error) return { avgPrecip: 0, maxPrecip: 0, analysis: "Données indisponibles." }
+        if (loading) return { avgPrecip: 0, maxPrecip: 0, analysis: "Chargement..." }
+
+        const avgPrecip = precipValues.reduce((a, b) => a + b, 0) / precipValues.length
+        const maxPrecip = Math.max(...precipValues)
+
+        // Rich Analysis Generation (4 lines)
+        let analysis = "";
+
+        // Sentence 1: General Situation
+        if (avgPrecip < 0.1) analysis += "Le ciel est globalement dégagé sur l'ensemble de l'île, sans précipitations notables prévues. ";
+        else if (avgPrecip < 2) analysis += "Quelques averses passagères traversent l'île, arrosant principalement le relief et la côte au vent. ";
+        else analysis += "Un épisode pluvieux significatif concerne la Martinique avec des pluies fréquentes et parfois soutenues. ";
+
+        // Sentence 2: Intensity and Localization
+        if (maxPrecip > 15) analysis += `Des cumuls importants sont relevés localement, atteignant ${maxPrecip.toFixed(1)} mm sur les zones les plus exposées. `;
+        else if (maxPrecip > 5) analysis += `L'intensité reste modérée, avec des cumuls maximaux autour de ${maxPrecip.toFixed(1)} mm sous les grains les plus actifs. `;
+        else analysis += "Les quantités d'eau restent anecdotiques, ne dépassant pas quelques millimètres sur les sommets. ";
+
+        // Sentence 3: Cloud Cover Context (inferred)
+        if (avgPrecip > 3) analysis += "La couverture nuageuse reste dense et menaçante, limitant grandement les éclaircies. ";
+        else if (avgPrecip > 0.5) analysis += "Le ciel est variable, alternant entre passages nuageux porteurs d'averses et belles éclaircies. ";
+        else analysis += "Le soleil domine largement malgré quelques nuages inoffensifs circulant dans le flux d'alizé. ";
+
+        // Sentence 4: Advice/Forecast
+        if (maxPrecip > 20) analysis += "La prudence est de mise à proximité des cours d'eau en raison du risque de montée rapide des eaux.";
+        else if (avgPrecip > 1) analysis += "Un parapluie ou un imperméable pourra s'avérer utile lors de vos déplacements extérieurs.";
+        else analysis += "Profitez de ces conditions sèches idéales pour toutes vos activités de plein air et de plage.";
+
+        return { avgPrecip, maxPrecip, analysis }
+    }, [allData, selectedDay, timeOfDay, loading, error])
+
+    const fetchData = async () => {
+        setLoading(true)
+        setError(false)
+        try {
+            const lats = MARTINIQUE_CITIES.map(c => c.lat).join(",")
+            const lons = MARTINIQUE_CITIES.map(c => c.lon).join(",")
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&hourly=precipitation,precipitation_probability&timezone=America/Martinique`)
+            if (!res.ok) throw new Error('Network response was not ok')
+            const data = await res.json()
+            const results = Array.isArray(data) ? data : [data]
+            setAllData(results)
+        } catch (e) {
+            console.error("Error fetching map data", e)
+            setError(true)
+        } finally {
+            setLoading(false)
         }
+    }
+
+    useEffect(() => {
         fetchData()
     }, [])
 
     useEffect(() => {
         if (!allData.length) return
 
-        // Filter to show only default cities + the currently selected/searched city
         const visibleCities = MARTINIQUE_CITIES.filter((city) =>
             city.isDefault || city.name === selectedCity
         )
@@ -44,12 +96,16 @@ export default function RainMapPage() {
         const newMarkers = visibleCities.map((city) => {
             const originalIndex = MARTINIQUE_CITIES.findIndex(c => c.name === city.name)
             const cityData = allData[originalIndex]
-            if (!cityData || !cityData.daily) return null
+            if (!cityData || !cityData.hourly) return null
 
-            const precip = cityData.daily.precipitation_sum[selectedDay]
-            const prob = cityData.daily.precipitation_probability_max[selectedDay]
+            const baseIndex = selectedDay * 24
+            const hourOffset = timeOfDay === 'morning' ? 8 : 14
+            const dataIndex = baseIndex + hourOffset
+
+            const precip = cityData.hourly.precipitation[dataIndex]
+            const prob = cityData.hourly.precipitation_probability[dataIndex]
             const isRaining = precip > 0.1
-            const isHeavy = precip > 10
+            const isHeavy = precip > 5 // adjusted threshold for hourly
 
             return {
                 id: city.name,
@@ -87,7 +143,7 @@ export default function RainMapPage() {
         }).filter(Boolean) as MapMarker[]
 
         setMarkers(newMarkers)
-    }, [selectedDay, allData, handleSearch, selectedCity])
+    }, [selectedDay, allData, handleSearch, selectedCity, timeOfDay])
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
@@ -97,12 +153,14 @@ export default function RainMapPage() {
                     {/* Map Section */}
                     <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
+                            {error && <MapErrorDisplay onRetry={fetchData} />}
+
                             <div className="p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Carte des Précipitations</h2>
                                         <p className="text-slate-500 text-xs sm:text-sm mt-1 font-medium">
-                                            Accumulation de pluie journalière
+                                            Précipitations horaires prévues
                                         </p>
                                     </div>
                                     <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl shadow-lg shadow-blue-500/20 text-white">
@@ -124,11 +182,11 @@ export default function RainMapPage() {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500" />
-                                            <span className="text-xs text-slate-600">0.1-10 mm (Légère)</span>
+                                            <span className="text-xs text-slate-600">0.1-5 mm (Légère)</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600" />
-                                            <span className="text-xs text-slate-600">&gt; 10 mm (Forte)</span>
+                                            <span className="text-xs text-slate-600">&gt; 5 mm (Forte)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -142,18 +200,47 @@ export default function RainMapPage() {
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                             <div className="mb-6">
                                 <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>
-                                <p className="text-sm text-slate-500">Sélectionnez le jour</p>
+                                <p className="text-sm text-slate-500">Sélectionnez le jour et l'heure</p>
                             </div>
 
-                            <MapControls
-                                onSearch={handleSearch}
-                                onDaySelect={handleDaySelect}
-                                selectedDay={selectedDay}
-                            />
+                            <div className="space-y-6">
+                                {/* Time Toggle */}
+                                <div className="bg-slate-50 p-1.5 rounded-2xl flex items-center border border-slate-200">
+                                    <button
+                                        onClick={() => setTimeOfDay('morning')}
+                                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${timeOfDay === 'morning'
+                                            ? 'bg-white text-orange-600 shadow-sm border border-slate-100'
+                                            : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1z" />
+                                        </svg>
+                                        <span>Matin (08h)</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setTimeOfDay('afternoon')}
+                                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${timeOfDay === 'afternoon'
+                                            ? 'bg-white text-red-600 shadow-sm border border-slate-100'
+                                            : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" />
+                                        </svg>
+                                        <span>Après-midi (14h)</span>
+                                    </button>
+                                </div>
+
+                                <MapControls
+                                    onSearch={handleSearch}
+                                    onDaySelect={handleDaySelect}
+                                    selectedDay={selectedDay}
+                                />
+                            </div>
                         </div>
 
                         {/* Info Card */}
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1">
+
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="text-blue-500">
                                     <i className="bi bi-info-circle text-xl"></i>
@@ -162,24 +249,24 @@ export default function RainMapPage() {
                             </div>
 
                             <div className="space-y-4">
-                                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100 flex items-center gap-4">
-                                    <div className="p-2 bg-white rounded-full shadow-sm">
-                                        <i className="bi bi-cloud-rain-fill text-blue-600"></i>
+                                <div className="space-y-4">
+                                    <div className={`rounded-xl p-4 border ${stats.maxPrecip >= 10 ? 'bg-blue-50 border-blue-100' : 'bg-slate-50 border-slate-100'}`}>
+                                        <p className={`text-sm font-medium ${stats.maxPrecip >= 10 ? 'text-blue-800' : 'text-slate-700'}`}>
+                                            {stats.analysis}
+                                        </p>
                                     </div>
-                                    <div>
-                                        <p className="text-xs font-bold text-blue-700 uppercase">Données</p>
-                                        <p className="text-sm text-slate-700">Accumulation totale prévue sur 24h.</p>
-                                    </div>
-                                </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Moyenne Mensuelle</p>
-                                        <p className="text-lg font-black text-slate-800">150 mm</p>
-                                    </div>
-                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Max 24h</p>
-                                        <p className="text-lg font-black text-slate-800">80 mm</p>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <p className="text-xs text-slate-500 uppercase font-bold mb-1">Moyenne Île</p>
+                                            <p className="text-xl font-black text-slate-800">{stats.avgPrecip.toFixed(1)} mm</p>
+                                        </div>
+                                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <p className="text-xs text-slate-500 uppercase font-bold mb-1">Max Locale</p>
+                                            <p className={`text-xl font-black ${stats.maxPrecip >= 20 ? 'text-blue-600' : 'text-slate-800'}`}>
+                                                {stats.maxPrecip.toFixed(1)} mm
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

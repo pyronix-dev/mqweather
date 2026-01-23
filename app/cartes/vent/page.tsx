@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { MartiniqueMap, MapMarker } from "@/components/MartiniqueMap"
@@ -8,35 +8,112 @@ import { MapControls } from "@/components/MapControls"
 import { MARTINIQUE_CITIES } from "@/lib/constants"
 import { useMapUrlState } from "@/hooks/useMapUrlState"
 
+import { MapErrorDisplay } from "@/components/MapErrorDisplay"
+
+// Helper to convert degrees to cardinal
+const getCardinalDirection = (angle: number) => {
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+    return directions[Math.round(angle / 45) % 8];
+}
+
 export default function WindMapPage() {
     const [markers, setMarkers] = useState<MapMarker[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
+    const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon'>('afternoon')
     const { selectedDay, selectedCity, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [allData, setAllData] = useState<any[]>([])
 
-    useEffect(() => {
-        async function fetchData() {
-            setLoading(true)
-            try {
-                const lats = MARTINIQUE_CITIES.map(c => c.lat).join(",")
-                const lons = MARTINIQUE_CITIES.map(c => c.lon).join(",")
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&daily=wind_speed_10m_max,wind_direction_10m_dominant,wind_gusts_10m_max&timezone=America/Martinique`)
-                const data = await res.json()
-                const results = Array.isArray(data) ? data : [data]
-                setAllData(results)
-            } catch (e) {
-                console.error("Error fetching map data", e)
-            } finally {
-                setLoading(false)
+    const stats = useMemo(() => {
+        if (!allData.length) return { dominantDir: '--', maxGusts: 0, analysis: "Chargement en cours...", avgDirCode: 0 }
+
+        // Find correct hour index
+        const baseIndex = selectedDay * 24
+        const hourOffset = timeOfDay === 'morning' ? 8 : 14
+        const dataIndex = baseIndex + hourOffset
+
+        // Create array of wind data for this hour
+        const windData = MARTINIQUE_CITIES.map((city, idx) => {
+            const data = allData[idx]
+            if (!data?.hourly) return null
+            return {
+                dir: data.hourly.wind_direction_10m[dataIndex] || 0,
+                gust: data.hourly.wind_gusts_10m[dataIndex] || 0,
+                speed: data.hourly.wind_speed_10m[dataIndex] || 0
             }
+        }).filter((d): d is { dir: number, gust: number, speed: number } => Boolean(d))
+
+        if (!windData.length && !loading && !error) return { dominantDir: '--', maxGusts: 0, analysis: "Données indisponibles pour cette période.", avgDirCode: 0 }
+        if (loading) return { dominantDir: '--', maxGusts: 0, analysis: "Chargement...", avgDirCode: 0 }
+
+        // Stats calculation
+        let sinSum = 0;
+        let cosSum = 0;
+        let maxGusts = 0;
+        let totalSpeed = 0;
+
+        windData.forEach(d => {
+            sinSum += Math.sin(d.dir * Math.PI / 180);
+            cosSum += Math.cos(d.dir * Math.PI / 180);
+            if (d.gust > maxGusts) maxGusts = d.gust;
+            totalSpeed += d.speed;
+        });
+
+        const avgAngle = (Math.atan2(sinSum, cosSum) * 180 / Math.PI + 360) % 360;
+        const dominantDir = getCardinalDirection(avgAngle);
+        const avgSpeed = totalSpeed / windData.length;
+
+        // Rich Analysis Generation (4 lines / sentences paragraph)
+        let analysis = "";
+
+        // Sentence 1: General flow
+        if (avgSpeed < 15) analysis += "Les conditions sont calmes avec une brise légère dominante sur l'ensemble de l'île. ";
+        else if (avgSpeed < 30) analysis += "Un régime d'alizés modéré souffle régulièrement, apportant une ventilation agréable sur les côtes. ";
+        else analysis += "Le vent souffle de manière soutenue aujourd'hui, nécessitant une vigilance particulière sur le littoral. ";
+
+        // Sentence 2: Gusts info
+        if (maxGusts > 50) analysis += `Des rafales importantes pouvant atteindre ${Math.round(maxGusts)} km/h sont attendues sur les caps exposés et les hauteurs. `;
+        else if (maxGusts > 30) analysis += `Quelques rafales modérées autour de ${Math.round(maxGusts)} km/h pourront être ressenties sous les averses. `;
+        else analysis += "Les rafales restent faibles et ne présentent aucun risque particulier pour les activités extérieures. ";
+
+        // Sentence 3: Direction context
+        if (dominantDir === 'E' || dominantDir === 'NE') analysis += "Le flux de secteur Est/Nord-Est maintient un temps classique pour la saison. ";
+        else if (dominantDir === 'SE') analysis += "Le vent s'oriente au secteur Sud-Est, apportant une ambiance plus humide et lourde. ";
+        else analysis += `Le vent est changeant, s'orientant temporairement au secteur ${dominantDir}. `;
+
+        // Sentence 4: Activity advice
+        if (maxGusts > 60 || avgSpeed > 40) analysis += "Il est recommandé d'éviter les sorties en mer et les activités nautiques exposées.";
+        else analysis += "Les conditions sont globalement favorables pour la navigation de plaisance et les loisirs nautiques.";
+
+        return { dominantDir, maxGusts: Math.round(maxGusts), analysis, avgDirCode: avgAngle }
+    }, [allData, selectedDay, timeOfDay, loading, error])
+
+    const fetchData = async () => {
+        setLoading(true)
+        setError(false)
+        try {
+            const lats = MARTINIQUE_CITIES.map(c => c.lat).join(",")
+            const lons = MARTINIQUE_CITIES.map(c => c.lon).join(",")
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=America/Martinique`)
+            if (!res.ok) throw new Error('Network response was not ok')
+            const data = await res.json()
+            const results = Array.isArray(data) ? data : [data]
+            setAllData(results)
+        } catch (e) {
+            console.error("Error fetching map data", e)
+            setError(true)
+        } finally {
+            setLoading(false)
         }
+    }
+
+    useEffect(() => {
         fetchData()
     }, [])
 
     useEffect(() => {
         if (!allData.length) return
 
-        // Filter to show only default cities + the currently selected/searched city
         const visibleCities = MARTINIQUE_CITIES.filter((city) =>
             city.isDefault || city.name === selectedCity
         )
@@ -44,11 +121,15 @@ export default function WindMapPage() {
         const newMarkers = visibleCities.map((city) => {
             const originalIndex = MARTINIQUE_CITIES.findIndex(c => c.name === city.name)
             const cityData = allData[originalIndex]
-            if (!cityData || !cityData.daily) return null
+            if (!cityData || !cityData.hourly) return null
 
-            const speed = Math.round(cityData.daily.wind_speed_10m_max[selectedDay])
-            const direction = cityData.daily.wind_direction_10m_dominant[selectedDay]
-            const gusts = Math.round(cityData.daily.wind_gusts_10m_max[selectedDay])
+            const baseIndex = selectedDay * 24
+            const hourOffset = timeOfDay === 'morning' ? 8 : 14
+            const dataIndex = baseIndex + hourOffset
+
+            const speed = Math.round(cityData.hourly.wind_speed_10m[dataIndex])
+            const direction = cityData.hourly.wind_direction_10m[dataIndex]
+            const gusts = Math.round(cityData.hourly.wind_gusts_10m[dataIndex])
 
             const isStrong = speed >= 40
             const isModerate = speed >= 25
@@ -63,14 +144,14 @@ export default function WindMapPage() {
                         className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
                     >
                         <div className={`
-                            px-1.5 py-1 rounded-lg shadow-lg border backdrop-blur-md flex items-center gap-1
+                            px-2 py-1.5 rounded-lg shadow-lg border backdrop-blur-md flex items-center gap-1
                             transition-all duration-300 hover:shadow-xl
                             ${isStrong ? 'bg-gradient-to-br from-red-500/95 to-pink-500/95 border-red-400/50 text-white shadow-red-500/30' :
                                 isModerate ? 'bg-gradient-to-br from-teal-500/95 to-cyan-500/95 border-teal-400/50 text-white shadow-teal-500/30' :
                                     'bg-white/95 border-slate-200/80 text-slate-700 shadow-slate-200/50'}
                         `}>
                             <svg
-                                className={`w-3 h-3 transition-transform duration-500 ${isStrong ? 'text-white animate-pulse' : isModerate ? 'text-white' : 'text-teal-600'}`}
+                                className={`w-4 h-4 transition-transform duration-500 ${isStrong ? 'text-white animate-pulse' : isModerate ? 'text-white' : 'text-teal-600'}`}
                                 style={{ transform: `rotate(${(direction + 180) % 360}deg)` }}
                                 fill="currentColor"
                                 viewBox="0 0 24 24"
@@ -96,7 +177,7 @@ export default function WindMapPage() {
         }).filter(Boolean) as MapMarker[]
 
         setMarkers(newMarkers)
-    }, [selectedDay, allData, handleSearch, selectedCity])
+    }, [selectedDay, allData, handleSearch, selectedCity, timeOfDay])
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
@@ -106,6 +187,8 @@ export default function WindMapPage() {
                     {/* Map Section */}
                     <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
+                            {error && <MapErrorDisplay onRetry={fetchData} />}
+
                             <div className="p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -153,18 +236,47 @@ export default function WindMapPage() {
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                             <div className="mb-6">
                                 <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>
-                                <p className="text-sm text-slate-500">Sélectionnez le jour</p>
+                                <p className="text-sm text-slate-500">Sélectionnez le jour et l'heure</p>
                             </div>
 
-                            <MapControls
-                                onSearch={handleSearch}
-                                onDaySelect={handleDaySelect}
-                                selectedDay={selectedDay}
-                            />
+                            <div className="space-y-6">
+                                {/* Time Toggle */}
+                                <div className="bg-slate-50 p-1.5 rounded-2xl flex items-center border border-slate-200">
+                                    <button
+                                        onClick={() => setTimeOfDay('morning')}
+                                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${timeOfDay === 'morning'
+                                            ? 'bg-white text-orange-600 shadow-sm border border-slate-100'
+                                            : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1z" />
+                                        </svg>
+                                        <span>Matin (08h)</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setTimeOfDay('afternoon')}
+                                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${timeOfDay === 'afternoon'
+                                            ? 'bg-white text-red-600 shadow-sm border border-slate-100'
+                                            : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" />
+                                        </svg>
+                                        <span>Après-midi (14h)</span>
+                                    </button>
+                                </div>
+
+                                <MapControls
+                                    onSearch={handleSearch}
+                                    onDaySelect={handleDaySelect}
+                                    selectedDay={selectedDay}
+                                />
+                            </div>
                         </div>
 
                         {/* Info Card */}
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1">
+
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="text-teal-500">
                                     <i className="bi bi-wind text-xl"></i>
@@ -173,26 +285,29 @@ export default function WindMapPage() {
                             </div>
 
                             <div className="space-y-4">
-                                <div className="bg-teal-50 rounded-xl p-4 border border-teal-100 flex items-center gap-4">
-                                    <div className="p-2 bg-white rounded-full shadow-sm">
-                                        <svg className="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-bold text-teal-700 uppercase">Indicateur</p>
-                                        <p className="text-sm text-slate-700">La flèche indique la direction du vent.</p>
-                                    </div>
+                                <div className={`rounded-xl p-4 border ${stats.maxGusts >= 50 ? 'bg-red-50 border-red-100' : 'bg-teal-50 border-teal-100'}`}>
+                                    <p className={`text-sm font-medium ${stats.maxGusts >= 50 ? 'text-red-800' : 'text-slate-700'}`}>
+                                        {stats.analysis}
+                                    </p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                                         <p className="text-xs text-slate-500 uppercase font-bold mb-1">Vent Dominant</p>
-                                        <p className="text-lg font-black text-slate-800">Est</p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-xl font-black text-slate-800">{stats.dominantDir}</p>
+                                            {stats.dominantDir !== '--' && (
+                                                <svg className="w-5 h-5 text-teal-600" style={{ transform: `rotate(${(stats.avgDirCode + 180) % 360}deg)` }} fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+                                                </svg>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                                         <p className="text-xs text-slate-500 uppercase font-bold mb-1">Rafales Max</p>
-                                        <p className="text-lg font-black text-slate-800">65 km/h</p>
+                                        <p className={`text-xl font-black ${stats.maxGusts >= 50 ? 'text-red-600' : 'text-slate-800'}`}>
+                                            {stats.maxGusts > 0 ? stats.maxGusts : '--'} km/h
+                                        </p>
                                     </div>
                                 </div>
                             </div>

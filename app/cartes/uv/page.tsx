@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { MartiniqueMap, MapMarker } from "@/components/MartiniqueMap"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -24,35 +24,87 @@ const getUVLabel = (uv: number) => {
     return "Faible"
 }
 
+import { MapErrorDisplay } from "@/components/MapErrorDisplay"
+
 export default function UVMapPage() {
     const { selectedDay, selectedCity, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [allData, setAllData] = useState<any[]>([])
     const [markers, setMarkers] = useState<MapMarker[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
+    const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon'>('afternoon')
+
+    const stats = useMemo(() => {
+        if (!allData.length) return { maxUV: 0, analysis: "Chargement en cours..." }
+
+        const baseIndex = selectedDay * 24
+        const hourOffset = timeOfDay === 'morning' ? 8 : 14
+        const dataIndex = baseIndex + hourOffset
+
+        const uvValues = MARTINIQUE_CITIES.map((city, idx) => {
+            const data = allData[idx]
+            if (!data?.hourly?.uv_index) return null
+            return data.hourly.uv_index[dataIndex] as number
+        }).filter((u): u is number => typeof u === 'number')
+
+        if (!uvValues.length && !loading && !error) return { maxUV: 0, analysis: "Données indisponibles pour ce créneau." }
+        if (loading) return { maxUV: 0, analysis: "Chargement..." }
+
+        const maxUV = Math.round(Math.max(...uvValues))
+        const avgUV = uvValues.reduce((a, b) => a + b, 0) / uvValues.length
+
+        // Rich Analysis Generation (4 lines)
+        let analysis = "";
+
+        // Sentence 1: General Intensity
+        if (maxUV >= 11) analysis += "L'indice UV atteint des niveaux extrêmes sur l'ensemble de l'île aujourd'hui. ";
+        else if (maxUV >= 8) analysis += "Le rayonnement solaire est très intense, avec des indices UV particulièrement élevés. ";
+        else if (maxUV >= 6) analysis += "L'ensoleillement est généreux, entraînant un indice UV élevé sur toutes les communes. ";
+        else analysis += "L'intensité du rayonnement UV reste modérée grâce à une couverture nuageuse protectrice. ";
+
+        // Sentence 2: Time Context
+        if (timeOfDay === 'afternoon') analysis += "Le risque est maximal actuellement, correspondant au pic d'intensité solaire. ";
+        else analysis += "L'intensité va augmenter rapidement au cours des prochaines heures pour atteindre son maximum à la mi-journée. ";
+
+        // Sentence 3: Risk Assessment
+        if (maxUV >= 8) analysis += "Le risque de brûlures est très rapide pour les peaux non protégées (moins de 15 minutes). ";
+        else if (maxUV >= 5) analysis += "Une exposition prolongée sans protection peut entraîner des coups de soleil significatifs. ";
+        else analysis += "Le risque de lésions cutanées est limité pour les expositions de courte durée. ";
+
+        // Sentence 4: Protection Advice
+        if (maxUV >= 8) analysis += "La protection maximale est impérative : écran total, chapeau, lunettes et vêtements couvrants.";
+        else if (maxUV >= 3) analysis += "L'application de crème solaire et le port de lunettes sont vivement recommandés.";
+        else analysis += "Aucune protection particulière n'est requise, sauf pour les peaux les plus sensibles.";
+
+        return { maxUV, analysis, avgUV }
+    }, [allData, selectedDay, timeOfDay, loading, error])
+
+    const fetchData = async () => {
+        setLoading(true)
+        setError(false)
+        try {
+            const lats = MARTINIQUE_CITIES.map(c => c.lat).join(",")
+            const lons = MARTINIQUE_CITIES.map(c => c.lon).join(",")
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&hourly=uv_index&timezone=America/Martinique`)
+            if (!res.ok) throw new Error('Network response was not ok')
+            const data = await res.json()
+            const results = Array.isArray(data) ? data : [data]
+            setAllData(results)
+        } catch (e) {
+            console.error("Error fetching UV data", e)
+            setError(true)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     useEffect(() => {
-        async function fetchData() {
-            setLoading(true)
-            try {
-                const lats = MARTINIQUE_CITIES.map(c => c.lat).join(",")
-                const lons = MARTINIQUE_CITIES.map(c => c.lon).join(",")
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&daily=uv_index_max&timezone=America/Martinique`)
-                const data = await res.json()
-                const results = Array.isArray(data) ? data : [data]
-                setAllData(results)
-            } catch (e) {
-                console.error("Error fetching UV data", e)
-            } finally {
-                setLoading(false)
-            }
-        }
         fetchData()
     }, [])
 
     useEffect(() => {
         if (!allData.length) return
 
-        // Filter to show only default cities + the currently selected/searched city
         const visibleCities = MARTINIQUE_CITIES.filter((city) =>
             city.isDefault || city.name === selectedCity
         )
@@ -60,9 +112,13 @@ export default function UVMapPage() {
         const newMarkers: MapMarker[] = visibleCities.map((city) => {
             const originalIndex = MARTINIQUE_CITIES.findIndex(c => c.name === city.name)
             const cityData = allData[originalIndex]
-            if (!cityData || !cityData.daily) return null
+            if (!cityData || !cityData.hourly) return null
 
-            const uvIndex = Math.round(cityData.daily.uv_index_max[selectedDay] || 0)
+            const baseIndex = selectedDay * 24
+            const hourOffset = timeOfDay === 'morning' ? 8 : 14
+            const dataIndex = baseIndex + hourOffset
+
+            const uvIndex = Math.round(cityData.hourly.uv_index[dataIndex] || 0)
             const colorClass = getUVColor(uvIndex)
 
             return {
@@ -86,7 +142,7 @@ export default function UVMapPage() {
                             </div>
                         </div>
 
-                        <div className={`w-7 h-7 rounded-full shadow-lg flex items-center justify-center border-2 border-white/70 ${colorClass} transition-all duration-300 hover:shadow-xl`}>
+                        <div className={`w-8 h-8 rounded-full shadow-lg flex items-center justify-center border-2 border-white/70 ${colorClass} transition-all duration-300 hover:shadow-xl`}>
                             <span className="font-black text-xs">{uvIndex}</span>
                         </div>
                     </div>
@@ -95,7 +151,7 @@ export default function UVMapPage() {
         }).filter(Boolean) as MapMarker[]
 
         setMarkers(newMarkers)
-    }, [selectedDay, allData, handleSearch, selectedCity])
+    }, [selectedDay, allData, handleSearch, selectedCity, timeOfDay])
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
@@ -105,6 +161,8 @@ export default function UVMapPage() {
                     {/* Map Section */}
                     <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
+                            {error && <MapErrorDisplay onRetry={fetchData} />}
+
                             <div className="p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -160,20 +218,49 @@ export default function UVMapPage() {
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                             <div className="mb-6">
                                 <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>
-                                <p className="text-sm text-slate-500">Sélectionnez le jour</p>
+                                <p className="text-sm text-slate-500">Sélectionnez le jour et l'heure</p>
                             </div>
 
-                            <MapControls
-                                onDaySelect={handleDaySelect}
-                                selectedDay={selectedDay}
-                                selectedCity={null}
-                                onCitySelect={() => { }}
-                                onSearch={handleSearch}
-                            />
+                            <div className="space-y-6">
+                                {/* Time Toggle */}
+                                <div className="bg-slate-50 p-1.5 rounded-2xl flex items-center border border-slate-200">
+                                    <button
+                                        onClick={() => setTimeOfDay('morning')}
+                                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${timeOfDay === 'morning'
+                                            ? 'bg-white text-orange-600 shadow-sm border border-slate-100'
+                                            : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1z" />
+                                        </svg>
+                                        <span>Matin (08h)</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setTimeOfDay('afternoon')}
+                                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${timeOfDay === 'afternoon'
+                                            ? 'bg-white text-red-600 shadow-sm border border-slate-100'
+                                            : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" />
+                                        </svg>
+                                        <span>Après-midi (14h)</span>
+                                    </button>
+                                </div>
+
+                                <MapControls
+                                    onDaySelect={handleDaySelect}
+                                    selectedDay={selectedDay}
+                                    selectedCity={null}
+                                    onCitySelect={() => { }}
+                                    onSearch={handleSearch}
+                                />
+                            </div>
                         </div>
 
                         {/* Info Card */}
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1">
+
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="text-amber-500">
                                     <i className="bi bi-info-circle text-xl"></i>
@@ -182,24 +269,22 @@ export default function UVMapPage() {
                             </div>
 
                             <div className="space-y-4">
-                                <div className="bg-amber-50 rounded-xl p-4 border border-amber-100 flex items-center gap-4">
-                                    <div className="p-2 bg-white rounded-full shadow-sm">
-                                        <i className="bi bi-sun-fill text-amber-500"></i>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-bold text-amber-700 uppercase">Protection</p>
-                                        <p className="text-sm text-slate-700">Crème solaire recommandée dès l'indice 3.</p>
-                                    </div>
+                                <div className={`rounded-xl p-4 border ${stats.maxUV >= 8 ? 'bg-rose-50 border-rose-100' : stats.maxUV >= 6 ? 'bg-amber-50 border-amber-100' : 'bg-lime-50 border-lime-100'}`}>
+                                    <p className={`text-sm font-medium ${stats.maxUV >= 8 ? 'text-rose-800' : stats.maxUV >= 6 ? 'text-amber-800' : 'text-slate-700'}`}>
+                                        {stats.analysis}
+                                    </p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Moyenne Max</p>
-                                        <p className="text-lg font-black text-slate-800">11+</p>
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Max Île</p>
+                                        <p className={`text-xl font-black ${stats.maxUV >= 8 ? 'text-rose-600' : 'text-slate-800'}`}>
+                                            {stats.maxUV > 0 ? stats.maxUV : '--'}
+                                        </p>
                                     </div>
                                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                                         <p className="text-xs text-slate-500 uppercase font-bold mb-1">Heures Critiques</p>
-                                        <p className="text-lg font-black text-slate-800">10h - 15h</p>
+                                        <p className="text-xl font-black text-slate-800">10h - 15h</p>
                                     </div>
                                 </div>
                             </div>

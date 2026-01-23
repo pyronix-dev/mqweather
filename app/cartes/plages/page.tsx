@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import Link from "next/link"
 import { MartiniqueMap, MapMarker } from "@/components/MartiniqueMap"
 import { Header } from "@/components/header"
@@ -13,49 +13,116 @@ import { getSlugFromIndex } from "@/lib/utils"
 
 interface BeachData {
     weather: {
-        daily: {
+        hourly: {
             time: string[]
             weather_code: number[]
-            uv_index_max: number[]
+            uv_index: number[]
         }
     }
     marine: {
-        daily: {
+        hourly: {
             time: string[]
-            sea_surface_temperature_max: number[]
-            wave_height_max: number[]
+            sea_surface_temperature: number[]
+            wave_height: number[]
         }
     }
 }
+
+import { MapErrorDisplay } from "@/components/MapErrorDisplay"
 
 export default function BeachMapPage() {
     const { selectedDay, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [beachData, setBeachData] = useState<Record<string, BeachData>>({})
     const [markers, setMarkers] = useState<MapMarker[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
+    const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon'>('afternoon')
 
-    useEffect(() => {
-        const fetchAllData = async () => {
-            setLoading(true)
-            const data: Record<string, BeachData> = {}
+    const stats = useMemo(() => {
+        const beaches = Object.values(beachData);
+        if (!beaches.length) return { avgSeaTemp: 0, maxWave: 0, analysis: "Chargement en cours..." }
 
-            await Promise.all(BEACH_LOCATIONS.map(async (beach) => {
-                try {
-                    const [weatherRes, marineRes] = await Promise.all([
-                        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${beach.lat}&longitude=${beach.lon}&daily=weather_code,uv_index_max&timezone=America/Martinique`),
-                        fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${beach.lat}&longitude=${beach.lon}&daily=sea_surface_temperature_max,wave_height_max&timezone=America/Martinique`)
-                    ])
-                    const weatherJson = await weatherRes.json()
-                    const marineJson = await marineRes.json()
-                    data[beach.name] = { weather: weatherJson, marine: marineJson }
-                } catch (error) {
-                    console.error(`Failed to fetch data for ${beach.name}`, error)
+        // Hour Index Calculation
+        const baseIndex = selectedDay * 24
+        const hourOffset = timeOfDay === 'morning' ? 8 : 14
+        const dataIndex = baseIndex + hourOffset
+
+        let tempSum = 0;
+        let tempCount = 0;
+        let maxWave = 0;
+
+        beaches.forEach(data => {
+            if (data.marine?.hourly) {
+                const temp = data.marine.hourly.sea_surface_temperature[dataIndex]
+                const wave = data.marine.hourly.wave_height[dataIndex]
+                if (typeof temp === 'number') {
+                    tempSum += temp
+                    tempCount++
                 }
+                if (typeof wave === 'number' && wave > maxWave) {
+                    maxWave = wave
+                }
+            }
+        })
+
+        if (tempCount === 0 && !loading && !error) return { avgSeaTemp: 0, maxWave: 0, analysis: "Données indisponibles pour ce créneau." }
+        if (loading) return { avgSeaTemp: 0, maxWave: 0, analysis: "Chargement..." }
+
+        const avgSeaTemp = tempSum / tempCount;
+
+        // Rich Analysis Generation (4 lines)
+        let analysis = "";
+
+        // Sentence 1: Sea State
+        if (maxWave >= 2.5) analysis += "La mer est forte et agitée, rendant la baignade périlleuse sur les côtes exposées. ";
+        else if (maxWave >= 1.5) analysis += "Une houle modérée concerne le littoral Atlantique, soyez vigilants lors de la baignade. ";
+        else analysis += "Le plan d'eau est globalement calme, offrant des conditions idéales pour la baignade en famille. ";
+
+        // Sentence 2: Temperature Comfort
+        if (avgSeaTemp >= 29) analysis += `L'eau est particulièrement chaude avec une moyenne de ${avgSeaTemp.toFixed(1)}°C, idéale pour la détente. `;
+        else if (avgSeaTemp >= 27) analysis += `La température de l'eau est agréable, autour de ${avgSeaTemp.toFixed(1)}°C, conforme aux normales de saison. `;
+        else analysis += `La mer est un peu plus fraîche aujourd'hui (${avgSeaTemp.toFixed(1)}°C), mais reste très accessible. `;
+
+        // Sentence 3: Weather Context (inferred)
+        if (timeOfDay === 'morning') analysis += "La matinée offre souvent les meilleures conditions de clarté et de calme avant le vent thermique. ";
+        else analysis += "L'après-midi, le clapot peut se lever légèrement avec le renforcement des alizés. ";
+
+        // Sentence 4: Specific Advice
+        if (maxWave > 2.0) analysis += "Il est recommandé de privilégier les plages de la côte Caraïbe, plus abritées de la houle.";
+        else analysis += "C'est une excellente journée pour profiter de l'ensemble des plages de l'île, y compris sur la côte au vent.";
+
+        return { avgSeaTemp, maxWave, analysis }
+    }, [beachData, selectedDay, timeOfDay, loading, error])
+
+    const fetchAllData = async () => {
+        setLoading(true)
+        setError(false)
+        const data: Record<string, BeachData> = {}
+
+        try {
+            await Promise.all(BEACH_LOCATIONS.map(async (beach) => {
+                const [weatherRes, marineRes] = await Promise.all([
+                    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${beach.lat}&longitude=${beach.lon}&hourly=weather_code,uv_index&timezone=America/Martinique`),
+                    fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${beach.lat}&longitude=${beach.lon}&hourly=sea_surface_temperature,wave_height&timezone=America/Martinique`)
+                ])
+                if (!weatherRes.ok || !marineRes.ok) throw new Error('Failed to fetch')
+                const weatherJson = await weatherRes.json()
+                const marineJson = await marineRes.json()
+                data[beach.name] = { weather: weatherJson, marine: marineJson }
             }))
 
+            if (Object.keys(data).length === 0) throw new Error('No data loaded')
+
             setBeachData(data)
+        } catch (error) {
+            console.error(`Failed to fetch data`, error)
+            setError(true)
+        } finally {
             setLoading(false)
         }
+    }
+
+    useEffect(() => {
         fetchAllData()
     }, [])
 
@@ -64,12 +131,16 @@ export default function BeachMapPage() {
 
         const newMarkers: MapMarker[] = BEACH_LOCATIONS.map((beach) => {
             const data = beachData[beach.name]
-            if (!data || !data.weather.daily || !data.marine.daily) return null
+            if (!data || !data.weather.hourly || !data.marine.hourly) return null
 
-            const weatherCode = data.weather.daily.weather_code[selectedDay] || 0
-            const uvIndex = Math.round(data.weather.daily.uv_index_max[selectedDay] || 0)
-            const seaTemp = Math.round(data.marine.daily.sea_surface_temperature_max[selectedDay] || 28)
-            const waveHeight = (data.marine.daily.wave_height_max[selectedDay] || 0).toFixed(1)
+            const baseIndex = selectedDay * 24
+            const hourOffset = timeOfDay === 'morning' ? 8 : 14
+            const dataIndex = baseIndex + hourOffset
+
+            const weatherCode = data.weather.hourly.weather_code[dataIndex] || 0
+            const uvIndex = Math.round(data.weather.hourly.uv_index[dataIndex] || 0)
+            const seaTemp = Math.round(data.marine.hourly.sea_surface_temperature[dataIndex] || 28)
+            const waveHeight = (data.marine.hourly.wave_height[dataIndex] || 0).toFixed(1)
 
             const icon = getWeatherIcon(weatherCode)
 
@@ -78,9 +149,8 @@ export default function BeachMapPage() {
                 lat: beach.lat,
                 lon: beach.lon,
                 component: (
-                    <Link
-                        key={beach.name}
-                        href={`/previsions/${getSlugFromIndex(selectedDay)}/plage?city=${encodeURIComponent(beach.city)}&lat=${beach.lat}&lon=${beach.lon}`}
+                    <div
+                        onClick={() => handleSearch(beach)}
                         className="group relative cursor-pointer transition-all duration-300 hover:scale-105 z-10 hover:z-50 animate-fade-in-up"
                     >
                         {/* Beach Card Marker */}
@@ -110,13 +180,13 @@ export default function BeachMapPage() {
                         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-slate-800/95 backdrop-blur-sm text-white text-xs font-bold rounded-full whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1 shadow-lg">
                             {beach.name}
                         </div>
-                    </Link>
+                    </div>
                 )
             }
         }).filter(Boolean) as MapMarker[]
 
         setMarkers(newMarkers)
-    }, [selectedDay, beachData, loading, handleSearch])
+    }, [selectedDay, beachData, loading, handleSearch, timeOfDay])
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
@@ -126,6 +196,8 @@ export default function BeachMapPage() {
                     {/* Map Section */}
                     <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
+                            {error && <MapErrorDisplay onRetry={fetchAllData} />}
+
                             <div className="p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -135,14 +207,7 @@ export default function BeachMapPage() {
                                         </p>
                                     </div>
                                     <div className="p-2 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl shadow-lg shadow-cyan-500/20 text-white">
-                                        <svg className="w-6 h-6" fill="currentColor" viewBox="-5.0 -10.0 110.0 120.0">
-                                            <path d="m31.473 44.984c0 4.6523-3.7734 8.4258-8.4258 8.4258-4.6562 0-8.4297-3.7734-8.4297-8.4258 0-4.6562 3.7734-8.4258 8.4297-8.4258 4.6523 0 8.4258 3.7695 8.4258 8.4258z" />
-                                            <path d="m23.047 56.145c-1.3086 0-2.3711 1.0625-2.3711 2.3711v4.6406c0 1.3086 1.0625 2.3711 2.3711 2.3711s2.3711-1.0625 2.3711-2.3711v-4.6406c0-1.3086-1.0625-2.3711-2.3711-2.3711z" />
-                                            <path d="m11.801 52.879-3.2812 3.2812c-0.92578 0.92578-0.92578 2.4258 0 3.3555 0.46484 0.46484 1.0703 0.69531 1.6758 0.69531 0.60938 0 1.2148-0.23047 1.6758-0.69531l3.2812-3.2812c0.92578-0.92578 0.92578-2.4258 0-3.3555-0.92578-0.92578-2.4258-0.92969-3.3555 0z" />
-                                            <path d="m11.887 44.984c0-1.3086-1.0625-2.3711-2.3711-2.3711h-4.6406c-1.3086 0-2.3711 1.0625-2.3711 2.3711 0 1.3125 1.0625 2.3711 2.3711 2.3711h4.6406c1.3086 0 2.3711-1.0625 2.3711-2.3711z" />
-                                            <path d="m11.801 37.094c0.46484 0.46484 1.0703 0.69141 1.6758 0.69141 0.60938 0 1.2148-0.23047 1.6758-0.69531 0.92578-0.92578 0.92578-2.4258 0-3.3516l-3.2812-3.2812c-0.92578-0.92578-2.4258-0.92578-3.3555 0-0.92578 0.92578-0.92578 2.4258 0 3.3555l3.2812 3.2812z" />
-                                            <path d="m23.047 33.824c1.3086 0 2.3711-1.0625 2.3711-2.3711v-4.6406c0-1.3086-1.0625-2.3711-2.3711-2.3711s-2.3711 1.0625-2.3711 2.3711v4.6406c0 1.3086 1.0625 2.3711 2.3711 2.3711z" />
-                                        </svg>
+                                        <i className="bi bi-water text-xl"></i>
                                     </div>
                                 </div>
                             </div>
@@ -174,14 +239,42 @@ export default function BeachMapPage() {
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                             <div className="mb-6">
                                 <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>
-                                <p className="text-sm text-slate-500">Sélectionnez le jour</p>
+                                <p className="text-sm text-slate-500">Sélectionnez le jour et l'heure</p>
                             </div>
 
-                            <MapControls
-                                onSearch={handleSearch}
-                                onDaySelect={handleDaySelect}
-                                selectedDay={selectedDay}
-                            />
+                            <div className="space-y-6">
+                                {/* Time Toggle */}
+                                <div className="bg-slate-50 p-1.5 rounded-2xl flex items-center border border-slate-200">
+                                    <button
+                                        onClick={() => setTimeOfDay('morning')}
+                                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${timeOfDay === 'morning'
+                                            ? 'bg-white text-orange-600 shadow-sm border border-slate-100'
+                                            : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1z" />
+                                        </svg>
+                                        <span>Matin (08h)</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setTimeOfDay('afternoon')}
+                                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${timeOfDay === 'afternoon'
+                                            ? 'bg-white text-red-600 shadow-sm border border-slate-100'
+                                            : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" />
+                                        </svg>
+                                        <span>Après-midi (14h)</span>
+                                    </button>
+                                </div>
+
+                                <MapControls
+                                    onSearch={handleSearch}
+                                    onDaySelect={handleDaySelect}
+                                    selectedDay={selectedDay}
+                                />
+                            </div>
                         </div>
 
                         {/* Info Card */}
@@ -194,24 +287,25 @@ export default function BeachMapPage() {
                             </div>
 
                             <div className="space-y-4">
-                                <div className="bg-cyan-50 rounded-xl p-4 border border-cyan-100 flex items-center gap-4">
-                                    <div className="p-2 bg-white rounded-full shadow-sm">
-                                        <i className="bi bi-water text-cyan-500"></i>
+                                <div className="space-y-4">
+                                    <div className={`rounded-xl p-4 border ${stats.maxWave >= 2 ? 'bg-amber-50 border-amber-100' : 'bg-cyan-50 border-cyan-100'}`}>
+                                        <p className={`text-sm font-medium ${stats.maxWave >= 2 ? 'text-amber-800' : 'text-slate-700'}`}>
+                                            {stats.analysis}
+                                        </p>
                                     </div>
-                                    <div>
-                                        <p className="text-xs font-bold text-cyan-700 uppercase">Qualité</p>
-                                        <p className="text-sm text-slate-700">Excellente sur la majorité des sites.</p>
-                                    </div>
-                                </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Temp. Eau Moy.</p>
-                                        <p className="text-lg font-black text-slate-800">28°C</p>
-                                    </div>
-                                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Vague Max</p>
-                                        <p className="text-lg font-black text-slate-800">1.2m</p>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <p className="text-xs text-slate-500 uppercase font-bold mb-1">Temp. Eau Moy.</p>
+                                            <div className="flex items-center gap-1">
+                                                <p className="text-xl font-black text-slate-800">{stats.avgSeaTemp > 0 ? stats.avgSeaTemp.toFixed(1) : '--'}°C</p>
+                                                <i className="bi bi-thermometer-half text-blue-500"></i>
+                                            </div>
+                                        </div>
+                                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <p className="text-xs text-slate-500 uppercase font-bold mb-1">Vague Max</p>
+                                            <p className="text-xl font-black text-slate-800">{stats.maxWave > 0 ? stats.maxWave.toFixed(1) : '--'} m</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -233,12 +327,16 @@ export default function BeachMapPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {BEACH_LOCATIONS.map((beach, index) => {
                             const data = beachData[beach.name]
-                            if (!data || !data.weather?.daily) return null
+                            if (!data || !data.weather?.hourly) return null
 
-                            const weatherCode = data.weather.daily.weather_code?.[selectedDay] || 0
-                            const uvIndex = Math.round(data.weather.daily.uv_index_max?.[selectedDay] || 0)
-                            const seaTemp = Math.round(data.marine?.daily?.sea_surface_temperature_max?.[selectedDay] || 28)
-                            const waveHeight = (data.marine?.daily?.wave_height_max?.[selectedDay] || 0.5).toFixed(1)
+                            const baseIndex = selectedDay * 24
+                            const hourOffset = timeOfDay === 'morning' ? 8 : 14
+                            const dataIndex = baseIndex + hourOffset
+
+                            const weatherCode = data.weather.hourly.weather_code[dataIndex] || 0
+                            const uvIndex = Math.round(data.weather.hourly.uv_index[dataIndex] || 0)
+                            const seaTemp = Math.round(data.marine.hourly.sea_surface_temperature[dataIndex] || 28)
+                            const waveHeight = (data.marine.hourly.wave_height[dataIndex] || 0.5).toFixed(1)
 
                             return (
                                 <Link

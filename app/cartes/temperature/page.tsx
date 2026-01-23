@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { MartiniqueMap, MapMarker } from "@/components/MartiniqueMap"
@@ -9,42 +9,91 @@ import { MARTINIQUE_CITIES } from "@/lib/constants"
 import { useMapUrlState } from "@/hooks/useMapUrlState"
 import { getWeatherIcon } from "@/lib/weather-icons"
 
+import { MapErrorDisplay } from "@/components/MapErrorDisplay"
+
 export default function TemperatureMapPage() {
     const [markers, setMarkers] = useState<MapMarker[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
     const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon'>('afternoon')
     const { selectedDay, selectedCity, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [allData, setAllData] = useState<any[]>([])
 
-    useEffect(() => {
-        async function fetchData() {
-            setLoading(true)
-            try {
-                const lats = MARTINIQUE_CITIES.map(c => c.lat).join(",")
-                const lons = MARTINIQUE_CITIES.map(c => c.lon).join(",")
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&hourly=temperature_2m,weather_code&timezone=America/Martinique`)
-                const data = await res.json()
-                const results = Array.isArray(data) ? data : [data]
-                setAllData(results)
-            } catch (e) {
-                console.error("Error fetching map data", e)
-            } finally {
-                setLoading(false)
-            }
+    // Stats memoization (unchanged)
+    const stats = useMemo(() => {
+        if (!allData.length) return { avgTemp: 0, maxTemp: 0, analysis: "Chargement des données..." }
+
+        const baseIndex = selectedDay * 24
+        const hourOffset = timeOfDay === 'morning' ? 8 : 14
+        const dataIndex = baseIndex + hourOffset
+
+        const temps = MARTINIQUE_CITIES.map((city, idx) => {
+            const data = allData[idx]
+            if (!data?.hourly?.temperature_2m) return null
+            return data.hourly.temperature_2m[dataIndex] as number
+        }).filter((t): t is number => typeof t === 'number')
+
+        // If no data found but we have overall data, it might be a specific day issue, but usually it's caught by error state.
+        if (!temps.length && !loading && !error) return { avgTemp: 0, maxTemp: 0, analysis: "Données indisponibles." }
+        if (loading) return { avgTemp: 0, maxTemp: 0, analysis: "Chargement..." }
+
+        const avgTemp = temps.reduce((a, b) => a + b, 0) / temps.length
+        const maxTemp = Math.max(...temps)
+
+        // Rich Analysis Generation (4 lines)
+        let analysis = "";
+
+        // Sentence 1: General Situation
+        if (avgTemp >= 30) analysis += "Une chaleur intense règne sur l'ensemble de l'île, avec des températures nettement supérieures aux normales. ";
+        else if (avgTemp >= 28) analysis += "Les températures sont chaudes et conformes à la saison, avec un ressenti agréable grâce aux alizés. ";
+        else analysis += "L'ambiance est relativement clémente aujourd'hui avec des températures modérées pour la saison. ";
+
+        // Sentence 2: Peaks and Localization
+        if (maxTemp >= 32) analysis += `Le thermomètre grimpe localement jusqu'à ${Math.round(maxTemp)}°C dans les plaines et zones abritées du vent. `;
+        else analysis += `Le mercure reste raisonnable, ne dépassant pas ${Math.round(maxTemp)}°C au plus chaud de la journée sur le littoral. `;
+
+        // Sentence 3: Time context & Feeling
+        if (timeOfDay === 'afternoon') analysis += "L'inconfort thermique est maximal en ce moment, la chaleur étant accentuée par l'humidité ambiante. ";
+        else analysis += "La fraîcheur matinale se dissipe rapidement pour laisser place à une chaleur lourde dès la mi-journée. ";
+
+        // Sentence 4: Advice
+        if (avgTemp >= 31 || maxTemp >= 33) analysis += "Hydratez-vous fréquemment et évitez les efforts physiques intenses aux heures les plus chaudes.";
+        else analysis += "Profitez de ces belles conditions climatiques, idéales pour les activités de plein air et la plage.";
+
+        return { avgTemp, maxTemp, analysis }
+    }, [allData, selectedDay, timeOfDay, loading, error])
+
+    const fetchData = async () => {
+        setLoading(true)
+        setError(false)
+        try {
+            const lats = MARTINIQUE_CITIES.map(c => c.lat).join(",")
+            const lons = MARTINIQUE_CITIES.map(c => c.lon).join(",")
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&hourly=temperature_2m,weather_code&timezone=America/Martinique`)
+            if (!res.ok) throw new Error('Network response was not ok')
+            const data = await res.json()
+            const results = Array.isArray(data) ? data : [data]
+            setAllData(results)
+        } catch (e) {
+            console.error("Error fetching map data", e)
+            setError(true)
+        } finally {
+            setLoading(false)
         }
+    }
+
+    useEffect(() => {
         fetchData()
     }, [])
 
     useEffect(() => {
         if (!allData.length) return
 
-        // Filter to show only default cities + the currently selected/searched city
         const visibleCities = MARTINIQUE_CITIES.filter((city, index) =>
             city.isDefault || city.name === selectedCity
         )
 
         const newMarkers = visibleCities.map((city) => {
-            // Find the original index in MARTINIQUE_CITIES for data lookup
             const originalIndex = MARTINIQUE_CITIES.findIndex(c => c.name === city.name)
             const cityData = allData[originalIndex]
             if (!cityData || !cityData.hourly) return null
@@ -96,6 +145,8 @@ export default function TemperatureMapPage() {
                     {/* Map Section */}
                     <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
+                            {error && <MapErrorDisplay onRetry={fetchData} />}
+
                             <div className="p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -189,21 +240,24 @@ export default function TemperatureMapPage() {
                             </div>
 
                             <div className="space-y-4">
-                                <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
-                                    <p className="text-sm text-slate-700 font-medium">
-                                        Les températures affichées correspondent aux relevés sous abri à 2m du sol.
-                                        Les ressentis peuvent être supérieurs en raison de l'humidité.
+                                <div className={`rounded-xl p-4 border ${stats.avgTemp >= 30 ? 'bg-orange-50 border-orange-100' : 'bg-blue-50 border-blue-100'}`}>
+                                    <p className={`text-sm font-medium ${stats.avgTemp >= 30 ? 'text-orange-800' : 'text-slate-700'}`}>
+                                        {stats.analysis}
                                     </p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Moyenne Saison</p>
-                                        <p className="text-xl font-black text-slate-800">27.5°C</p>
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Moyenne Île</p>
+                                        <div className="flex items-end gap-1">
+                                            <p className="text-xl font-black text-slate-800">{stats.avgTemp > 0 ? stats.avgTemp.toFixed(1) : '--'}°C</p>
+                                        </div>
                                     </div>
                                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Record Max</p>
-                                        <p className="text-xl font-black text-red-600">35.4°C</p>
+                                        <p className="text-xs text-slate-500 uppercase font-bold mb-1">Max Relevé</p>
+                                        <p className={`text-xl font-black ${stats.maxTemp >= 30 ? 'text-red-600' : 'text-slate-800'}`}>
+                                            {stats.maxTemp > 0 ? stats.maxTemp : '--'}°C
+                                        </p>
                                     </div>
                                 </div>
                             </div>
