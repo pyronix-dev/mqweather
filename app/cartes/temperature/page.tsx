@@ -11,6 +11,7 @@ import { getWeatherIcon } from "@/lib/weather-icons"
 import { getWeatherIconClass } from "@/lib/weather-icons"
 
 import { MapErrorDisplay } from "@/components/MapErrorDisplay"
+import { MorningIcon, AfternoonIcon } from "@/components/TimeIcons"
 
 export default function TemperatureMapPage() {
     const [markers, setMarkers] = useState<MapMarker[]>([])
@@ -205,9 +206,7 @@ export default function TemperatureMapPage() {
                                             ? 'bg-white text-orange-600 shadow-sm border border-slate-100'
                                             : 'text-slate-500 hover:text-slate-700'}`}
                                     >
-                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1z" />
-                                        </svg>
+                                        <MorningIcon />
                                         <span>Matin (08h)</span>
                                     </button>
                                     <button
@@ -216,9 +215,7 @@ export default function TemperatureMapPage() {
                                             ? 'bg-white text-red-600 shadow-sm border border-slate-100'
                                             : 'text-slate-500 hover:text-slate-700'}`}
                                     >
-                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" />
-                                        </svg>
+                                        <AfternoonIcon />
                                         <span>Après-midi (14h)</span>
                                     </button>
                                 </div>

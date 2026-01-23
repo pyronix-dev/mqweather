@@ -8,6 +8,7 @@ import { MapControls } from "@/components/MapControls"
 import { MARTINIQUE_CITIES } from "@/lib/constants"
 import { useMapUrlState } from "@/hooks/useMapUrlState"
 import { getWeatherIcon } from "@/lib/weather-icons"
+import { MorningIcon, AfternoonIcon } from "@/components/TimeIcons"
 
 // Simple weather icon for header
 const WeatherIcon = () => (
@@ -16,6 +17,8 @@ const WeatherIcon = () => (
     <path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5.64 5.64l1.42 1.42M16.95 16.95l1.41 1.41M5.64 18.36l1.42-1.42M16.95 7.05l1.41-1.41" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
   </svg>
 )
+
+
 
 // Function to generate weather summary text based on conditions
 function generateWeatherSummary(weatherData: any[], selectedDay: number): string {
@@ -241,6 +244,7 @@ export default function HomePage() {
                           ? 'bg-white text-blue-600 shadow-sm'
                           : 'text-slate-500 hover:text-slate-700'}`}
                       >
+                        <MorningIcon />
                         <span>Matin</span>
                       </button>
                       <button
@@ -249,6 +253,7 @@ export default function HomePage() {
                           ? 'bg-white text-red-600 shadow-sm'
                           : 'text-slate-500 hover:text-slate-700'}`}
                       >
+                        <AfternoonIcon />
                         <span>Après-midi</span>
                       </button>
                     </div>
