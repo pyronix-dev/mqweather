@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import DOMPurify from 'isomorphic-dompurify'
@@ -42,5 +43,3 @@ export function sanitizeInput(input: string): string {
   if (!input) return ""
   return DOMPurify.sanitize(input).trim()
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

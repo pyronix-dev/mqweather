@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import React from 'react'
 
 export const MorningIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -11,5 +12,3 @@ export const AfternoonIcon = ({ className = "w-5 h-5" }: { className?: string })
         <path d="M12,2A10,10,0,1,0,22,12,10.01114,10.01114,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8.00917,8.00917,0,0,1,12,20ZM14.09814,9.63379,13,10.26807V7a1,1,0,0,0-2,0v5a1.00025,1.00025,0,0,0,1.5.86621l2.59814-1.5a1.00016,1.00016,0,1,0-1-1.73242Z" />
     </svg>
 )
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

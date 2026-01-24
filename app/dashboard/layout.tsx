@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { redirect } from 'next/navigation'
 import { getUserSession } from '@/lib/auth-server'
 
@@ -18,5 +19,3 @@ export default async function DashboardLayout({
         </>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

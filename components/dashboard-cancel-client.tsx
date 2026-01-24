@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState } from "react"
@@ -81,5 +82,3 @@ export default function CancelSubscriptionPage({ initialUser }: { initialUser: a
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

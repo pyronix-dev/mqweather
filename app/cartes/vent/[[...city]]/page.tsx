@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import WindMapPage from '@/components/maps/vent-client'
@@ -22,5 +23,3 @@ export default async function VentPage(props: { params: Promise<{ city?: string[
 
     return <WindMapPage initialUser={user} />
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import * as React from 'react'
@@ -54,5 +55,3 @@ function ResizableHandle({
 }
 
 export { ResizablePanelGroup, ResizablePanel, ResizableHandle }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

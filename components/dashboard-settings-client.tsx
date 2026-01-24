@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect } from "react"
@@ -135,5 +136,3 @@ export default function SettingsPage({ initialUser }: { initialUser: any }) {
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

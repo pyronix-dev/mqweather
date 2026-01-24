@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 
 export const MARTINIQUE_CITIES = [
@@ -64,5 +65,3 @@ export const BEACH_LOCATIONS = [
     { name: "Cap Macré", city: "Le Marin", lat: 14.4750, lon: -60.8420 },
     
 ]
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

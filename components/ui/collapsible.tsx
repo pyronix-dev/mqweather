@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
@@ -31,5 +32,3 @@ function CollapsibleContent({
 }
 
 export { Collapsible, CollapsibleTrigger, CollapsibleContent }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

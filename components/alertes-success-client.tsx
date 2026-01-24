@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useSearchParams, useRouter } from "next/navigation"
@@ -200,5 +201,3 @@ export default function SuccessPage({ initialUser }: { initialUser: any }) {
         </Suspense>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

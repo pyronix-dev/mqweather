@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import { generateReferenceCode } from '@/lib/supabase'
@@ -117,5 +118,3 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: "Erreur serveur" }, { status: 500 })
     }
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

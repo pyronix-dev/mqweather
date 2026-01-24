@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import Link from "next/link"
 
 export default function NotFound() {
@@ -47,5 +48,3 @@ export default function NotFound() {
     </div>
   )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

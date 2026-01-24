@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { Loader2Icon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -14,5 +15,3 @@ function Spinner({ className, ...props }: React.ComponentProps<'svg'>) {
 }
 
 export { Spinner }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

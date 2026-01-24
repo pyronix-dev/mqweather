@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { createSupabaseAdmin } from './supabase'
 
 export interface RateLimitResult {
@@ -78,5 +79,3 @@ export async function checkRateLimit(ip: string, actionType: 'register' | 'otp_r
     await supabase.from('ip_limit_tracking').update(updates).eq('ip_address', ip)
     return { blocked: false }
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

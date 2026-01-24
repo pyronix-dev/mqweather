@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, use } from "react"
@@ -367,5 +368,3 @@ export default function UserDetailPage({ params, initialUser }: { params: { id: 
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

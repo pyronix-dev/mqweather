@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useRef, useEffect } from "react"
@@ -122,5 +123,3 @@ export function MapControls({ onSearch, onDaySelect, selectedDay }: MapControlsP
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

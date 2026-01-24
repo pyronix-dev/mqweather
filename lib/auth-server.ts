@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { cookies } from 'next/headers'
 
 export async function getUserSession() {
@@ -27,7 +28,7 @@ export async function getUserFromSession() {
     const session = await getUserSession()
     if (!session?.userId) return null
 
-    
+
     try {
         const { createSupabaseAdmin } = await import('@/lib/supabase')
         const supabase = createSupabaseAdmin()
@@ -40,15 +41,15 @@ export async function getUserFromSession() {
 
         if (error || !user) {
             console.warn('⚠️ Server Auth: DB User not found or error, falling back to cookie data', error)
-            
+
             return {
                 name: session.referenceCode || 'Utilisateur',
                 email: session.email || '',
-                role: 'user' 
+                role: 'user'
             }
         }
 
-        
+
         let displayName = user.reference_code
         if (user.full_name) {
             displayName = user.full_name.split(' ')[0]
@@ -62,7 +63,7 @@ export async function getUserFromSession() {
         }
     } catch (e) {
         console.error('Error fetching user server-side:', e)
-        
+
         return {
             name: session.referenceCode || 'Utilisateur',
             reference: session.referenceCode,
@@ -72,4 +73,8 @@ export async function getUserFromSession() {
     }
 }
 
-// Developed by Omar Rafik (OMX) - omx001@proton.me
+export async function getAuthUser() {
+    const session = await getUserSession()
+    if (!session?.userId) return null
+    return session
+}

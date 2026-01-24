@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import type React from "react"
 
@@ -14,5 +15,3 @@ export default function AdminLayout({
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

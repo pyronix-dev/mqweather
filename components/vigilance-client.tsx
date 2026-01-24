@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useRef, useState, useEffect } from "react"
@@ -379,5 +380,3 @@ export function VigilanceClient({ initialUser }: { initialUser: any }) {
     </div>
   )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

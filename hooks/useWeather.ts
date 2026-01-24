@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { useState, useEffect } from "react"
 
@@ -102,5 +103,3 @@ export function useWeather(lat: string, lon: string, dayIndex: number) {
 
     return { weather, hourlyData, loading }
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

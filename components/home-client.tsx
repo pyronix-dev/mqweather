@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useState } from "react"
@@ -503,5 +504,3 @@ export function HomeClient({ initialUser }: HomeClientProps) {
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

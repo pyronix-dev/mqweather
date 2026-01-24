@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import React from 'react'
 
 
@@ -165,5 +166,3 @@ export const LightningIcon = ({ className = "", style }: WeatherIconProps) => (
 export const UVIcon = ({ className = "", style }: WeatherIconProps) => (
     <i className={`bi bi-sun-fill ${className}`} style={{ color: '#F59E0B', ...style }} />
 )
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

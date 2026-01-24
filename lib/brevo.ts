@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getPaymentConfirmationEmailHtml, getCancellationEmailHtml, getPlanChangeEmailHtml } from '@/lib/email-templates'
 
@@ -222,5 +223,3 @@ export async function sendPlanChangeEmail(
 
   return sendEmail(email, subject, htmlContent)
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

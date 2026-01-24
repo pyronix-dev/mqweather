@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
@@ -293,5 +294,3 @@ export default function UVMapPage({ initialUser }: { initialUser: any }) {
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 "use client"
 
@@ -435,5 +436,3 @@ function StatCard({ label, value, loading, color = "slate" }: { label: string; v
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

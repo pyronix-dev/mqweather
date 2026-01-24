@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import React from "react"
 
 interface MapErrorDisplayProps {
@@ -29,5 +30,3 @@ export function MapErrorDisplay({ onRetry }: MapErrorDisplayProps) {
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

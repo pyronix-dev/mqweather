@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import * as React from 'react'
@@ -51,5 +52,3 @@ function AvatarFallback({
 }
 
 export { Avatar, AvatarImage, AvatarFallback }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

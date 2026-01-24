@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import { sendSMS } from '@/lib/brevo'
@@ -52,5 +53,3 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Serveur error' }, { status: 500 })
     }
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

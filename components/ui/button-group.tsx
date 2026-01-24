@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 
@@ -81,5 +82,3 @@ export {
   ButtonGroupText,
   buttonGroupVariants,
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import * as React from 'react'
 import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu'
 import { cva } from 'class-variance-authority'
@@ -164,5 +165,3 @@ export {
   NavigationMenuViewport,
   navigationMenuTriggerStyle,
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

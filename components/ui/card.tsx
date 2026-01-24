@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import * as React from 'react'
 
 import { cn } from '@/lib/utils'
@@ -90,5 +91,3 @@ export {
   CardDescription,
   CardContent,
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

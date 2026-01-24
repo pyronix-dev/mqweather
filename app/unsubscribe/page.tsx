@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import UnsubscribeClient from '@/components/unsubscribe-client'
@@ -8,5 +9,3 @@ export default async function UnsubscribePage() {
     const user = await getUserFromSession()
     return <UnsubscribeClient initialUser={user} />
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

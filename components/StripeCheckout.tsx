@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import React, { useEffect, useState } from 'react';
@@ -29,5 +30,3 @@ export function StripeCheckout({ clientSecret }: StripeCheckoutProps) {
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 
 const WORDPRESS_SITE_URL = process.env.WORDPRESS_SITE_URL || "https://techcrunch.com"
@@ -19,5 +20,3 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to fetch news' }, { status: 500 })
     }
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

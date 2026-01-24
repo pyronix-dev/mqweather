@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 
@@ -7,7 +8,7 @@ export async function GET() {
     try {
         const supabase = createSupabaseAdmin()
 
-        
+
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
         const { data: observations, error } = await supabase
@@ -21,7 +22,7 @@ export async function GET() {
             return NextResponse.json({ error: 'Failed to fetch observations' }, { status: 500 })
         }
 
-        
+
         const formattedObservations = observations.map((obs) => ({
             id: obs.id,
             type: obs.type,
@@ -42,8 +43,15 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
+        const session = await getUserSession()
+        if (!session?.userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
         const body = await request.json()
-        const { type, x, y, user_id, details, temp } = body
+        const { type, x, y, details, temp } = body
+        const user_id = session.userId
+
 
         if (!type || x === undefined || y === undefined) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -51,7 +59,7 @@ export async function POST(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
-        
+
         const insertData = {
             type,
             x: Number(x),
@@ -74,7 +82,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to save observation', details: error.message }, { status: 500 })
         }
 
-        
+
         const newObservation = {
             id: data.id,
             type: data.type,
@@ -92,5 +100,3 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState } from "react"
@@ -109,5 +110,3 @@ export function DeleteAccountDialog({ isOpen, onClose }: DeleteAccountDialogProp
         </Dialog.Root>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

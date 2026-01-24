@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import TemperatureMapPage from '@/components/maps/temperature-client'
@@ -22,5 +23,3 @@ export default async function TemperaturePage(props: { params: Promise<{ city?: 
 
     return <TemperatureMapPage initialUser={user} />
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

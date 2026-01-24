@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createSupabaseAdmin } from '@/lib/supabase'
@@ -86,5 +87,3 @@ export function getClientIP(request: Request): string {
     }
     return request.headers.get('x-real-ip') || 'unknown'
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

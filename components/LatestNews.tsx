@@ -1,6 +1,9 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useState } from "react"
+import DOMPurify from "isomorphic-dompurify"
+
 
 interface WPPost {
     id: number
@@ -26,7 +29,7 @@ export function LatestNews() {
     useEffect(() => {
         async function fetchNews() {
             try {
-                
+
                 const res = await fetch('/api/news')
 
                 if (!res.ok) throw new Error("Failed to fetch")
@@ -45,7 +48,7 @@ export function LatestNews() {
     }, [])
 
     if (error) {
-        
+
         return null
     }
 
@@ -80,8 +83,9 @@ export function LatestNews() {
                     >
                         <h4
                             className="font-bold text-slate-800 text-sm leading-snug group-hover:text-blue-600 transition-colors line-clamp-2"
-                            dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.title.rendered) }}
                         />
+
                         <div className="flex items-center gap-2 mt-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-blue-400 video-transition"></div>
                             <span className="text-[10px] text-slate-400 font-medium">
@@ -105,5 +109,3 @@ export function LatestNews() {
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

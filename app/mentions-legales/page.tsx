@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import MentionsLegalesClient from '@/components/mentions-legales-client'
@@ -8,5 +9,3 @@ export default async function MentionsLegalesPage() {
     const user = await getUserFromSession()
     return <MentionsLegalesClient initialUser={user} />
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 export interface VigilanceContent {
     headline: string;
     description: string;
@@ -132,5 +133,3 @@ Les déplacements et les activités peuvent généralement se poursuivre, mais i
         footer: "Veuillez vérifier votre connexion internet ou réessayer plus tard."
     }
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

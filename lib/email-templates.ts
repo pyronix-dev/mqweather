@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 
 
@@ -446,5 +447,3 @@ export function getVigilanceAlertEmailHtml(colorName: string): string {
 </html>
     `
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

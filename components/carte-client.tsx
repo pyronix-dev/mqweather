@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import type React from "react"
@@ -697,5 +698,3 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
         </div>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

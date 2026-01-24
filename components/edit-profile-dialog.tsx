@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState } from "react"
@@ -122,5 +123,3 @@ export function EditProfileDialog({ isOpen, onClose, user }: EditProfileDialogPr
         </Dialog.Root>
     )
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

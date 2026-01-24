@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
@@ -102,5 +103,3 @@ export {
   EmptyContent,
   EmptyMedia,
 }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me

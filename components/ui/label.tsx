@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import * as React from 'react'
@@ -22,5 +23,3 @@ function Label({
 }
 
 export { Label }
-
-// Developed by Omar Rafik (OMX) - omx001@proton.me
