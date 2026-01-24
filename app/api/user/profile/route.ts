@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createSupabaseAdmin } from '@/lib/supabase'
@@ -21,7 +22,7 @@ export async function PATCH(request: Request) {
         const body = await request.json()
         const { full_name, email, phone } = body
 
-        // Basic validation
+        
         if (!email && !phone) {
             return NextResponse.json({ error: 'Email or Phone is required' }, { status: 400 })
         }

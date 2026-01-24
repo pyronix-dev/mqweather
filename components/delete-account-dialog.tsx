@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState } from "react"
@@ -41,7 +42,7 @@ export function DeleteAccountDialog({ isOpen, onClose }: DeleteAccountDialogProp
 
             if (!res.ok) throw new Error("Delete failed")
 
-            // Redirect to login or home after deletion
+            
             alert("Votre compte a été supprimé.")
             router.push('/login')
             router.refresh()

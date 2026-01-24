@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextRequest, NextResponse } from 'next/server'
 
 const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY
@@ -11,29 +12,29 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No weather data provided' }, { status: 400 })
         }
 
-        // Format weather data for the AI
+        
         const today = new Date()
         today.setDate(today.getDate() + selectedDay)
         const dayName = today.toLocaleDateString('fr-FR', { weekday: 'long' })
         const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
-        // Determine time context label
+        
         const timeLabel = timeOfDay === 'morning' ? 'Matin' : 'Après-midi'
 
-        // Calculate relevant hour index (8am for morning, 2pm for afternoon)
-        // selectedDay * 24 hours + offset
+        
+        
         const hourOffset = timeOfDay === 'morning' ? 8 : 14
         const targetHourIndex = (selectedDay * 24) + hourOffset
 
-        // Summarize weather conditions based on SPECIFIC HOUR
+        
         const weatherSummary = weatherData.map((data: any, index: number) => {
             if (!data?.hourly?.weather_code || !data?.hourly?.temperature_2m) return null
 
-            // Extract hourly data points
+            
             const currentTemp = Math.round(data.hourly.temperature_2m[targetHourIndex] || 0)
             const weatherCode = data.hourly.weather_code[targetHourIndex] || 0
 
-            // Helper to get daily min/max for context (still useful)
+            
             const dailyMax = Math.round(data.daily?.temperature_2m_max?.[selectedDay] || 0)
             const dailyMin = Math.round(data.daily?.temperature_2m_min?.[selectedDay] || 0)
 

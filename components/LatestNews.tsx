@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useState } from "react"
@@ -14,8 +15,8 @@ interface WPPost {
     }
 }
 
-// ⚠️ REPLACE THIS WITH YOUR WORDPRESS URL
-// Example: "https://votre-site-wordpress.com"
+
+
 const WORDPRESS_SITE_URL = "https://techcrunch.com"
 
 export function LatestNews() {
@@ -26,7 +27,7 @@ export function LatestNews() {
     useEffect(() => {
         async function fetchNews() {
             try {
-                // Fetch from our local proxy API to avoid CORS issues
+                
                 const res = await fetch('/api/news')
 
                 if (!res.ok) throw new Error("Failed to fetch")
@@ -45,7 +46,7 @@ export function LatestNews() {
     }, [])
 
     if (error) {
-        // Fallback or hide component on error
+        
         return null
     }
 

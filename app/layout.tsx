@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import type React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 import { ToastProvider } from "@/components/ui/toast-context"
 import { ConfirmDialogProvider } from "@/components/ui/confirm-context"
 
-// ... imports
+
 
 export default function RootLayout({
   children,

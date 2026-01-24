@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
-        // Find user by reference or ID
+        
         let query = supabase.from('users').select('id, email, phone').single()
 
         if (id) {
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
-        // Cancel all active subscriptions
+        
         const { error: subError } = await supabase
             .from('subscriptions')
             .update({ status: 'cancelled' })
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to cancel subscription' }, { status: 500 })
         }
 
-        // Also disable notifications flag just in case
+        
         await supabase
             .from('users')
             .update({ notifications_enabled: false })

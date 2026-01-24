@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
@@ -5,24 +6,24 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2025-04-30.basil',
 })
 
-// Price configuration (in cents for EUR)
+
 const PRICES = {
     'sms-monthly': {
-        amount: 499, // 4,99€
+        amount: 499, 
         name: 'SMS Standard - Mensuel',
         description: 'Alertes météo SMS - Abonnement mensuel',
         mode: 'subscription' as const,
         interval: 'month' as const,
     },
     'sms-annual': {
-        amount: 4990, // 49,90€
+        amount: 4990, 
         name: 'SMS Standard - Annuel',
         description: 'Alertes météo SMS - Abonnement annuel (2 mois offerts)',
         mode: 'subscription' as const,
         interval: 'year' as const,
     },
     'email-annual': {
-        amount: 1000, // 10€
+        amount: 1000, 
         name: 'Alertes Email - Annuel',
         description: 'Alertes météo Email - Abonnement annuel',
         mode: 'subscription' as const,
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
         const priceConfig = PRICES[plan as keyof typeof PRICES]
         const origin = request.headers.get('origin') || 'http://localhost:3000'
 
-        // Create a Stripe Checkout session
+        
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             ui_mode: 'embedded',

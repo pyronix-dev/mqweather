@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect } from "react"
@@ -7,7 +8,7 @@ import { Footer } from "@/components/footer"
 import { StripeCheckout } from "@/components/StripeCheckout"
 import { Suspense } from "react"
 
-// Loading state
+
 function CheckoutLoading() {
     return (
         <div className="min-h-[400px] flex flex-col items-center justify-center gap-4">
@@ -26,8 +27,8 @@ function CheckoutContent() {
     useEffect(() => {
         const plan = searchParams.get("plan")
 
-        // Basic validation or data gathering could happen here.
-        // In a real app, you might pass more data via context or re-fetch current selection.
+        
+        
         if (!plan) {
             setError("Aucun plan sélectionné.")
             return
@@ -37,7 +38,7 @@ function CheckoutContent() {
         const phone = searchParams.get("phone")
         const profile = searchParams.get("profile")
 
-        // Fetch the client secret
+        
         fetch("/api/checkout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

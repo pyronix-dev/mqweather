@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 "use client"
 
@@ -88,7 +89,7 @@ export default function AdminDashboard({ initialUser }: { initialUser: any }) {
             variant: action === 'delete' ? 'danger' : 'warning'
         })
 
-        if (!result && result !== '') return // Check for false (cancel) but allow empty string
+        if (!result && result !== '') return 
 
         const reason = typeof result === 'string' ? result : undefined
 
@@ -114,7 +115,7 @@ export default function AdminDashboard({ initialUser }: { initialUser: any }) {
 
     useEffect(() => {
         if (initialUser && isAdmin === null) {
-            // Secondary check if initial state wasn't enough or if we need to refresh
+            
             fetch("/api/auth/me")
                 .then((res) => res.json())
                 .then((data) => {

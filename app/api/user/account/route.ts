@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createSupabaseAdmin } from '@/lib/supabase'
@@ -20,7 +21,7 @@ export async function DELETE(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
-        // 1. Get user details from public users table to archive
+        
         const { data: user, error: fetchError } = await supabase
             .from('users')
             .select('*')
@@ -32,7 +33,7 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
-        // 2. Archive to deleted_users
+        
         const { error: archiveError } = await supabase
             .from('deleted_users')
             .insert({
@@ -49,7 +50,7 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Failed to archive user' }, { status: 500 })
         }
 
-        // 3. Delete from public users table
+        
         const { error: deletePublicError } = await supabase
             .from('users')
             .delete()
@@ -60,18 +61,18 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Failed to delete profile' }, { status: 500 })
         }
 
-        // 4. Delete from Supabase Auth (This prevents login)
+        
         const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(
             userId
         )
 
         if (deleteAuthError) {
             console.error('Delete User: Failed to delete auth user', deleteAuthError)
-            // Note: Even if this fails, the user is gone from public table, so app access is effectively broken
-            // But we should report it.
+            
+            
         }
 
-        // 5. Clear cookie
+        
         cookieStore.delete('auth_session')
 
         return NextResponse.json({ success: true })

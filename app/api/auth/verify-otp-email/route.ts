@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { NextRequest, NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
@@ -13,13 +14,13 @@ export async function POST(request: NextRequest) {
 
         const supabase = createSupabaseAdmin()
 
-        // 1. Find the LATEST valid code for this email
+        
         const { data: record, error } = await supabase
             .from('verification_codes')
             .select('*')
             .eq('email', email)
             .eq('verified', false)
-            .gt('expires_at', new Date().toISOString()) // Not expired
+            .gt('expires_at', new Date().toISOString()) 
             .order('created_at', { ascending: false })
             .limit(1)
             .single()
@@ -28,15 +29,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Code invalide ou expiré' }, { status: 400 })
         }
 
-        // 2. Check Attempts (Simple Rate Limiting)
+        
         const attempts = record.attempts || 0
         if (attempts >= 5) {
             return NextResponse.json({ error: 'Trop de tentatives échouées. Veuillez demander un nouveau code.' }, { status: 400 })
         }
 
-        // 3. Verify Code
+        
         if (record.code !== code) {
-            // Increment attempts
+            
             await supabase
                 .from('verification_codes')
                 .update({ attempts: attempts + 1 })
@@ -45,13 +46,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Code incorrect' }, { status: 400 })
         }
 
-        // 4. Mark as Verified
+        
         await supabase
             .from('verification_codes')
             .update({ verified: true })
             .eq('id', record.id)
 
-        // 5. Log Login History
+        
         const { data: user } = await supabase
             .from('users')
             .select('id')

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useSearchParams } from "next/navigation"
@@ -30,7 +31,7 @@ function CancelContent({ initialUser }: { initialUser: any }) {
             <Header initialUser={initialUser} />
             <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
                 <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    {/* Error Header */}
+                    {}
                     <div className="px-6 sm:px-8 py-8 border-b border-slate-100">
                         <div className="flex items-start gap-4">
                             <ErrorCircleIcon />
@@ -48,7 +49,7 @@ function CancelContent({ initialUser }: { initialUser: any }) {
                         </div>
                     </div>
 
-                    {/* Info Section */}
+                    {}
                     <div className="px-6 sm:px-8 py-6 bg-slate-50">
                         <div className="space-y-3">
                             {isPaymentFailed ? (
@@ -91,7 +92,7 @@ function CancelContent({ initialUser }: { initialUser: any }) {
                         </div>
                     </div>
 
-                    {/* Help Section */}
+                    {}
                     <div className="px-6 sm:px-8 py-6 border-t border-slate-100">
                         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                             <p className="text-sm text-blue-800">

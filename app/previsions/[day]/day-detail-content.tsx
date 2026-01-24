@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect } from "react"
@@ -205,7 +206,7 @@ export default function DayDetailContent({ initialUser }: { initialUser: any }) 
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  // Ensure we handle array or string param
+  
   const dayParam = Array.isArray(params.day) ? params.day[0] : params.day
   const dayIndex = getDayIndexFromSlug(dayParam || "today")
 
@@ -238,7 +239,7 @@ export default function DayDetailContent({ initialUser }: { initialUser: any }) 
       <Header initialUser={initialUser} />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Back Button */}
+        {}
         <button
           onClick={handleBack}
           className="group flex items-center gap-2 text-slate-600 hover:text-slate-800 font-medium mb-6 transition-colors"
@@ -274,7 +275,7 @@ export default function DayDetailContent({ initialUser }: { initialUser: any }) 
           </div>
         ) : weather ? (
           <>
-            {/* Main Weather Card */}
+            {}
             <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 rounded-3xl p-6 sm:p-8 mb-6 border border-amber-100 shadow-sm">
               <div className="mb-6">
                 <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 capitalize">{formatDate(weather.date)}</h1>
@@ -297,7 +298,7 @@ export default function DayDetailContent({ initialUser }: { initialUser: any }) 
               </div>
             </div>
 
-            {/* Weather Details Grid */}
+            {}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
               <div className="bg-white rounded-2xl p-4 border border-slate-200 hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-2 text-orange-500 mb-2">
@@ -370,7 +371,7 @@ export default function DayDetailContent({ initialUser }: { initialUser: any }) 
               </div>
             </div>
 
-            {/* Hourly Temperature Chart */}
+            {}
             <div
               onClick={() => router.push(`/previsions/${dayParam}/temperature?city=${encodeURIComponent(cityName)}&lat=${lat}&lon=${lon}`)}
               className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 mb-6 cursor-pointer hover:border-orange-300 hover:shadow-md transition-all group"
@@ -407,7 +408,7 @@ export default function DayDetailContent({ initialUser }: { initialUser: any }) 
               </ResponsiveContainer>
             </div>
 
-            {/* Hourly Precipitation & Wind Chart */}
+            {}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div
                 onClick={() => router.push(`/previsions/${dayParam}/pluie?city=${encodeURIComponent(cityName)}&lat=${lat}&lon=${lon}`)}
@@ -467,7 +468,7 @@ export default function DayDetailContent({ initialUser }: { initialUser: any }) 
               </div>
             </div>
 
-            {/* Plage / Marine Link */}
+            {}
             <div
               onClick={() => router.push(`/previsions/${dayParam}/plage?city=${encodeURIComponent(cityName)}&lat=${lat}&lon=${lon}`)}
               className="mt-6 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl p-6 text-white cursor-pointer hover:shadow-lg transition-all flex items-center justify-between"

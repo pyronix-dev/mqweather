@@ -1,12 +1,8 @@
-/**
- * Brevo SMS and Email Service
- * 
- * Handles sending transactional SMS and Email via Brevo API
- * Docs: https://developers.brevo.com/
- */
+// Developed by Omar Rafik (OMX) - omx001@proton.me
+
 import { getPaymentConfirmationEmailHtml, getCancellationEmailHtml, getPlanChangeEmailHtml } from '@/lib/email-templates'
 
-// Removed top-level BREVO_API_KEY to force dynamic reading
+
 
 const BREVO_SMS_SENDER = process.env.BREVO_SMS_SENDER || 'MeteoMQ'
 const BREVO_EMAIL_SENDER = process.env.BREVO_EMAIL_SENDER || 'bossjack1kalirafik@gmail.com'
@@ -26,9 +22,7 @@ interface SendEmailResult {
   error?: string
 }
 
-/**
- * Send SMS via Brevo Transactional SMS API
- */
+
 export async function sendSMS(
   phone: string,
   message: string
@@ -39,14 +33,14 @@ export async function sendSMS(
     return { success: false, error: 'Brevo API key not configured' }
   }
 
-  // Format phone number
-  let formattedPhone = phone.replace(/\s/g, '') // Remove spaces
+  
+  let formattedPhone = phone.replace(/\s/g, '') 
 
-  // Handle Martinique/France local format
+  
   if (formattedPhone.startsWith('0')) {
-    // Assume non-international number is +596 (Martinique) or +33 depends on context
-    // Given this is a Martinique app (MQ Weather), default to +596 for 0696/0697, else maybe +33? 
-    // For safety, let's treat 0696/0697 as +596, otherwise +33 (France Hexagone)
+    
+    
+    
     if (formattedPhone.startsWith('0696') || formattedPhone.startsWith('0697')) {
       formattedPhone = '+596' + formattedPhone.substring(1)
     } else {
@@ -88,9 +82,7 @@ export async function sendSMS(
   }
 }
 
-/**
- * Send Email via Brevo Transactional Email API
- */
+
 export async function sendEmail(
   to: string,
   subject: string,
@@ -143,9 +135,7 @@ export async function sendEmail(
   }
 }
 
-/**
- * Generate a reference code for a subscription
- */
+
 export function generateReferenceCode(sessionId?: string): string {
   if (sessionId) {
     const hash = sessionId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
@@ -156,9 +146,7 @@ export function generateReferenceCode(sessionId?: string): string {
   return `MQ${timestamp}${random}`
 }
 
-/**
- * Get price string for plan
- */
+
 function getPriceForPlan(plan: string): string {
   switch (plan) {
     case 'sms-monthly': return '4,99€'
@@ -168,9 +156,7 @@ function getPriceForPlan(plan: string): string {
   }
 }
 
-/**
- * Get plan display name
- */
+
 function getPlanDisplayName(plan: string): string {
   switch (plan) {
     case 'sms-monthly': return 'SMS Standard Mensuel'
@@ -180,9 +166,7 @@ function getPlanDisplayName(plan: string): string {
   }
 }
 
-/**
- * Send SMS confirmation after successful payment
- */
+
 export async function sendSMSConfirmation(
   phone: string,
   plan: string,
@@ -196,9 +180,7 @@ export async function sendSMSConfirmation(
   return sendSMS(phone, message)
 }
 
-/**
- * Send Email confirmation after successful payment
- */
+
 export async function sendEmailConfirmation(
   email: string,
   plan: string,
@@ -214,9 +196,7 @@ export async function sendEmailConfirmation(
 }
 
 
-/**
- * Send Cancellation Email
- */
+
 export async function sendCancellationEmail(
   email: string,
   plan: string,
@@ -230,9 +210,7 @@ export async function sendCancellationEmail(
   return sendEmail(email, subject, htmlContent)
 }
 
-/**
- * Send Plan Change Email
- */
+
 export async function sendPlanChangeEmail(
   email: string,
   newPlan: string

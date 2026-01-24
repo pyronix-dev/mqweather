@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { Suspense } from "react"
 import DayDetailContent from "./day-detail-content"

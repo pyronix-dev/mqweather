@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useSearchParams, useRouter } from "next/navigation"
@@ -52,14 +53,14 @@ function SuccessContent({ initialUser }: { initialUser: any }) {
                     setReferenceCode(data.user.reference_code)
                     if (data.user.full_name) setUserName(data.user.full_name)
                     setStatus('success')
-                    router.refresh() // Refresh Server Components to update Header auth state
+                    router.refresh() 
                 } else if (data.status === 'pending') {
-                    // Payment not confirmed yet
-                    setStatus('verifying') // Keep verifying or show pending message
+                    
+                    setStatus('verifying') 
                 } else {
                     console.error('Verification failed payload:', JSON.stringify(data))
                     console.error('Verification failed status:', res.status)
-                    setStatus('success') // Fallback to success UI but log error
+                    setStatus('success') 
                 }
             } catch (error) {
                 console.error('Verification exception:', error)
@@ -96,7 +97,7 @@ function SuccessContent({ initialUser }: { initialUser: any }) {
             <Header initialUser={initialUser} />
             <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
                 <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    {/* Status Header */}
+                    {}
                     <div className="px-6 sm:px-8 py-8 border-b border-slate-100">
                         <div className="flex items-start gap-4">
                             {status === 'verifying' ? <LoadingSpinner /> : <CheckCircleIcon />}
@@ -115,7 +116,7 @@ function SuccessContent({ initialUser }: { initialUser: any }) {
 
                     {status === 'success' && (
                         <>
-                            {/* Reference Code Section */}
+                            {}
                             <div className="px-6 sm:px-8 py-6 bg-slate-50">
                                 <p className="text-lg font-black text-slate-800 mb-4">
                                     Votre numéro de référence est: <span className="text-emerald-600">{referenceCode || 'Généré par email'}</span>
@@ -149,7 +150,7 @@ function SuccessContent({ initialUser }: { initialUser: any }) {
                                 </div>
                             </div>
 
-                            {/* Plan Info */}
+                            {}
                             <div className="px-6 sm:px-8 py-6 border-t border-slate-100">
                                 <div className="flex items-center justify-between mb-4">
                                     <span className="text-sm font-bold text-slate-500">Votre abonnement</span>
@@ -163,7 +164,7 @@ function SuccessContent({ initialUser }: { initialUser: any }) {
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
+                            {}
                             <div className="px-6 sm:px-8 py-6 border-t border-slate-100">
                                 <div className="flex flex-col sm:flex-row gap-4">
                                     <Link

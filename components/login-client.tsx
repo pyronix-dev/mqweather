@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect } from "react"
@@ -32,7 +33,7 @@ export default function LoginPage({ initialUser }: { initialUser: any }) {
     const [error, setError] = useState("")
     const router = useRouter()
 
-    // No client-side check needed anymore, handled by server
+    
     useEffect(() => {
     }, [])
 
@@ -41,10 +42,10 @@ export default function LoginPage({ initialUser }: { initialUser: any }) {
         setIsLoading(true)
         setError("")
 
-        // Validate Input
-        // 1. Check if it looks like an email
+        
+        
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        // 2. Check if it looks like a Reference Code (Start with MQ, followed by exactly 6 digits)
+        
         const refCodeRegex = /^MQ\d{6}$/i
 
         const trimmedIdentifier = identifier.trim()
@@ -106,7 +107,7 @@ export default function LoginPage({ initialUser }: { initialUser: any }) {
 
             <main className="flex-1 flex items-center justify-center px-4 py-12 sm:py-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
                 <div className="w-full max-w-md">
-                    {/* Logo & Title */}
+                    {}
                     <div className="text-center mb-8">
                         <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-900 text-white rounded-2xl mb-4 shadow-lg shadow-slate-200">
                             <UserIcon />
@@ -119,7 +120,7 @@ export default function LoginPage({ initialUser }: { initialUser: any }) {
                         </p>
                     </div>
 
-                    {/* Login Card */}
+                    {}
                     <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
                         <div className="h-1.5 bg-slate-900" />
 
@@ -147,7 +148,7 @@ export default function LoginPage({ initialUser }: { initialUser: any }) {
                                             value={identifier}
                                             onChange={(e) => {
                                                 setIdentifier(e.target.value)
-                                                setError("") // Clear error on type
+                                                setError("") 
                                             }}
                                             placeholder="votre@email.com ou MQ123456"
                                             required
@@ -184,7 +185,7 @@ export default function LoginPage({ initialUser }: { initialUser: any }) {
                                         type="button"
                                         onClick={() => {
                                             setStep("identifier")
-                                            setOtp("") // Clear OTP when going back
+                                            setOtp("") 
                                         }}
                                         className="text-xs text-slate-600 hover:text-black font-medium hover:underline mt-2"
                                     >

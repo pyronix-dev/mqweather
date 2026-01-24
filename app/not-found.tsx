@@ -1,9 +1,10 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import Link from "next/link"
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center px-4">
-      {/* Page Not Found Header */}
+      {}
       <p 
         className="text-sm md:text-base tracking-[0.3em] uppercase mb-8 md:mb-12"
         style={{ color: '#d4d4a0' }}
@@ -11,7 +12,7 @@ export default function NotFound() {
         Page non trouvee
       </p>
 
-      {/* 404 with Shimmer Effect */}
+      {}
       <h1 
         className="text-[120px] sm:text-[180px] md:text-[240px] lg:text-[300px] font-serif font-light leading-none animate-shimmer select-none"
         style={{ 
@@ -22,7 +23,7 @@ export default function NotFound() {
         404
       </h1>
 
-      {/* Description */}
+      {}
       <p 
         className="text-lg sm:text-xl md:text-2xl text-center mt-8 md:mt-12 italic font-light max-w-md"
         style={{ 
@@ -37,7 +38,7 @@ export default function NotFound() {
         n&apos;existe pas.
       </p>
 
-      {/* Back to Home Button */}
+      {}
       <Link 
         href="/"
         className="mt-12 md:mt-16 px-8 py-4 bg-white text-black font-semibold text-sm tracking-wider rounded-full hover:bg-gray-100 transition-colors duration-300 uppercase"

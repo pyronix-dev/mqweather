@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useRef, useState } from "react"
@@ -20,23 +21,23 @@ interface MartiniqueMapProps {
 export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps) {
     const mapContainer = useRef<HTMLDivElement>(null)
     const map = useRef<maplibregl.Map | null>(null)
-    const [currentZoom, setCurrentZoom] = useState(9) // Fallback initial
+    const [currentZoom, setCurrentZoom] = useState(9) 
 
     const [loaded, setLoaded] = useState(false)
     const [projectedMarkers, setProjectedMarkers] = useState<{ id: string; x: number; y: number }[]>([])
     const markersRef = useRef(markers)
     const [showResetButton, setShowResetButton] = useState(false)
 
-    // Initial map center (Martinique)
+    
     const initialCenter: [number, number] = [-61.0242, 14.6415]
 
-    // Helper to get initial zoom based on screen size
+    
     const getInitialZoom = () => {
-        if (typeof window === 'undefined') return 9.5 // Default for SSR
+        if (typeof window === 'undefined') return 9.5 
         return window.innerWidth < 768 ? 8.5 : 9.5
     }
 
-    // Update markersRef whenever markers prop changes
+    
     useEffect(() => {
         markersRef.current = markers
         if (loaded) {
@@ -44,12 +45,12 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         }
     }, [markers, loaded])
 
-    // Effect to handle centering the map when centerOn prop changes
+    
     useEffect(() => {
         if (loaded && map.current && centerOn) {
             map.current.flyTo({
                 center: [centerOn.lon, centerOn.lat],
-                zoom: 12, // Zoom in when centering on a specific point
+                zoom: 12, 
                 essential: true,
                 duration: 1500
             })
@@ -67,7 +68,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 style: "https://api.maptiler.com/maps/dataviz-v4/style.json?key=UxUuNKolwcBvNiLEf3iZ",
                 center: initialCenter,
                 zoom: zoomLevel,
-                interactive: false, // Disable user interaction as requested
+                interactive: false, 
                 attributionControl: false
             })
 
@@ -77,7 +78,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 checkResetButtonVisibility()
             })
 
-            // Track zoom for dynamic sizing
+            
             map.current.on('zoom', () => {
                 setCurrentZoom(map.current!.getZoom())
                 updateMarkerPositions()
@@ -103,7 +104,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         }
     }, [])
 
-    // Update positions whenever markers change or map loads
+    
     useEffect(() => {
         if (loaded) {
             updateMarkerPositions()
@@ -116,7 +117,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         const currentZoom = map.current.getZoom()
         const initialZoom = getInitialZoom()
 
-        // Show button if zoom is significantly different from initial
+        
         setShowResetButton(currentZoom > initialZoom + 0.5)
     }
 
@@ -149,16 +150,16 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         }
     }
 
-    // Calculate scale based on zoom
-    // Base scale 1 at initial zoom (~9), max scale 1.5 at zoom 12+
+    
+    
     const getMarkerScale = () => {
         const base = 1
-        const max = 2.5 // Increased max scale for better visibility
-        const zoomThreshold = 11 // Start scaling up after this zoom
+        const max = 2.5 
+        const zoomThreshold = 11 
 
         if (currentZoom <= zoomThreshold) return base
 
-        const scale = base + ((currentZoom - zoomThreshold) * 0.8) // Aggressive scaling
+        const scale = base + ((currentZoom - zoomThreshold) * 0.8) 
         return Math.min(scale, max)
     }
 
@@ -168,7 +169,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         <div className="relative w-full h-full">
             <div ref={mapContainer} className="w-full h-full" />
 
-            {/* Reset View Button */}
+            {}
             {showResetButton && (
                 <button
                     onClick={handleResetView}
@@ -181,7 +182,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 </button>
             )}
 
-            {/* Markers Layer */}
+            {}
             {projectedMarkers.map((pos, index) => {
                 const markerData = markers[index]
                 if (!markerData) return null

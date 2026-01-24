@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 
@@ -7,7 +8,7 @@ export async function GET() {
     try {
         const supabase = createSupabaseAdmin()
 
-        // Fetch observations from the last 24 hours
+        
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
         const { data: observations, error } = await supabase
@@ -21,7 +22,7 @@ export async function GET() {
             return NextResponse.json({ error: 'Failed to fetch observations' }, { status: 500 })
         }
 
-        // Map database columns to frontend expected format
+        
         const formattedObservations = observations.map((obs) => ({
             id: obs.id,
             type: obs.type,
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
-        // Use x and y columns directly
+        
         const insertData = {
             type,
             x: Number(x),
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to save observation', details: error.message }, { status: 500 })
         }
 
-        // Return in frontend format
+        
         const newObservation = {
             id: data.id,
             type: data.type,

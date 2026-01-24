@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { cookies } from 'next/headers'
 
 export async function getUserSession() {
@@ -27,7 +28,7 @@ export async function getUserFromSession() {
     const session = await getUserSession()
     if (!session?.userId) return null
 
-    // We utilize the admin client to fetch user details server-side safely
+    
     try {
         const { createSupabaseAdmin } = await import('@/lib/supabase')
         const supabase = createSupabaseAdmin()
@@ -40,15 +41,15 @@ export async function getUserFromSession() {
 
         if (error || !user) {
             console.warn('⚠️ Server Auth: DB User not found or error, falling back to cookie data', error)
-            // Fallback to cookie data to avoid flicker
+            
             return {
                 name: session.referenceCode || 'Utilisateur',
                 email: session.email || '',
-                role: 'user' // Default to user if DB fails
+                role: 'user' 
             }
         }
 
-        // Format name logic similar to /api/auth/me
+        
         let displayName = user.reference_code
         if (user.full_name) {
             displayName = user.full_name.split(' ')[0]
@@ -62,7 +63,7 @@ export async function getUserFromSession() {
         }
     } catch (e) {
         console.error('Error fetching user server-side:', e)
-        // Fallback to cookie data
+        
         return {
             name: session.referenceCode || 'Utilisateur',
             reference: session.referenceCode,

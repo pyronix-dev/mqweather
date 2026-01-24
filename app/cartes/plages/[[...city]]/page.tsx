@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import BeachMapPage from '@/components/maps/plages-client'
@@ -11,12 +12,12 @@ export default async function PlagesPage(props: { params: Promise<{ city?: strin
     const searchParams = await props.searchParams
     const user = await getUserFromSession()
 
-    // Validate City if present
+    
     const citySlug = params.city?.[0] ? decodeURIComponent(params.city[0]) : null
     const cityParam = citySlug || searchParams.ville
 
     if (cityParam) {
-        // For beaches, we still navigate by Commune/City
+        
         const isValid = MARTINIQUE_CITIES.some(c => c.name.toLowerCase() === cityParam.toLowerCase())
         if (!isValid) notFound()
     }

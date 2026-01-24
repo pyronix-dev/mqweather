@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { useState, useEffect } from "react"
 
@@ -54,7 +55,7 @@ export function useWeather(lat: string, lon: string, dayIndex: number) {
                     setWeather(dayData)
                 }
 
-                // Get hourly data for this specific day
+                
                 if (data.hourly) {
                     const startIndex = dayIndex * 24
                     const dayHourlyData = data.hourly.time.slice(startIndex, startIndex + 24).map((time: string, i: number) => ({
@@ -67,16 +68,16 @@ export function useWeather(lat: string, lon: string, dayIndex: number) {
                     setHourlyData(dayHourlyData)
                 }
 
-                // Fetch Marine Data (Waves & Temp)
+                
                 try {
-                    // Note: SST is usually hourly in OpenMeteo, but we can take the max or noon value
+                    
                     const marineResponse = await fetch(
                         `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&daily=wave_height_max,wave_direction_dominant,wave_period_max&hourly=wave_height,wave_period,wave_direction,sea_surface_temperature&timezone=America/Martinique`
                     )
                     const marineData = await marineResponse.json()
 
                     if (marineData.daily && dayIndex < marineData.daily.time.length) {
-                        // Calculate avg water temp for the day (from noon value approx index 12)
+                        
                         const noonIndex = (dayIndex * 24) + 12
                         const waterTemp = marineData.hourly?.sea_surface_temperature ? marineData.hourly.sea_surface_temperature[noonIndex] : null
 

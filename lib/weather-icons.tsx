@@ -1,8 +1,9 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import React from 'react'
 
-// Bootstrap Icons wrapper for weather conditions
-// Uses WMO Weather interpretation codes from Open-Meteo API
-// https://open-meteo.com/en/docs
+
+
+
 
 interface WeatherIconProps {
     className?: string
@@ -17,48 +18,48 @@ export const WeatherIcon = ({ code, className = "", style }: { code: number } & 
 
 export const getWeatherIconClass = (code: number): string => {
     switch (code) {
-        case 0: // Clear sky
+        case 0: 
             return 'bi-sun-fill'
-        case 1: // Mainly clear
+        case 1: 
             return 'bi-sun-fill'
-        case 2: // Partly cloudy
+        case 2: 
             return 'bi-cloud-sun-fill'
-        case 3: // Overcast
+        case 3: 
             return 'bi-clouds-fill'
-        case 45: // Fog
-        case 48: // Depositing rime fog
+        case 45: 
+        case 48: 
             return 'bi-cloud-haze-fill'
-        case 51: // Drizzle: Light
-        case 53: // Drizzle: Moderate
-        case 55: // Drizzle: Dense
+        case 51: 
+        case 53: 
+        case 55: 
             return 'bi-cloud-drizzle-fill'
-        case 56: // Freezing Drizzle: Light
-        case 57: // Freezing Drizzle: Dense
+        case 56: 
+        case 57: 
             return 'bi-cloud-drizzle-fill'
-        case 61: // Rain: Slight
-        case 63: // Rain: Moderate
-        case 65: // Rain: Heavy
+        case 61: 
+        case 63: 
+        case 65: 
             return 'bi-cloud-rain-fill'
-        case 66: // Freezing Rain: Light
-        case 67: // Freezing Rain: Heavy
+        case 66: 
+        case 67: 
             return 'bi-cloud-rain-heavy-fill'
-        case 71: // Snow fall: Slight
-        case 73: // Snow fall: Moderate
-        case 75: // Snow fall: Heavy
+        case 71: 
+        case 73: 
+        case 75: 
             return 'bi-cloud-snow-fill'
-        case 77: // Snow grains
+        case 77: 
             return 'bi-snow'
-        case 80: // Rain showers: Slight
-        case 81: // Rain showers: Moderate
-        case 82: // Rain showers: Violent
+        case 80: 
+        case 81: 
+        case 82: 
             return 'bi-cloud-rain-fill'
-        case 85: // Snow showers: Slight
-        case 86: // Snow showers: Heavy
+        case 85: 
+        case 86: 
             return 'bi-cloud-snow-fill'
-        case 95: // Thunderstorm: Slight or moderate
+        case 95: 
             return 'bi-cloud-lightning-fill'
-        case 96: // Thunderstorm with hail: Slight
-        case 99: // Thunderstorm with hail: Heavy
+        case 96: 
+        case 99: 
             return 'bi-cloud-lightning-rain-fill'
         default:
             return 'bi-sun-fill'
@@ -67,41 +68,41 @@ export const getWeatherIconClass = (code: number): string => {
 
 export const getWeatherIconColor = (code: number): string => {
     switch (code) {
-        case 0: // Clear sky
-        case 1: // Mainly clear
-            return '#FBBF24' // Amber/Yellow
-        case 2: // Partly cloudy
-            return '#F59E0B' // Orange-ish
-        case 3: // Overcast
-            return '#94A3B8' // Slate gray
-        case 45: // Fog
+        case 0: 
+        case 1: 
+            return '#FBBF24' 
+        case 2: 
+            return '#F59E0B' 
+        case 3: 
+            return '#94A3B8' 
+        case 45: 
         case 48:
-            return '#CBD5E1' // Light gray
-        case 51: case 53: case 55: // Drizzle
+            return '#CBD5E1' 
+        case 51: case 53: case 55: 
         case 56: case 57:
-            return '#60A5FA' // Light blue
-        case 61: case 63: case 65: // Rain
+            return '#60A5FA' 
+        case 61: case 63: case 65: 
         case 66: case 67:
         case 80: case 81: case 82:
-            return '#3B82F6' // Blue
-        case 71: case 73: case 75: // Snow
+            return '#3B82F6' 
+        case 71: case 73: case 75: 
         case 77: case 85: case 86:
-            return '#E2E8F0' // White-ish
-        case 95: case 96: case 99: // Thunderstorm
-            return '#8B5CF6' // Purple
+            return '#E2E8F0' 
+        case 95: case 96: case 99: 
+            return '#8B5CF6' 
         default:
             return '#FBBF24'
     }
 }
 
-// Legacy function for backwards compatibility
+
 export const getWeatherIcon = (code: number) => {
     const iconClass = getWeatherIconClass(code)
     const color = getWeatherIconColor(code)
     return <i className={`bi ${iconClass}`} style={{ color, fontSize: 'inherit' }} />
 }
 
-// Common weather-related icons
+
 export const SunIcon = ({ className = "", style }: WeatherIconProps) => (
     <i className={`bi bi-sun-fill ${className}`} style={{ color: '#FBBF24', ...style }} />
 )

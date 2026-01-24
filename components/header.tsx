@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import type React from "react"
@@ -94,31 +95,31 @@ export function Header({ initialUser }: HeaderProps) {
   const pathname = usePathname()
   const router = useRouter()
 
-  // Fetch user session on mount (only if not provided initially or to revalidate)
+  
   useEffect(() => {
-    if (initialUser) return // Skip fetch if we have server data
+    if (initialUser) return 
 
     const checkSession = async () => {
       try {
         const res = await fetch('/api/auth/me')
         if (res.ok) {
           const data = await res.json()
-          // Construct display name: First Name -> Full Name -> Reference
+          
           const name = data.first_name || data.full_name || data.reference
           setUser({
             name: name,
             email: data.email || '',
-            role: data.role // Capture role
+            role: data.role 
           })
         }
       } catch (e) {
-        // Not logged in
+        
       }
     }
     checkSession()
   }, [])
 
-  // Close dropdowns when clicking outside
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -155,7 +156,7 @@ export function Header({ initialUser }: HeaderProps) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords
-          // Find nearest city
+          
           const nearest = MARTINIQUE_CITIES.reduce((prev, curr) => {
             const prevDist = Math.abs(prev.lat - latitude) + Math.abs(prev.lon - longitude)
             const currDist = Math.abs(curr.lat - latitude) + Math.abs(curr.lon - longitude)
@@ -203,9 +204,9 @@ export function Header({ initialUser }: HeaderProps) {
   return (
     <header className="sticky top-0 z-[100] bg-white border-b border-slate-200 shadow-sm">
       <div className="w-full px-4 sm:px-6 py-3 sm:py-4">
-        {/* Desktop Header */}
+        {}
         <div className="hidden sm:flex items-center justify-between gap-4">
-          {/* Logo Section */}
+          {}
           <div className="flex-shrink-0 animate-fade-in-up">
             <Link href="/">
               <img
@@ -216,7 +217,7 @@ export function Header({ initialUser }: HeaderProps) {
             </Link>
           </div>
 
-          {/* Navigation */}
+          {}
           <nav className="flex items-center gap-4 lg:gap-6 flex-wrap justify-center flex-1">
 
             <Link
@@ -254,7 +255,7 @@ export function Header({ initialUser }: HeaderProps) {
                 <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-slate-800 rounded-full" />
               )}
             </Link>
-            {/* Maps Dropdown */}
+            {}
             <div
               className="relative group"
               onMouseEnter={() => setMapsMenuOpen(true)}
@@ -303,7 +304,7 @@ export function Header({ initialUser }: HeaderProps) {
             </div>
           </nav>
 
-          {/* Right Section */}
+          {}
           <div className="flex items-center gap-3 flex-shrink-0 animate-slide-in-right">
             <div className="hidden lg:block relative" ref={searchRef}>
               <div className="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 focus-within:border-slate-400 transition-colors">
@@ -332,7 +333,7 @@ export function Header({ initialUser }: HeaderProps) {
                 )}
               </div>
 
-              {/* City suggestions dropdown */}
+              {}
               {showCitySuggestions && (
                 <div className="absolute top-full mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 max-h-80 overflow-hidden animate-fade-in-up">
                   <button
@@ -387,7 +388,7 @@ export function Header({ initialUser }: HeaderProps) {
               Alertes
             </Link>
 
-            {/* Authenticated User Menu */}
+            {}
             {user ? (
               <div className="relative" ref={userMenuRef}>
                 <button
@@ -457,7 +458,7 @@ export function Header({ initialUser }: HeaderProps) {
           </div>
         </div>
 
-        {/* Mobile Header */}
+        {}
         <div className="sm:hidden flex items-center justify-between gap-3">
           <div className="flex-shrink-0 animate-fade-in-up">
             <Link href="/">
@@ -480,7 +481,7 @@ export function Header({ initialUser }: HeaderProps) {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {}
         {
           mobileMenuOpen && (
             <nav className="sm:hidden mt-4 space-y-3 animate-slide-in-left border-t border-slate-200 pt-4">
@@ -555,7 +556,7 @@ export function Header({ initialUser }: HeaderProps) {
 
                   {showCitySuggestions && (
                     <div className="absolute top-full mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-60 overflow-hidden">
-                      {/* Ma localisation button */}
+                      {}
                       <button
                         onClick={() => {
                           handleGetLocation()
@@ -613,7 +614,7 @@ export function Header({ initialUser }: HeaderProps) {
                   Alertes
                 </Link>
 
-                {/* Mobile Espace Membre */}
+                {}
                 {user ? (
                   <>
                     {(user.role === 'admin' || user.role === 'super_admin') && (

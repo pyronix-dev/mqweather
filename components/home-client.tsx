@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useState } from "react"
@@ -17,7 +18,7 @@ const MartiniqueMap = dynamic(() => import("@/components/MartiniqueMap").then((m
     loading: () => <div className="w-full h-full bg-slate-100 animate-pulse rounded-2xl" />,
 })
 
-// Simple weather icon for header
+
 const WeatherIcon = () => (
     <svg className="w-8 h-8 text-slate-600" viewBox="0 0 24 24" fill="currentColor">
         <circle cx="12" cy="12" r="4" />
@@ -25,7 +26,7 @@ const WeatherIcon = () => (
     </svg>
 )
 
-// Function to generate weather summary text based on conditions
+
 function generateWeatherSummary(weatherData: any[], selectedDay: number): string {
     if (!weatherData.length) return "Chargement des données météo..."
 
@@ -34,7 +35,7 @@ function generateWeatherSummary(weatherData: any[], selectedDay: number): string
     const dayName = today.toLocaleDateString('fr-FR', { weekday: 'long' })
     const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
 
-    // Analyze weather conditions across all cities
+    
     let rainyCount = 0
     let cloudyCount = 0
     let sunnyCount = 0
@@ -125,20 +126,20 @@ export function HomeClient({ initialUser }: HomeClientProps) {
         }
         fetchData()
 
-        // Refresh every 3 hours (3 * 60 * 60 * 1000 ms)
+        
         const interval = setInterval(fetchData, 3 * 60 * 60 * 1000)
 
         return () => clearInterval(interval)
     }, [])
 
-    // Fetch AI-generated bulletin when data changes
+    
     useEffect(() => {
         if (!allData.length) return
 
-        // Generate simple fallback summary
+        
         setWeatherSummary(generateWeatherSummary(allData, selectedDay))
 
-        // Fetch AI bulletin
+        
         async function fetchAIBulletin() {
             setBulletinLoading(true)
             try {
@@ -166,17 +167,17 @@ export function HomeClient({ initialUser }: HomeClientProps) {
 
         fetchAIBulletin()
 
-        // Create markers
+        
         const newMarkers = MARTINIQUE_CITIES.map((city, index) => {
             const cityData = allData[index]
             if (!cityData || !cityData.daily || !cityData.hourly) return null
 
-            // Switch to hourly data logic based on timeOfDay
+            
             const baseIndex = selectedDay * 24
             const hourOffset = timeOfDay === 'morning' ? 8 : 14
             const dataIndex = baseIndex + hourOffset
 
-            // Fallback safe access
+            
             if (!cityData.hourly.temperature_2m || !cityData.hourly.temperature_2m[dataIndex]) return null
 
             const temp = Math.round(cityData.hourly.temperature_2m[dataIndex])
@@ -202,7 +203,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                             <span className="font-bold text-xs leading-none tracking-tight text-slate-800">{temp}°</span>
                         </div>
 
-                        {/* City Name Label on hover */}
+                        {}
                         <span className="text-[10px] font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full mt-2 shadow-md border border-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1">
                             {city.name}
                         </span>
@@ -218,13 +219,13 @@ export function HomeClient({ initialUser }: HomeClientProps) {
         <div className="min-h-screen bg-slate-100 flex flex-col">
             <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
-                {/* Two Column Layout like Vigilance Page */}
-                {/* Three Column Layout: Map (50%) | Weather (25%) | News (25%) */}
+                {}
+                {}
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch max-w-[1800px] mx-auto">
 
                     <div className="lg:col-span-2 relative w-full h-auto min-h-[800px] md:min-h-[650px] lg:min-h-[700px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
-                            {/* Map Header */}
+                            {}
                             <div className="p-5 border-b border-slate-200 flex-shrink-0">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div className="flex items-center gap-4">
@@ -242,7 +243,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                     </div>
                                 </div>
 
-                                {/* Day Selector */}
+                                {}
                                 <div className="mt-4">
                                     <MapControls
                                         onSearch={handleSearch}
@@ -250,7 +251,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                         selectedDay={selectedDay}
                                     />
 
-                                    {/* Time Toggle - Positioned below day selector */}
+                                    {}
                                     <div className="flex justify-center mt-4">
                                         <div className="bg-slate-100 p-1 rounded-xl flex items-center shadow-inner">
                                             <button
@@ -276,7 +277,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                 </div>
                             </div>
 
-                            {/* Map Container */}
+                            {}
                             <div className="flex-1 relative">
                                 {loading ? (
                                     <div className="absolute inset-0 flex items-center justify-center bg-slate-50">
@@ -306,7 +307,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                     <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
                                 )}
 
-                                {/* Legend Overlay - hidden on mobile */}
+                                {}
                                 <div className="hidden sm:block absolute bottom-4 left-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-100 z-10 animate-slide-in-left">
                                     <div className="text-xs font-bold text-slate-600 mb-3 uppercase tracking-wider">Légende</div>
                                     <div className="flex flex-col gap-2">
@@ -328,11 +329,11 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                         </div>
                     </div>
 
-                    {/* Middle Column (Weather Info) */}
+                    {}
                     <div className="space-y-5 animate-slide-in-right lg:col-span-1">
-                        {/* AI Weather Bulletin Card */}
+                        {}
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[450px] flex flex-col">
-                            {/* Header */}
+                            {}
                             <div className="bg-slate-800 p-5 flex-shrink-0">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-white/10 rounded-lg">
@@ -347,7 +348,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                 </div>
                             </div>
 
-                            {/* Content */}
+                            {}
                             <div className="flex-1 flex flex-col min-h-0 bg-white">
                                 {loading || bulletinLoading ? (
                                     <div className="flex-1 flex flex-col items-center justify-center p-5 space-y-3 opacity-60">
@@ -387,7 +388,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                             </div>
                                         </div>
 
-                                        {/* Quick Stats fixed at bottom */}
+                                        {}
                                         {allData.length > 0 && allData[0]?.daily && (
                                             <div className="p-4 border-t border-slate-100 bg-white z-10">
                                                 <div className="grid grid-cols-2 gap-3">
@@ -411,7 +412,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                             </div>
                         </div>
 
-                        {/* Quick Access Cards */}
+                        {}
                         <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
                             <h3 className="text-sm font-bold text-slate-600 uppercase tracking-wider mb-4">Cartes Détaillées</h3>
                             <div className="grid grid-cols-2 gap-3">
@@ -459,7 +460,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                             </div>
                         </div>
 
-                        {/* Vigilance Link */}
+                        {}
                         <a
                             href="/vigilance"
                             className="group block bg-slate-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200"
@@ -481,16 +482,16 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                         </a>
                     </div>
 
-                    {/* Right Column (News) */}
+                    {}
                     <div className="space-y-5 animate-slide-in-right lg:col-span-1" style={{ animationDelay: '0.2s' }}>
-                        {/* WordPress News Feed */}
+                        {}
                         <LatestNews />
                     </div>
                 </div>
             </main>
             <Footer />
 
-            {/* Add custom animation for slow spin */}
+            {}
             <style jsx global>{`
                 @keyframes spin-slow {
                     from { transform: rotate(0deg); }

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 
@@ -11,8 +12,8 @@ export async function POST(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
-        // 1. Get the latest active verification record (regardless of code match)
-        // We look for any *unverified* and *unexpired* code for this phone
+        
+        
         const { data: record, error } = await supabase
             .from('phone_verification_codes')
             .select('*')
@@ -27,20 +28,20 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Code expiré ou introuvable. Veuillez renvoyer un nouveau code.' }, { status: 400 })
         }
 
-        // 2. Check Rate Limits
+        
         const attempts = record.attempts || 0
         const lastAttempt = new Date(record.last_attempt_at || record.created_at).getTime()
         const now = Date.now()
         const minutesSinceLastAttempt = (now - lastAttempt) / 1000 / 60
 
-        // Max attempts (15) -> Force expiry
+        
         if (attempts >= 15) {
-            // Optionally verify even if attempts high? No, user said 15 = expired.
+            
             return NextResponse.json({ error: 'Trop de tentatives échouées. Ce code est expiré. Veuillez en générer un nouveau.' }, { status: 400 })
         }
 
-        // Soft Block (every 3rd attempt: 3, 6, 9, 12...)
-        // But only if we are currently "in" the penalty box (less than 5 mins passed)
+        
+        
         if (attempts > 0 && attempts % 3 === 0) {
             if (minutesSinceLastAttempt < 5) {
                 const waitTime = Math.ceil(5 - minutesSinceLastAttempt)
@@ -48,9 +49,9 @@ export async function POST(request: Request) {
             }
         }
 
-        // 3. Verify Code
+        
         if (record.code !== code) {
-            // Increment attempts
+            
             await supabase
                 .from('phone_verification_codes')
                 .update({
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
                 })
                 .eq('id', record.id)
 
-            // Calculate remaining attempts before next block
+            
             const currentAttempts = attempts + 1
             const attemptsBeforeBlock = 3 - (currentAttempts % 3)
 
@@ -70,13 +71,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: `Code incorrect.` }, { status: 400 })
         }
 
-        // 4. Success
+        
         await supabase
             .from('phone_verification_codes')
             .update({ verified: true })
             .eq('id', record.id)
 
-        // Log login history (find user by phone)
+        
         const { data: user } = await supabase
             .from('users')
             .select('id')

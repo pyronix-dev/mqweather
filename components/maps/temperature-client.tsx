@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
@@ -20,7 +21,7 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
     const { selectedDay, selectedCity, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [allData, setAllData] = useState<any[]>([])
 
-    // Stats memoization (unchanged)
+    
     const stats = useMemo(() => {
         if (!allData.length) return { avgTemp: 0, maxTemp: 0, analysis: "Chargement des données..." }
 
@@ -34,30 +35,30 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
             return data.hourly.temperature_2m[dataIndex] as number
         }).filter((t): t is number => typeof t === 'number')
 
-        // If no data found but we have overall data, it might be a specific day issue, but usually it's caught by error state.
+        
         if (!temps.length && !loading && !error) return { avgTemp: 0, maxTemp: 0, analysis: "Données indisponibles." }
         if (loading) return { avgTemp: 0, maxTemp: 0, analysis: "Chargement..." }
 
         const avgTemp = temps.reduce((a, b) => a + b, 0) / temps.length
         const maxTemp = Math.max(...temps)
 
-        // Rich Analysis Generation (4 lines)
+        
         let analysis = "";
 
-        // Sentence 1: General Situation
+        
         if (avgTemp >= 30) analysis += "Une chaleur intense règne sur l'ensemble de l'île, avec des températures nettement supérieures aux normales. ";
         else if (avgTemp >= 28) analysis += "Les températures sont chaudes et conformes à la saison, avec un ressenti agréable grâce aux alizés. ";
         else analysis += "L'ambiance est relativement clémente aujourd'hui avec des températures modérées pour la saison. ";
 
-        // Sentence 2: Peaks and Localization
+        
         if (maxTemp >= 32) analysis += `Le thermomètre grimpe localement jusqu'à ${Math.round(maxTemp)}°C dans les plaines et zones abritées du vent. `;
         else analysis += `Le mercure reste raisonnable, ne dépassant pas ${Math.round(maxTemp)}°C au plus chaud de la journée sur le littoral. `;
 
-        // Sentence 3: Time context & Feeling
+        
         if (timeOfDay === 'afternoon') analysis += "L'inconfort thermique est maximal en ce moment, la chaleur étant accentuée par l'humidité ambiante. ";
         else analysis += "La fraîcheur matinale se dissipe rapidement pour laisser place à une chaleur lourde dès la mi-journée. ";
 
-        // Sentence 4: Advice
+        
         if (avgTemp >= 31 || maxTemp >= 33) analysis += "Hydratez-vous fréquemment et évitez les efforts physiques intenses aux heures les plus chaudes.";
         else analysis += "Profitez de ces belles conditions climatiques, idéales pour les activités de plein air et la plage.";
 
@@ -143,7 +144,7 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
             <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
-                    {/* Map Section */}
+                    {}
                     <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
                             {error && <MapErrorDisplay onRetry={fetchData} />}
@@ -197,7 +198,7 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
                             </div>
 
                             <div className="space-y-6">
-                                {/* Time Toggle */}
+                                {}
                                 <div className="bg-slate-50 p-1.5 rounded-2xl flex items-center border border-slate-200">
                                     <button
                                         onClick={() => setTimeOfDay('morning')}
@@ -227,7 +228,7 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
                             </div>
                         </div>
 
-                        {/* Info Card */}
+                        {}
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="text-orange-500">

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 
 const WORDPRESS_SITE_URL = process.env.WORDPRESS_SITE_URL || "https://techcrunch.com"
@@ -5,7 +6,7 @@ const WORDPRESS_SITE_URL = process.env.WORDPRESS_SITE_URL || "https://techcrunch
 export async function GET() {
     try {
         const response = await fetch(`${WORDPRESS_SITE_URL}/wp-json/wp/v2/posts?per_page=3&_fields=id,date,link,title,excerpt`, {
-            next: { revalidate: 3600 } // Cache for 1 hour
+            next: { revalidate: 3600 } 
         })
 
         if (!response.ok) {

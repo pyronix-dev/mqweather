@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useRef, useEffect } from "react"
@@ -26,7 +27,7 @@ export function MapControls({ onSearch, onDaySelect, selectedDay }: MapControlsP
     const [showSuggestions, setShowSuggestions] = useState(false)
     const searchRef = useRef<HTMLDivElement>(null)
 
-    // Generate next 7 days
+    
     const days = Array.from({ length: 7 }, (_, i) => {
         const d = new Date()
         d.setDate(d.getDate() + i)
@@ -53,7 +54,7 @@ export function MapControls({ onSearch, onDaySelect, selectedDay }: MapControlsP
 
     return (
         <div className="flex flex-col md:flex-row gap-4 w-full mb-4">
-            {/* Search Bar */}
+            {}
             <div className="relative w-full md:w-72 z-40" ref={searchRef}>
                 <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-slate-200 focus-within:border-teal-500 transition-colors shadow-sm">
                     <SearchIcon />
@@ -97,7 +98,7 @@ export function MapControls({ onSearch, onDaySelect, selectedDay }: MapControlsP
                 )}
             </div>
 
-            {/* Day Selector */}
+            {}
             <div className="flex-1 overflow-x-auto pb-2 md:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <style jsx>{`
                     div::-webkit-scrollbar {

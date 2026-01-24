@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import { requireAdmin, logAdminAction, getClientIP } from '@/lib/admin-auth'
@@ -8,9 +9,7 @@ interface RouteParams {
     params: Promise<{ id: string }>
 }
 
-/**
- * GET /api/admin/users/[id] - Get detailed user info with login history
- */
+
 export async function GET(request: Request, { params }: RouteParams) {
     const admin = await requireAdmin()
     if (admin instanceof NextResponse) return admin
@@ -18,7 +17,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     const { id } = await params
     const supabase = createSupabaseAdmin()
 
-    // Fetch user
+    
     const { data: user, error: userError } = await supabase
         .from('users')
         .select('*')
@@ -29,7 +28,7 @@ export async function GET(request: Request, { params }: RouteParams) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Fetch login history
+    
     const { data: loginHistory } = await supabase
         .from('login_history')
         .select('*')
@@ -37,14 +36,14 @@ export async function GET(request: Request, { params }: RouteParams) {
         .order('created_at', { ascending: false })
         .limit(20)
 
-    // Fetch subscriptions
+    
     const { data: subscriptions } = await supabase
         .from('subscriptions')
         .select('*')
         .eq('user_id', id)
         .order('created_at', { ascending: false })
 
-    // Remove sensitive data
+    
     delete user.password_hash
 
     return NextResponse.json({
@@ -54,9 +53,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     })
 }
 
-/**
- * PATCH /api/admin/users/[id] - Update user details
- */
+
 export async function PATCH(request: Request, { params }: RouteParams) {
     const admin = await requireAdmin()
     if (admin instanceof NextResponse) return admin
@@ -65,7 +62,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     const body = await request.json()
     const supabase = createSupabaseAdmin()
 
-    // Only allow updating specific fields
+    
     const allowedFields = ['full_name', 'email', 'phone', 'notifications_enabled', 'notif_sms', 'notif_email', 'is_banned', 'banned_reason', 'role']
     const updates: Record<string, any> = {}
 
@@ -75,12 +72,12 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         }
     }
 
-    // Only super_admin can change roles
+    
     if (updates.role && admin.role !== 'super_admin') {
         return NextResponse.json({ error: 'Only super admins can change user roles' }, { status: 403 })
     }
 
-    // Protection: Prevent banning/changing role of self
+    
     if (id === admin.id && (updates.is_banned || updates.role)) {
         return NextResponse.json({ error: 'You cannot ban yourself or change your own role' }, { status: 403 })
     }
@@ -97,15 +94,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         return NextResponse.json({ error: 'Failed to update user' }, { status: 500 })
     }
 
-    // Log the action
+    
     await logAdminAction(admin.id, 'update_user', 'user', id, updates, getClientIP(request))
 
     return NextResponse.json({ user: data })
 }
 
-/**
- * DELETE /api/admin/users/[id] - Delete user (soft delete to deleted_users)
- */
+
 export async function DELETE(request: Request, { params }: RouteParams) {
     const admin = await requireAdmin()
     if (admin instanceof NextResponse) return admin
@@ -113,7 +108,7 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     const { id } = await params
     const supabase = createSupabaseAdmin()
 
-    // Fetch user first
+    
     const { data: user, error: fetchError } = await supabase
         .from('users')
         .select('*')
@@ -124,17 +119,17 @@ export async function DELETE(request: Request, { params }: RouteParams) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Prevent deleting admins unless you're super_admin
+    
     if ((user.role === 'admin' || user.role === 'super_admin') && admin.role !== 'super_admin') {
         return NextResponse.json({ error: 'Only super admins can delete admin accounts' }, { status: 403 })
     }
 
-    // Protection: Prevent self-delete
+    
     if (id === admin.id) {
         return NextResponse.json({ error: 'You cannot delete your own account' }, { status: 403 })
     }
 
-    // Copy to deleted_users
+    
     await supabase.from('deleted_users').insert({
         id: user.id,
         reference_code: user.reference_code,
@@ -144,7 +139,7 @@ export async function DELETE(request: Request, { params }: RouteParams) {
         original_created_at: user.created_at
     })
 
-    // Delete the user (cascades to related records)
+    
     const { error: deleteError } = await supabase
         .from('users')
         .delete()
@@ -155,7 +150,7 @@ export async function DELETE(request: Request, { params }: RouteParams) {
         return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 })
     }
 
-    // Log the action
+    
     await logAdminAction(admin.id, 'delete_user', 'user', id, { email: user.email }, getClientIP(request))
 
     return NextResponse.json({ success: true })

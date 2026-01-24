@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import React from 'react'
 
 export const MorningIcon = ({ className = "w-5 h-5" }: { className?: string }) => (

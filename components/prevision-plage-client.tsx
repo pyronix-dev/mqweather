@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useParams, useSearchParams, useRouter } from "next/navigation"
@@ -60,7 +61,7 @@ export default function BeachPage({ initialUser }: { initialUser: any }) {
         })
     }
 
-    // Helper to convert degrees to cardinal direction
+    
     const getDirection = (angle: number) => {
         const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
         return directions[Math.round(angle / 45) % 8];
@@ -89,7 +90,7 @@ export default function BeachPage({ initialUser }: { initialUser: any }) {
 
                         {weather.waveHeight !== undefined ? (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                                {/* HOULE (Wave Height) */}
+                                {}
                                 <div className="bg-cyan-50 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
                                     <WaveIcon />
                                     <p className="text-cyan-700 font-medium mt-4 mb-2 uppercase tracking-wide text-sm">Hauteur des Vagues</p>
@@ -99,7 +100,7 @@ export default function BeachPage({ initialUser }: { initialUser: any }) {
                                     </div>
                                 </div>
 
-                                {/* DIRECTION */}
+                                {}
                                 <div className="bg-slate-50 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
                                     <CompassIcon degree={weather.waveDirection || 0} />
                                     <p className="text-slate-600 font-medium mt-4 mb-2 uppercase tracking-wide text-sm">Direction Houle</p>
@@ -109,7 +110,7 @@ export default function BeachPage({ initialUser }: { initialUser: any }) {
                                     <p className="text-sm text-slate-400 mt-1">{weather.waveDirection}°</p>
                                 </div>
 
-                                {/* PERIODE */}
+                                {}
                                 <div className="bg-teal-50 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
                                     <div className="w-16 h-16 flex items-center justify-center bg-white rounded-full text-2xl font-bold text-teal-600 shadow-sm">
                                         T

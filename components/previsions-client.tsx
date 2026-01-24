@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect, useRef, Suspense } from "react"
@@ -203,7 +204,7 @@ const CloudRainIcon = () => (
   </svg>
 )
 
-// Replaced by MARTINIQUE_CITIES from lib/constants
+
 
 const getWeatherIcon = (precipitation: number) => {
   if (precipitation > 60) return <CloudRainIcon />
@@ -366,16 +367,16 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
 
     const cityName = searchParams.get("city")
 
-    // VALIDATION: Only accept cities from our known list
+    
     const validCity = cityName ? MARTINIQUE_CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase()) : null
 
     if (validCity) {
-      // Use the trusted coordinates from our list, ignore URL lat/lon to prevent spoofing
+      
       setSelectedCity(validCity)
       setSearchQuery(validCity.name)
     }
     initializedFromUrl.current = true
-  }, []) // Empty dependency - run once on mount
+  }, []) 
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -428,7 +429,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
 
   useEffect(() => {
     if (loading) return
-    if (map.current) return // initialize map only once
+    if (map.current) return 
 
     if (mapContainer.current) {
       map.current = new maplibregl.Map({
@@ -441,7 +442,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
 
       map.current.addControl(new maplibregl.NavigationControl({ showCompass: false, showZoom: false }), "top-right")
 
-      // Initialize marker
+      
       const el = document.createElement("div")
       el.className = "w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg"
 
@@ -449,14 +450,14 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
         .setLngLat([selectedCity.lon, selectedCity.lat])
         .addTo(map.current)
 
-      // Cleanup on unmount
+      
       return () => {
         marker.current?.remove()
         map.current?.remove()
         map.current = null
       }
     }
-  }, [loading]) // Initialize when loading finishes
+  }, [loading]) 
 
   useEffect(() => {
     if (!map.current) return
@@ -467,11 +468,11 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
       essential: true,
     })
 
-    // Update marker position if it exists
+    
     if (marker.current) {
       marker.current.setLngLat([selectedCity.lon, selectedCity.lat])
     }
-  }, [selectedCity.lat, selectedCity.lon, zoom]) // Use specific properties instead of object
+  }, [selectedCity.lat, selectedCity.lon, zoom]) 
 
   const filteredSuggestions = MARTINIQUE_CITIES.filter((city) =>
     city.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -524,7 +525,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
     <div className="min-h-screen bg-background">
       <Header initialUser={initialUser} />
 
-      {/* City Search Bar */}
+      {}
       <div className="bg-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="max-w-sm relative z-40" ref={searchRef}>
@@ -580,7 +581,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
         </div>
       </div>
 
-      {/* Main Content */}
+      {}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {loading ? (
           <div className="space-y-6 sm:space-8">
@@ -599,9 +600,9 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
         ) : (
           <>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              {/* Aujourd'hui info - left side on desktop */}
+              {}
               <div className="order-2 lg:order-1">
-                {/* City Header */}
+                {}
                 <div className="mb-4 sm:mb-6 animate-fade-in">
                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
                     {selectedCity.name}
@@ -609,10 +610,10 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                   <p className="text-muted-foreground text-sm sm:text-base">Martinique - Aujourd&apos;hui</p>
                 </div>
 
-                {/* Weather Data */}
+                {}
                 <div className="border border-border rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 animate-slide-in-left shadow-sm bg-white">
                   <div className="flex flex-col gap-4">
-                    {/* Main Temperature - Enlarged Area */}
+                    {}
                     <div className="bg-amber-50/50 rounded-2xl p-6 border border-amber-100 flex items-center gap-6">
                       <div className="p-4 bg-white rounded-full shadow-sm text-amber-500">
                         <ThermometerIcon />
@@ -625,9 +626,9 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                       </div>
                     </div>
 
-                    {/* Metrics Grid */}
+                    {}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                      {/* Pression */}
+                      {}
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-amber-500">
@@ -641,7 +642,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         </p>
                       </div>
 
-                      {/* Ressenti */}
+                      {}
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-orange-500">
@@ -654,7 +655,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         </p>
                       </div>
 
-                      {/* Humidité */}
+                      {}
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-blue-500">
@@ -665,7 +666,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         <p className="text-2xl sm:text-3xl font-black text-foreground">{weather?.relative_humidity_2m}%</p>
                       </div>
 
-                      {/* Vent */}
+                      {}
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-teal-500">
@@ -679,7 +680,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         </p>
                       </div>
 
-                      {/* Visibilité */}
+                      {}
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-green-500">
@@ -693,7 +694,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         </p>
                       </div>
 
-                      {/* Précip */}
+                      {}
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-blue-500">
@@ -707,7 +708,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         </p>
                       </div>
 
-                      {/* Direction */}
+                      {}
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200 col-span-2 sm:col-span-2">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-indigo-500">
@@ -729,18 +730,18 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                 </div>
               </div>
 
-              {/* Map - right side on desktop */}
+              {}
               <div className="order-1 lg:order-2">
                 <div className="relative border border-border rounded-xl overflow-hidden h-80 sm:h-[432px] animate-fade-in-up shadow-sm">
                   <div ref={mapContainer} className="w-full h-full" />
 
-                  {/* City label */}
+                  {}
                   <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg z-20 border border-border">
                     <p className="font-bold text-foreground">{selectedCity.name}</p>
                     <p className="text-xs text-muted-foreground">Martinique</p>
                   </div>
 
-                  {/* Custom zoom controls */}
+                  {}
                   <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
                     <button
                       onClick={handleZoomIn}
@@ -771,7 +772,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              {/* Temperature Chart */}
+              {}
               <div className="border border-border rounded-xl p-4 sm:p-5 animate-slide-in-up shadow-sm">
                 <h3 className="text-base sm:text-lg font-bold text-foreground mb-4">Température (24h)</h3>
                 <ResponsiveContainer width="100%" height={200}>
@@ -808,7 +809,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                 </ResponsiveContainer>
               </div>
 
-              {/* Humidity Chart */}
+              {}
               <div className="border border-border rounded-xl p-4 sm:p-5 animate-slide-in-up shadow-sm">
                 <h3 className="text-base sm:text-lg font-bold text-foreground mb-4">Humidité & Précipitations</h3>
                 <ResponsiveContainer width="100%" height={200}>
@@ -843,7 +844,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
               </div>
             </div>
 
-            {/* 7-day forecast section */}
+            {}
             <div className="border border-border rounded-2xl p-4 sm:p-6 animate-fade-in-up shadow-sm bg-slate-50">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="bg-slate-700 p-2 rounded-xl">
@@ -880,17 +881,17 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                       <ChevronRightIcon />
                     </div>
 
-                    {/* Day name */}
+                    {}
                     <p className="text-slate-800 font-bold text-sm mb-3 capitalize">{day.date}</p>
 
-                    {/* Weather icon - larger */}
+                    {}
                     <div className="flex justify-center mb-3 text-amber-500 group-hover:scale-110 transition-transform duration-300">
                       <div className="w-12 h-12 flex items-center justify-center">
                         {getWeatherIcon(day.precipitation)}
                       </div>
                     </div>
 
-                    {/* Temperature large */}
+                    {}
                     <p className="text-3xl font-bold text-slate-800 mb-1">{Math.round(day.max)}°C</p>
 
                     <div className="text-xs text-slate-500 mb-1">
@@ -898,7 +899,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                     </div>
                     <div className="text-xs text-slate-400 mb-3">Min {Math.round(day.min)}°C</div>
 
-                    {/* Weather condition */}
+                    {}
                     <p className="text-xs text-slate-600 font-medium mb-4 pb-3 border-b border-slate-100">
                       {getWeatherLabel(day.precipitation)} ({day.precipitation}%)
                     </p>

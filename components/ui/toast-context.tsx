@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
@@ -31,7 +32,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         const id = Math.random().toString(36).substr(2, 9)
         setToasts((prev) => [...prev, { id, message, type }])
 
-        // Auto remove after 3 seconds
+        
         setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== id))
         }, 4000)
@@ -54,7 +55,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 }
 
 const ToastItem = ({ message, type, onClose }: Toast & { onClose: () => void }) => {
-    // Colors based on type
+    
     const styles = {
         success: 'bg-emerald-500 text-white shadow-emerald-200',
         error: 'bg-red-500 text-white shadow-red-200',

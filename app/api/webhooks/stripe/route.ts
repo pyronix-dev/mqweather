@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import {
@@ -10,10 +11,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2025-04-30.basil',
 })
 
-// Webhook secret for verifying Stripe signatures
+
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
-// Price map in cents
+
 const PLAN_PRICES: Record<string, number> = {
     'sms-monthly': 499,
     'sms-annual': 4990,
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
     const body = await request.text()
     const signature = request.headers.get('stripe-signature')
 
-    // Debug logging
+    
     console.log('📥 Received Stripe Webhook')
 
     if (!signature) {
@@ -38,12 +39,12 @@ export async function POST(request: NextRequest) {
     let event: Stripe.Event
 
     try {
-        // If webhook secret is configured, verify the signature
+        
         if (webhookSecret) {
             event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
             console.log('✅ Signature verified')
         } else {
-            // For development without webhook secret, parse the event directly
+            
             event = JSON.parse(body) as Stripe.Event
             console.warn('⚠️ Webhook signature verification skipped (no STRIPE_WEBHOOK_SECRET)')
         }
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
         )
     }
 
-    // Handle the event
+    
     switch (event.type) {
         case 'checkout.session.completed': {
             const session = event.data.object as Stripe.Checkout.Session
@@ -65,33 +66,33 @@ export async function POST(request: NextRequest) {
             console.log('Customer email:', session.customer_email)
             console.log('Metadata:', session.metadata)
 
-            // Extract data from metadata and session
+            
             const plan = session.metadata?.plan || ''
             const phone = session.metadata?.phone || ''
             const email = session.customer_email || session.metadata?.email || ''
 
-            // New user details
+            
             const fullName = session.customer_details?.name || ''
-            const country = session.customer_details?.address?.country || 'MQ' // Default to Martinique if not found
+            const country = session.customer_details?.address?.country || 'MQ' 
 
-            // Payment details (approximate if not expanded, but usually in session.payment_method_details if available)
-            // Note: In some API versions or flows this might be nested differently or require expansion.
-            // We'll try to get it if available on the session object (requires API 2022-11-15+)
-            // For now, we'll extract what we can or leave null
+            
+            
+            
+            
             const paymentDetails = session.payment_method_details?.card
             const cardBrand = paymentDetails?.brand || ''
             const cardLast4 = paymentDetails?.last4 || ''
 
-            // ===== SAVE TO SUPABASE =====
+            
             let referenceCode = ''
 
             try {
                 const supabase = createSupabaseAdmin()
 
-                // 1. Create or find user
+                
                 let userId: string
 
-                // Check if user exists by email or phone
+                
                 const { data: existingUser } = await supabase
                     .from('users')
                     .select('id, reference_code')
@@ -100,18 +101,18 @@ export async function POST(request: NextRequest) {
 
                 if (existingUser) {
                     userId = existingUser.id
-                    referenceCode = existingUser.reference_code // Reuse existing reference
+                    referenceCode = existingUser.reference_code 
                     console.log('📦 Found existing user:', userId, 'Ref:', referenceCode)
 
-                    // Update user details if they are missing or to keep fresh
+                    
                     await supabase.from('users').update({
                         full_name: fullName,
                         country: country
                     }).eq('id', userId)
 
                 } else {
-                    // Create new user with NEW reference
-                    // Use session ID for deterministic code (matches Success Page)
+                    
+                    
                     referenceCode = generateReferenceCode(session.id)
                     console.log('Generating new reference:', referenceCode)
 
@@ -136,7 +137,7 @@ export async function POST(request: NextRequest) {
                     console.log('👤 Created new user:', userId)
                 }
 
-                // 2. Create subscription
+                
                 const { error: subError } = await supabase
                     .from('subscriptions')
                     .insert({
@@ -160,15 +161,15 @@ export async function POST(request: NextRequest) {
 
             } catch (dbError) {
                 console.error('❌ Database error:', dbError)
-                // Continue with notifications even if DB fails
+                
             }
 
-            // ===== SEND NOTIFICATIONS =====
-            // For SMS plans: always send SMS, also send email if provided
-            // For Email plans: send email only
+            
+            
+            
 
             if (plan.includes('sms')) {
-                // Send SMS confirmation
+                
                 if (phone) {
                     console.log(`📱 Sending SMS confirmation to ${phone}...`)
                     const smsResult = await sendSMSConfirmation(phone, plan, referenceCode)
@@ -179,7 +180,7 @@ export async function POST(request: NextRequest) {
                     }
                 }
 
-                // Also send email confirmation if user provided email
+                
                 if (email) {
                     console.log(`📧 Sending Email confirmation to ${email}...`)
                     const emailResult = await sendEmailConfirmation(email, plan, referenceCode)
@@ -209,7 +210,7 @@ export async function POST(request: NextRequest) {
             console.log('📝 Subscription updated:', subscription.id)
             console.log('Status:', subscription.status)
 
-            // Update subscription status in Supabase
+            
             try {
                 const supabase = createSupabaseAdmin()
                 await supabase
@@ -217,9 +218,9 @@ export async function POST(request: NextRequest) {
                     .update({ status: subscription.status === 'active' ? 'active' : 'cancelled' })
                     .eq('stripe_subscription_id', subscription.id)
 
-                // Detect Plan Change
-                // Check if items changed in previous_attributes
-                // @ts-ignore
+                
+                
+                
                 const previousAttributes = event.data.previous_attributes
                 const itemsChanged = previousAttributes && previousAttributes.items
 
@@ -228,7 +229,7 @@ export async function POST(request: NextRequest) {
                     const newPrice = subscription.items.data[0].price.unit_amount
 
                     if (newPrice) {
-                        // Helper to find plan key from price
+                        
                         const getPlanFromAmount = (amount: number) => {
                             for (const [key, val] of Object.entries(PLAN_PRICES)) {
                                 if (val === amount) return key
@@ -239,7 +240,7 @@ export async function POST(request: NextRequest) {
                         const newPlan = getPlanFromAmount(newPrice)
 
                         if (newPlan) {
-                            // Fetch user email
+                            
                             const { data: subData } = await supabase
                                 .from('subscriptions')
                                 .select('user_id')
@@ -273,7 +274,7 @@ export async function POST(request: NextRequest) {
             const subscription = event.data.object as Stripe.Subscription
             console.log('❌ Subscription cancelled:', subscription.id)
 
-            // Mark subscription as cancelled in Supabase
+            
             try {
                 const supabase = createSupabaseAdmin()
                 await supabase
@@ -289,7 +290,7 @@ export async function POST(request: NextRequest) {
         case 'invoice.payment_failed': {
             const invoice = event.data.object as Stripe.Invoice
             console.log('⚠️ Payment failed for invoice:', invoice.id)
-            // TODO: Send payment failure notification via Brevo
+            
             break
         }
 

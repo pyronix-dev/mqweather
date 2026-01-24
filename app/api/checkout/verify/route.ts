@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createSupabaseAdmin, generateReferenceCode } from '@/lib/supabase'
@@ -9,20 +10,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2025-04-30.basil',
 })
 
-// Price map in cents
+
 const PLAN_PRICES: Record<string, number> = {
     'sms-monthly': 499,
     'sms-annual': 4990,
     'email-annual': 1000
 }
 
-// Shared verification logic
+
 async function verifySession(sessionId: string) {
     if (!sessionId) {
         throw new Error('Session ID required')
     }
 
-    // 1. Retrieve Stripe Session
+    
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
         expand: ['line_items', 'customer_details']
     })
@@ -39,7 +40,7 @@ async function verifySession(sessionId: string) {
         return { status: 'pending', message: 'Payment not successful yet' }
     }
 
-    // Data extraction
+    
     const plan = session.metadata?.plan || ''
     const phone = session.metadata?.phone || ''
     let email = session.customer_email || session.metadata?.email || ''
@@ -62,7 +63,7 @@ async function verifySession(sessionId: string) {
 
     const supabase = createSupabaseAdmin()
 
-    // 2. Check/Create User
+    
     let userId: string
     let referenceCode: string = ''
 
@@ -76,14 +77,14 @@ async function verifySession(sessionId: string) {
         userId = existingUser.id
         referenceCode = existingUser.reference_code
 
-        // Update details
+        
         await supabase.from('users').update({
             full_name: fullName,
             country: country
         }).eq('id', userId)
 
     } else {
-        // Create New User
+        
         referenceCode = generateReferenceCode(session.id)
 
         const { data: newUser, error: userError } = await supabase
@@ -102,7 +103,7 @@ async function verifySession(sessionId: string) {
         userId = newUser.id
     }
 
-    // 3. Check/Create Subscription
+    
     const { data: existingSub } = await supabase
         .from('subscriptions')
         .select('id')
@@ -127,7 +128,7 @@ async function verifySession(sessionId: string) {
 
         if (subError) console.error('Sub creation error:', subError)
         else {
-            // Send notifications (Critical for local dev/immediate feedback)
+            
             console.log('📧 [Verify] Sending immediate notifications...')
 
             if (plan.includes('sms')) {
@@ -143,7 +144,7 @@ async function verifySession(sessionId: string) {
         }
     }
 
-    // Return success data with cookies info (to be set by handler)
+    
     return {
         success: true,
         status: 'complete',
@@ -152,7 +153,7 @@ async function verifySession(sessionId: string) {
             id: userId,
             reference_code: referenceCode,
             full_name: fullName || existingUser?.full_name,
-            email: email || existingUser?.email // used for cookie
+            email: email || existingUser?.email 
         }
     }
 }
@@ -174,7 +175,7 @@ export async function GET(request: NextRequest) {
 
         const response = NextResponse.json(result)
 
-        // Set Auth Cookie if successful
+        
         if (result.success && result.user) {
             response.cookies.set('auth_session', JSON.stringify({
                 userId: result.user.id,
@@ -205,7 +206,7 @@ export async function POST(request: NextRequest) {
         const result = await verifySession(session_id)
         const response = NextResponse.json(result)
 
-        // Set Auth Cookie if successful
+        
         if (result.success && result.user) {
             response.cookies.set('auth_session', JSON.stringify({
                 userId: result.user.id,

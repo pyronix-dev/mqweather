@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useRef, useState, useEffect } from "react"
@@ -50,7 +51,7 @@ export function VigilanceClient({ initialUser }: { initialUser: any }) {
 
   const mapUrl = vigilanceData?.mapUrl || "https://raw.githubusercontent.com/pyronix-dev/upwork/main/error.png"
 
-  /* Random text effect removed as we now use static structured content */
+  
 
   const formatLastUpdate = () => {
     if (vigilanceData?.lastUpdate) {
@@ -76,7 +77,7 @@ export function VigilanceClient({ initialUser }: { initialUser: any }) {
       <Header initialUser={initialUser} />
       <main className="flex-1 w-full px-4 sm:px-6 py-4 sm:py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch">
-          {/* Map Section */}
+          {}
           <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
             <div
               className={`absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col ${currentVigilance.name === "rouge"
@@ -185,7 +186,7 @@ export function VigilanceClient({ initialUser }: { initialUser: any }) {
             </div>
           </div>
 
-          {/* Sidebar - Bulletin Météo */}
+          {}
           <div className="w-full space-y-4 sm:space-y-6 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 h-full">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
@@ -249,10 +250,10 @@ export function VigilanceClient({ initialUser }: { initialUser: any }) {
                                   : "bg-gray-50/80 border-gray-500"
                         }`}
                     >
-                      {/* Access structured content */}
+                      {}
                       {(() => {
                         const colorKey = currentVigilance.name as keyof typeof VIGILANCE_TEXTS
-                        // Cast to VigilanceContent to ensure TS knows the structure, fallback to error
+                        
                         const content: VigilanceContent = (VIGILANCE_TEXTS[colorKey] || VIGILANCE_TEXTS['erreur']) as any
 
                         return (
@@ -270,7 +271,7 @@ export function VigilanceClient({ initialUser }: { initialUser: any }) {
                               </div>
                             </div>
 
-                            {/* Subscription Call to Action */}
+                            {}
                             {content.showSubscription && (
                               <div className="bg-white/60 rounded-lg p-2 border border-slate-200/50 flex items-start gap-2">
                                 <div className="p-1 bg-blue-100 text-blue-600 rounded-md flex-shrink-0">
@@ -288,7 +289,7 @@ export function VigilanceClient({ initialUser }: { initialUser: any }) {
                               </div>
                             )}
 
-                            {/* Impacts Section */}
+                            {}
                             {content.impacts && content.impacts.length > 0 && (
                               <div className="bg-white/40 rounded-lg p-2.5">
                                 <p className="text-[10px] font-bold text-slate-800 uppercase tracking-wide mb-1.5 flex items-center gap-1">
@@ -306,7 +307,7 @@ export function VigilanceClient({ initialUser }: { initialUser: any }) {
                               </div>
                             )}
 
-                            {/* Recommendations Section */}
+                            {}
                             {content.recommendations && content.recommendations.length > 0 && (
                               <div className="bg-white/60 rounded-lg p-2.5 border border-slate-200/50">
                                 <p className="text-[10px] font-bold text-slate-800 uppercase tracking-wide mb-1.5 flex items-center gap-1">
@@ -328,7 +329,7 @@ export function VigilanceClient({ initialUser }: { initialUser: any }) {
                               </div>
                             )}
 
-                            {/* Footer Text */}
+                            {}
                             {content.footer && (
                               <p className="text-[10px] text-slate-500 italic border-t border-slate-200/50 pt-2 mt-1.5 whitespace-pre-wrap leading-tight">
                                 {content.footer}
@@ -339,7 +340,7 @@ export function VigilanceClient({ initialUser }: { initialUser: any }) {
                         )
                       })()}
 
-                      {/* Vigilance Phenomena (API Data) - Kept as supplementary info */}
+                      {}
                       {vigilanceData?.phenomena && vigilanceData.phenomena.length > 0 && (
                         <div className="mt-3 border-t border-black/5 pt-2">
                           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1.5">Phénomènes Identifiés (Météo-France)</p>

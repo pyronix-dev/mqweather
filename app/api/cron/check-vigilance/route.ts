@@ -1,10 +1,11 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server';
 import { fetchAndParseVigilanceData } from '@/app/api/vigilance/route';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/brevo';
 import { getVigilanceAlertEmailHtml } from '@/lib/email-templates';
 
-// Initialize Supabase Admin client (to access all users)
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
     try {
         console.log('[Cron] Checking vigilance status...');
 
-        // 1. Fetch current vigilance data
+        
         const currentData = await fetchAndParseVigilanceData();
 
         if (!currentData || currentData.colorName === 'erreur') {
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
         const currentColorId = currentData.colorId;
         const currentColorName = currentData.colorName;
 
-        // 2. Fetch last known state from DB
+        
         const { data: lastState, error: dbError } = await supabase
             .from('vigilance_state')
             .select('*')
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
             return NextResponse.json({ message: 'Database error', error: dbError }, { status: 500 });
         }
 
-        // Initialize if empty
+        
         if (!lastState) {
             console.log('[Cron] No previous state found. Initializing...');
             await supabase.from('vigilance_state').insert({
@@ -48,11 +49,11 @@ export async function GET(request: Request) {
 
         const lastColorId = lastState.color_id;
 
-        // 3. Compare
+        
         if (currentColorId !== lastColorId) {
             console.log(`[Cron] Vigilance changed from ${lastState.color_name} (${lastColorId}) to ${currentColorName} (${currentColorId})`);
 
-            // Update DB immediately
+            
             await supabase
                 .from('vigilance_state')
                 .update({
@@ -60,26 +61,26 @@ export async function GET(request: Request) {
                     color_name: currentColorName,
                     updated_at: new Date().toISOString()
                 })
-                .eq('id', lastState.id); // Assuming single row or update all? Better update by ID.
+                .eq('id', lastState.id); 
 
-            // 4. Check if we should send emails
-            // Condition: New color is NOT Green (1) and NOT Error (-1)
+            
+            
             if (currentColorId > 1) {
                 console.log('[Cron] Triggering alert emails...');
 
-                // Fetch active subscribers
-                // Assuming we want to send to ALL users who have 'active' subscription?
-                // Or just all users? "send all the users that subscribed"
-                // We'll join users and subscriptions.
+                
+                
+                
+                
                 const { data: users, error: usersError } = await supabase
                     .from('users')
                     .select('email, id, subscriptions(status), notifications_enabled')
                     .eq('subscriptions.status', 'active')
-                    .neq('notifications_enabled', false); // Only send if not disabled (null/true is ok)
+                    .neq('notifications_enabled', false); 
 
-                // Note: The above query assumes 1:1 or 1:many. If multiple subscriptions, might duplicate?
-                // Better: Get distinct users with at least one active subscription.
-                // Or just get all users and filter.
+                
+                
+                
 
                 if (usersError) {
                     console.error('[Cron] Error fetching users:', usersError);
@@ -112,7 +113,7 @@ export async function GET(request: Request) {
             }
         } else {
             console.log('[Cron] No change in vigilance. Updating heartbeat...');
-            // Heartbeat: Update updated_at so we know the check ran
+            
             await supabase
                 .from('vigilance_state')
                 .update({

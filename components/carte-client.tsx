@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import type React from "react"
@@ -158,7 +159,7 @@ interface ImageBounds {
     height: number
 }
 
-const layoutConfig = {} // Declare layoutConfig here
+const layoutConfig = {} 
 
 export default function CarteClient({ initialUser }: { initialUser: any }) {
     const [loading, setLoading] = useState(true)
@@ -175,7 +176,7 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
     const mapImageRef = useRef<HTMLImageElement>(null)
     const [imageBounds, setImageBounds] = useState<ImageBounds | null>(null)
 
-    // Responsive check
+    
     const [isDesktop, setIsDesktop] = useState(false)
 
     useEffect(() => {
@@ -185,10 +186,10 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
         return () => window.removeEventListener("resize", checkDesktop)
     }, [])
 
-    // Close marker popup when clicking outside
+    
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
-            // If clicking on a marker button or popup, don't close (handled by stopPropagation)
+            
             const target = e.target as HTMLElement
             if (target.closest('[data-marker-popup]') || target.closest('[data-marker-button]')) {
                 return
@@ -222,13 +223,13 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
             const img = mapImageRef.current
             const containerRect = container.getBoundingClientRect()
 
-            // Get the natural dimensions of the image
+            
             const naturalWidth = img.naturalWidth
             const naturalHeight = img.naturalHeight
             const containerWidth = containerRect.width
             const containerHeight = containerRect.height
 
-            // Calculate the actual displayed size (object-contain behavior)
+            
             const imageAspect = naturalWidth / naturalHeight
             const containerAspect = containerWidth / containerHeight
 
@@ -238,13 +239,13 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
             let offsetTop: number
 
             if (imageAspect > containerAspect) {
-                // Image is wider than container (letterboxed top/bottom)
+                
                 displayedWidth = containerWidth
                 displayedHeight = containerWidth / imageAspect
                 offsetLeft = 0
                 offsetTop = (containerHeight - displayedHeight) / 2
             } else {
-                // Image is taller than container (letterboxed left/right)
+                
                 displayedHeight = containerHeight
                 displayedWidth = containerHeight * imageAspect
                 offsetLeft = (containerWidth - displayedWidth) / 2
@@ -264,16 +265,16 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
         return () => window.removeEventListener("resize", calculateImageBounds)
     }, [mapLoaded])
 
-    // Fetch markers on mount
+    
     useEffect(() => {
         const fetchMarkers = async () => {
             try {
                 const res = await fetch('/api/observations')
                 if (res.ok) {
                     const data = await res.json()
-                    // Transform API data to Marker interface
+                    
                     const loadedMarkers = data.map((obs: any) => ({
-                        id: obs.id, // UUID string
+                        id: obs.id, 
                         x: Number(obs.x),
                         y: Number(obs.y),
                         type: obs.type,
@@ -292,7 +293,7 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
 
     const handlePublish = async () => {
         if (selectedWeather && clickPosition && details.trim()) {
-            setLoading(true) // Re-use loading state or add a publishing state
+            setLoading(true) 
             try {
                 const res = await fetch('/api/observations', {
                     method: 'POST',
@@ -319,7 +320,7 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
                     }
                     setMarkers([newMarker, ...markers])
 
-                    // Reset form
+                    
                     setSelectedWeather(null)
                     setTemperature("")
                     setDetails("")
@@ -339,30 +340,30 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
     const isMarkerOld = (createdAt?: Date) => {
         if (!createdAt) return false
         const hoursDiff = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60)
-        return hoursDiff > 12 // Fade after 12h
+        return hoursDiff > 12 
     }
 
     const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!mapContainerRef.current || !imageBounds) return
-        // Close any open marker popup
+        
         setSelectedMarker(null)
 
         const rect = mapContainerRef.current.getBoundingClientRect()
         const clickX = e.clientX - rect.left
         const clickY = e.clientY - rect.top
 
-        // Check if click is within image bounds
+        
         if (
             clickX < imageBounds.left ||
             clickX > imageBounds.left + imageBounds.width ||
             clickY < imageBounds.top ||
             clickY > imageBounds.top + imageBounds.height
         ) {
-            // Click is outside the image, ignore it
+            
             return
         }
 
-        // Calculate position relative to the image (not the container)
+        
         const x = ((clickX - imageBounds.left) / imageBounds.width) * 100
         const y = ((clickY - imageBounds.top) / imageBounds.height) * 100
 
@@ -402,7 +403,7 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
         const actualX = imageBounds.left + (markerX / 100) * imageBounds.width
         const actualY = imageBounds.top + (markerY / 100) * imageBounds.height
 
-        // Convert to percentage of container
+        
         const containerX = (actualX / containerRect.width) * 100
         const containerY = (actualY / containerRect.height) * 100
 
@@ -411,7 +412,7 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
 
     const handleTemperatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
-        // Only allow digits, empty string, or minus sign at start
+        
         if (value === "" || value === "-" || /^-?\d+$/.test(value)) {
             setTemperature(value)
         }
@@ -423,7 +424,7 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
 
             <main className="flex-1 w-full px-4 sm:px-6 py-4 sm:py-6 relative">
                 <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 transition-all duration-300">
-                    {/* Map Section */}
+                    {}
                     <div className="w-full xl:w-auto animate-fade-in-up transition-all duration-300 xl:flex-[0_0_60%] xl:max-w-[60%]">
                         <div className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                             <div className="p-4 sm:p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -505,7 +506,7 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
                                                         )}
                                                         {marker.details && <p className="text-xs text-slate-500">{marker.details}</p>}
                                                         {isOld && <p className="text-xs text-amber-600 mt-2 font-medium">{"Observation > 48h"}</p>}
-                                                        {/* Arrow pointing to marker */}
+                                                        {}
                                                         <div className={`absolute left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-l-transparent border-r-transparent ${marker.y < 25
                                                             ? 'bottom-full border-b-8 border-b-white'
                                                             : 'top-full border-t-8 border-t-white'
@@ -533,7 +534,7 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
                         </div>
                     </div>
 
-                    {/* Sidebar - Observation Form */}
+                    {}
                     <div
                         className="w-full xl:flex-1 animate-fade-in-up transition-all duration-300"
                         style={
@@ -620,7 +621,7 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
                                                     value={temperature}
                                                     onChange={handleTemperatureChange}
                                                     onKeyDown={(e) => {
-                                                        // Allow: backspace, delete, tab, escape, enter, minus (at start only)
+                                                        
                                                         if (
                                                             ["Backspace", "Delete", "Tab", "Escape", "Enter", "ArrowLeft", "ArrowRight"].includes(
                                                                 e.key,
@@ -629,7 +630,7 @@ export default function CarteClient({ initialUser }: { initialUser: any }) {
                                                         ) {
                                                             return
                                                         }
-                                                        // Block non-numeric keys
+                                                        
                                                         if (!/^\d$/.test(e.key)) {
                                                             e.preventDefault()
                                                         }

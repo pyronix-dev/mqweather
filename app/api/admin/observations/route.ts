@@ -1,12 +1,11 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import { requireAdmin, logAdminAction, getClientIP } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
 
-/**
- * GET /api/admin/observations - List all observations for moderation
- */
+
 export async function GET(request: Request) {
     const admin = await requireAdmin()
     if (admin instanceof NextResponse) return admin
@@ -40,9 +39,7 @@ export async function GET(request: Request) {
     })
 }
 
-/**
- * DELETE /api/admin/observations - Delete observation by ID (in body)
- */
+
 export async function DELETE(request: Request) {
     const admin = await requireAdmin()
     if (admin instanceof NextResponse) return admin

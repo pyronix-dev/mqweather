@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect, useRef } from "react"
@@ -7,7 +8,7 @@ import { Footer } from "@/components/footer"
 import { useWeather } from "@/hooks/useWeather"
 import { MARTINIQUE_CITIES } from "@/lib/constants"
 
-// --- ICONS (Blue/Teal/Cyan Theme) ---
+
 const WaveIcon = () => (
     <svg className="w-12 h-12 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75c5.4 0 8.25-7.5 11.25-7.5s5.85 7.5 11.25 7.5" />
@@ -40,25 +41,25 @@ const MapPinIcon = () => (
     </svg>
 )
 
-// --- CITY DATA ---
-// Imported from @/lib/constants
+
+
 
 
 export default function MarinePage({ initialUser }: { initialUser: any }) {
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    // Default to a coastal city (Le Diamant) if none provided
+    
     const rawCityName = searchParams.get("city")
     const isValidCity = rawCityName && MARTINIQUE_CITIES.some(c => c.name.toLowerCase() === rawCityName.toLowerCase())
     const cityName = isValidCity ? rawCityName : "Le Diamant"
     const lat = searchParams.get("lat") || "14.478"
     const lon = searchParams.get("lon") || "-61.029"
-    const dayIndex = 0 // Today
+    const dayIndex = 0 
 
     const { weather, loading } = useWeather(lat, lon, dayIndex)
 
-    // Search State
+    
     const [searchQuery, setSearchQuery] = useState("")
     const [showSuggestions, setShowSuggestions] = useState(false)
     const searchRef = useRef<HTMLDivElement>(null)
@@ -83,7 +84,7 @@ export default function MarinePage({ initialUser }: { initialUser: any }) {
         router.push(`/meteo-marine?city=${encodeURIComponent(city.name)}&lat=${city.lat}&lon=${city.lon}`)
     }
 
-    // Helper to convert degrees to cardinal direction
+    
     const getDirection = (angle: number) => {
         const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
         return directions[Math.round(angle / 45) % 8];
@@ -95,7 +96,7 @@ export default function MarinePage({ initialUser }: { initialUser: any }) {
 
             <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-                {/* Header Section */}
+                {}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
                     <div>
                         <button
@@ -178,10 +179,10 @@ export default function MarinePage({ initialUser }: { initialUser: any }) {
 
                 {!loading && weather ? (
                     <>
-                        {/* Main Metrics Grid */}
+                        {}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-                            {/* Water Temp Card */}
+                            {}
                             <div className="bg-white border border-slate-100 rounded-3xl p-8 relative overflow-hidden group hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
                                 <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">
                                     <ThermometerWaterIcon />
@@ -201,7 +202,7 @@ export default function MarinePage({ initialUser }: { initialUser: any }) {
                                 <p className="mt-3 text-xs text-blue-500 font-semibold bg-blue-50 inline-block px-2 py-1 rounded-md">Idéale pour la baignade</p>
                             </div>
 
-                            {/* Swell Card */}
+                            {}
                             <div className="bg-white border border-slate-100 rounded-3xl p-8 relative overflow-hidden group hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300">
                                 <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">
                                     <WaveIcon />
@@ -227,7 +228,7 @@ export default function MarinePage({ initialUser }: { initialUser: any }) {
                                 </div>
                             </div>
 
-                            {/* Wind Card */}
+                            {}
                             <div className="bg-white border border-slate-100 rounded-3xl p-8 relative overflow-hidden group hover:shadow-lg hover:shadow-teal-500/5 transition-all duration-300">
                                 <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">
                                     <svg className="w-16 h-16 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2" /></svg>
@@ -247,7 +248,7 @@ export default function MarinePage({ initialUser }: { initialUser: any }) {
                             </div>
                         </div>
 
-                        {/* Suitability Banner */}
+                        {}
                         <div className={`rounded-3xl p-6 sm:p-8 border flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left shadow-sm ${weather.waveHeight && weather.waveHeight > 1.8 ? 'bg-orange-50 border-orange-100' : 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-100'}`}>
                             <div className={`p-4 rounded-2xl shrink-0 ${weather.waveHeight && weather.waveHeight > 1.8 ? 'bg-orange-100 text-orange-500' : 'bg-white text-green-500 shadow-sm'}`}>
                                 {weather.waveHeight && weather.waveHeight > 1.8 ? (

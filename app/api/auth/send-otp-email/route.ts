@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { NextRequest, NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
@@ -17,15 +18,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Email requis' }, { status: 400 })
         }
 
-        // Generate 6-digit code
+        
         const code = Math.floor(100000 + Math.random() * 900000).toString()
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes from now
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000) 
 
         console.log("🔢 [API] Generated code for", email)
 
         const supabase = createSupabaseAdmin()
 
-        // Insert into verification_codes (formerly phone_verification_codes)
+        
         const { error: dbError } = await supabase
             .from('verification_codes')
             .insert({
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Erreur lors de la génération du code' }, { status: 500 })
         }
 
-        // Send Email
+        
         console.log("📧 [API] Sending email via lib/brevo...")
         const htmlContent = getVerifyEmailHtml(code)
         const result = await sendEmail(email, "Vérification de votre email - Météo Martinique", htmlContent)

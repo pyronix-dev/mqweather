@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
@@ -5,10 +6,7 @@ import { requireAdmin, logAdminAction, getClientIP } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
 
-/**
- * POST /api/admin/subscriptions - Manually manage subscriptions
- * Body: { userId, action: 'grant' | 'extend' | 'cancel', durationMonths?: number, planId?: string }
- */
+
 export async function POST(request: Request) {
     const admin = await requireAdmin()
     if (admin instanceof NextResponse) return admin
@@ -22,7 +20,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Missing userId or action' }, { status: 400 })
     }
 
-    // Fetch existing active subscription
+    
     const { data: currentSub } = await supabase
         .from('subscriptions')
         .select('*')
@@ -32,7 +30,7 @@ export async function POST(request: Request) {
 
     try {
         if (action === 'grant') {
-            // Grant new subscription
+            
             if (currentSub) {
                 return NextResponse.json({ error: 'User already has an active subscription' }, { status: 400 })
             }
@@ -59,12 +57,12 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: true, subscription: data })
 
         } else if (action === 'extend') {
-            // Extend existing subscription
+            
             if (!currentSub) {
                 return NextResponse.json({ error: 'No active subscription to extend' }, { status: 400 })
             }
 
-            // Handle null or invalid dates
+            
             const baseDate = currentSub.expires_at ? new Date(currentSub.expires_at) : new Date()
             const currentEndDate = isNaN(baseDate.getTime()) ? new Date() : baseDate
 
@@ -84,7 +82,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: true, subscription: data })
 
         } else if (action === 'cancel') {
-            // Cancel subscription
+            
             if (!currentSub) {
                 return NextResponse.json({ error: 'No active subscription to cancel' }, { status: 400 })
             }

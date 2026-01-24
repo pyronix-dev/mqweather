@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from "next/server"
 import JSZip from "jszip"
 
@@ -5,8 +6,8 @@ const METEO_FRANCE_API_KEY = process.env.METEO_FRANCE_API_KEY
 const METEO_FRANCE_APPLICATION_ID = process.env.METEO_FRANCE_APPLICATION_ID
 const TOKEN_URL = "https://portail-api.meteofrance.fr/token"
 
-// Color ID mapping from Météo France API
-// 1 = Vert (Green), 2 = Jaune (Yellow), 3 = Orange, 4 = Rouge (Red), 5 = Violet (Purple)
+
+
 const COLOR_ID_MAP: Record<number, string> = {
   1: "vert",
   2: "jaune",
@@ -15,7 +16,7 @@ const COLOR_ID_MAP: Record<number, string> = {
   5: "violet",
 }
 
-// Map URLs from GitHub
+
 const MAP_URLS: Record<string, string> = {
   gris: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_gris.png",
   vert: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/map_vert.png",
@@ -26,13 +27,13 @@ const MAP_URLS: Record<string, string> = {
   erreur: "https://raw.githubusercontent.com/pyronix-dev/mqweather/main/public/maps/error.png",
 }
 
-// In-memory token cache (simple version)
-// In a real serverless env, this might reset on cold starts, but it helps for hot invocations
+
+
 let cachedToken: string | null = null
 let tokenExpiration: number = 0
 
 async function getOAuthToken(): Promise<string | null> {
-  // Return cached token if valid (with 60s buffer)
+  
   if (cachedToken && Date.now() < tokenExpiration - 60000) {
     return cachedToken
   }
@@ -61,7 +62,7 @@ async function getOAuthToken(): Promise<string | null> {
 
     const data = await response.json()
     cachedToken = data.access_token
-    // Set expiration (usually 3600s). Default to 1 hour if not provided
+    
     const expiresIn = data.expires_in || 3600
     tokenExpiration = Date.now() + (expiresIn * 1000)
 
@@ -95,11 +96,11 @@ async function tryFetchWithToken(endpoint: string, token: string): Promise<Respo
 }
 
 export async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
-  // Strategy: 
-  // 1. Try static API Key first (if available) - simplest
-  // 2. Try OAuth2 flow (auto-renew)
+  
+  
+  
 
-  // 1. Static Key
+  
   if (METEO_FRANCE_API_KEY) {
     const endpoints = [
       "https://public-api.meteofrance.fr/public/DPVigilance/v1/vigilanceom/flux/dernier",
@@ -111,7 +112,7 @@ export async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
     }
   }
 
-  // 2. OAuth2 Flow
+  
   const token = await getOAuthToken()
   if (token) {
     const endpoint = "https://public-api.meteofrance.fr/public/DPVigilance/v1/vigilanceom/flux/dernier"
@@ -119,10 +120,10 @@ export async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
 
     let response = await tryFetchWithToken(endpoint, token)
 
-    // Retry logic for 401 (Invalid Token) - force refresh
+    
     if (!response || response.status === 401) {
       console.log("[MQ] Token might be expired (401), refreshing...")
-      cachedToken = null // Clear cache
+      cachedToken = null 
       const newToken = await getOAuthToken()
       if (newToken) {
         response = await tryFetchWithToken(endpoint, newToken)
@@ -134,7 +135,7 @@ export async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
     }
   }
 
-  // All failed
+  
   console.log("[MQ] All methods failed, returning error status")
   return {
     colorId: -1,
@@ -147,7 +148,7 @@ export async function fetchAndParseVigilanceData(): Promise<VigilanceData> {
 
 async function processResponse(response: Response): Promise<VigilanceData> {
   console.log(`[MQ] Success with token`)
-  // Get the response as array buffer for ZIP processing
+  
   const arrayBuffer = await response.arrayBuffer()
   const zip = new JSZip()
   const zipContents = await zip.loadAsync(arrayBuffer)
@@ -155,11 +156,11 @@ async function processResponse(response: Response): Promise<VigilanceData> {
   const allFiles = Object.keys(zipContents.files)
   console.log(`[MQ] ZIP files found:`, allFiles)
 
-  // TFFF is the ICAO code for Fort-de-France, Martinique
+  
   const txtFiles = allFiles.filter((f) => f.toLowerCase().endsWith(".txt"))
   console.log(`[MQ] TXT files found:`, txtFiles)
 
-  // Look for Martinique file (TFFF = Fort-de-France airport code)
+  
   const martiniqueTxtFile = txtFiles.find((f) => f.includes("TFFF") || f.toLowerCase().includes("martinique"))
 
   if (martiniqueTxtFile) {
@@ -168,14 +169,14 @@ async function processResponse(response: Response): Promise<VigilanceData> {
     const content = await file.async("string")
     console.log(`[MQ] File content:\n${content}`)
 
-    // Parse the TXT content for vigilance data
+    
     const vigilanceData = parseVigilanceTxtContent(content)
     if (vigilanceData) {
       return vigilanceData
     }
   } else {
     console.log(`[MQ] No Martinique TXT file found, checking all TXT files...`)
-    // Fallback: check all TXT files for Martinique data
+    
     for (const txtFile of txtFiles) {
       const file = zipContents.files[txtFile]
       const content = await file.async("string")
@@ -197,18 +198,18 @@ async function processResponse(response: Response): Promise<VigilanceData> {
 function parseVigilanceTxtContent(content: string): VigilanceData | null {
   try {
     const lines = content.split("\n").map((l) => l.trim())
-    let maxColorId = 1 // Default to green (vert)
+    let maxColorId = 1 
     const phenomena: string[] = []
 
     for (const line of lines) {
       const lowerLine = line.toLowerCase()
 
-      // Look for color level indicators in the text
-      // Common patterns in Météo France vigilance files:
-      // - Direct color mentions: "VIGILANCE JAUNE", "NIVEAU ORANGE"
-      // - Numeric codes: "NIV=2", "COULEUR 3"
+      
+      
+      
+      
 
-      // Check for explicit vigilance level colors
+      
       if (
         lowerLine.includes("vigilance rouge") ||
         lowerLine.includes("niveau rouge") ||
@@ -242,7 +243,7 @@ function parseVigilanceTxtContent(content: string): VigilanceData | null {
         console.log(`[MQ] Found VIOLET in line: ${line}`)
       }
 
-      // Look for numeric patterns
+      
       const numericMatch = line.match(/(?:couleur|color|niveau|level|niv|vig)[:\s=]*(\d)/i)
       if (numericMatch) {
         const colorId = Number.parseInt(numericMatch[1])
@@ -252,7 +253,7 @@ function parseVigilanceTxtContent(content: string): VigilanceData | null {
         }
       }
 
-      // Extract phenomena mentioned
+      
       const phenomenaKeywords = [
         "vent",
         "pluie",

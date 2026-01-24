@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect } from "react"
@@ -33,16 +34,16 @@ export default function SettingsPage({ initialUser }: { initialUser: any }) {
     const [loading, setLoading] = useState(true)
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 
-    // Fetch initial preferences
+    
     useEffect(() => {
         const fetchSettings = async () => {
             try {
                 const res = await fetch('/api/auth/me')
                 if (res.ok) {
                     const data = await res.json()
-                    // If backend sends nested notifications object
+                    
 
-                    // Fallback to legacy if needed, or if nothing set
+                    
                 }
             } catch (e) {
                 console.error(e)
@@ -76,7 +77,7 @@ export default function SettingsPage({ initialUser }: { initialUser: any }) {
                     <div className="py-12 text-center text-slate-500">Chargement...</div>
                 ) : (
                     <div className="space-y-6">
-                        {/* Theme Section */}
+                        {}
                         <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                             <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
                                 <MoonIcon />

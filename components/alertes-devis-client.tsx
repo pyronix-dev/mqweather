@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState } from "react"
@@ -45,7 +46,7 @@ export default function DevisPage({ initialUser }: { initialUser: any }) {
         e.preventDefault()
         setIsSubmitting(true)
 
-        // Simulate form submission
+        
         await new Promise(resolve => setTimeout(resolve, 1500))
 
         setIsSubmitting(false)
@@ -118,7 +119,7 @@ export default function DevisPage({ initialUser }: { initialUser: any }) {
                 </Link>
 
                 <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                    {/* Header */}
+                    {}
                     <div className="relative bg-gradient-to-r from-slate-700 to-slate-900 px-6 py-10 text-white overflow-hidden">
                         <div className="absolute inset-0 overflow-hidden">
                             <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full" />
@@ -135,7 +136,7 @@ export default function DevisPage({ initialUser }: { initialUser: any }) {
                         </div>
                     </div>
 
-                    {/* Features */}
+                    {}
                     <div className="px-6 py-6 bg-slate-50 border-b border-slate-200">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             {["Multi-numéros illimités", "Support prioritaire 24/7", "Historique & Rapports détaillés"].map((feature) => (
@@ -149,7 +150,7 @@ export default function DevisPage({ initialUser }: { initialUser: any }) {
                         </div>
                     </div>
 
-                    {/* Form */}
+                    {}
                     <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -217,7 +218,7 @@ export default function DevisPage({ initialUser }: { initialUser: any }) {
                             </div>
                         </div>
 
-                        {/* Number Selector - Stylish List */}
+                        {}
                         <div>
                             <label className="block text-sm font-black text-slate-700 mb-3">
                                 Nombre de numéros à alerter

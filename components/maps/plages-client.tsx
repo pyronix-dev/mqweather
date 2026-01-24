@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
@@ -43,7 +44,7 @@ export default function BeachMapPage({ initialUser }: { initialUser: any }) {
         const beaches = Object.values(beachData);
         if (!beaches.length) return { avgSeaTemp: 0, maxWave: 0, analysis: "Chargement en cours..." }
 
-        // Hour Index Calculation
+        
         const baseIndex = selectedDay * 24
         const hourOffset = timeOfDay === 'morning' ? 8 : 14
         const dataIndex = baseIndex + hourOffset
@@ -71,24 +72,24 @@ export default function BeachMapPage({ initialUser }: { initialUser: any }) {
 
         const avgSeaTemp = tempSum / tempCount;
 
-        // Rich Analysis Generation (4 lines)
+        
         let analysis = "";
 
-        // Sentence 1: Sea State
+        
         if (maxWave >= 2.5) analysis += "La mer est forte et agitée, rendant la baignade périlleuse sur les côtes exposées. ";
         else if (maxWave >= 1.5) analysis += "Une houle modérée concerne le littoral Atlantique, soyez vigilants lors de la baignade. ";
         else analysis += "Le plan d'eau est globalement calme, offrant des conditions idéales pour la baignade en famille. ";
 
-        // Sentence 2: Temperature Comfort
+        
         if (avgSeaTemp >= 29) analysis += `L'eau est particulièrement chaude avec une moyenne de ${avgSeaTemp.toFixed(1)}°C, idéale pour la détente. `;
         else if (avgSeaTemp >= 27) analysis += `La température de l'eau est agréable, autour de ${avgSeaTemp.toFixed(1)}°C, conforme aux normales de saison. `;
         else analysis += `La mer est un peu plus fraîche aujourd'hui (${avgSeaTemp.toFixed(1)}°C), mais reste très accessible. `;
 
-        // Sentence 3: Weather Context (inferred)
+        
         if (timeOfDay === 'morning') analysis += "La matinée offre souvent les meilleures conditions de clarté et de calme avant le vent thermique. ";
         else analysis += "L'après-midi, le clapot peut se lever légèrement avec le renforcement des alizés. ";
 
-        // Sentence 4: Specific Advice
+        
         if (maxWave > 2.0) analysis += "Il est recommandé de privilégier les plages de la côte Caraïbe, plus abritées de la houle.";
         else analysis += "C'est une excellente journée pour profiter de l'ensemble des plages de l'île, y compris sur la côte au vent.";
 
@@ -100,7 +101,7 @@ export default function BeachMapPage({ initialUser }: { initialUser: any }) {
         setError(false)
 
         try {
-            // Build batch coordinates for all beaches
+            
             const lats = BEACH_LOCATIONS.map(b => b.lat).join(',')
             const lons = BEACH_LOCATIONS.map(b => b.lon).join(',')
 
@@ -117,9 +118,9 @@ export default function BeachMapPage({ initialUser }: { initialUser: any }) {
             const data: Record<string, BeachData> = {}
 
             BEACH_LOCATIONS.forEach((beach, index) => {
-                // Open-Meteo returns an array of objects when multiple coordinates are passed
-                // But wait, it returns a single object if there's only one, or an array if there are multiple.
-                // Actually for batch requests it's always an array.
+                
+                
+                
                 data[beach.name] = {
                     weather: weatherJsonArray[index],
                     marine: marineJsonArray[index]
@@ -166,22 +167,22 @@ export default function BeachMapPage({ initialUser }: { initialUser: any }) {
                         onClick={() => handleSearch(beach)}
                         className="group relative cursor-pointer transition-all duration-300 hover:scale-105 z-10 hover:z-50 animate-fade-in-up"
                     >
-                        {/* Beach Card Marker */}
+                        {}
                         <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-slate-200/50 p-1 flex flex-col items-center gap-1 min-w-[55px] transition-all duration-300 hover:shadow-2xl hover:border-amber-200">
-                            {/* Weather Icon */}
+                            {}
                             <div className="text-lg drop-shadow-sm">
                                 {icon}
                             </div>
 
-                            {/* Stats Row */}
+                            {}
                             <div className="flex items-center gap-1 w-full justify-center border-t border-slate-100 pt-1">
-                                {/* Water Temp */}
+                                {}
                                 <div className="flex items-center gap-0.5 text-blue-500" title="Température de l'eau">
                                     <i className="bi bi-thermometer-high text-[10px]"></i>
                                     <span className="text-[8px] font-black">{seaTemp}°</span>
                                 </div>
 
-                                {/* UV */}
+                                {}
                                 <div className={`flex items-center gap-0.5 px-1 py-0 rounded-full ${uvIndex >= 6 ? 'bg-orange-100 text-orange-600' : 'bg-emerald-100 text-emerald-600'}`} title="Indice UV">
                                     <i className="bi bi-sun-fill text-[10px]"></i>
                                     <span className="text-[8px] font-black">{uvIndex}</span>
@@ -189,7 +190,7 @@ export default function BeachMapPage({ initialUser }: { initialUser: any }) {
                             </div>
                         </div>
 
-                        {/* Name Label */}
+                        {}
                         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-slate-800/95 backdrop-blur-sm text-white text-xs font-bold rounded-full whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1 shadow-lg">
                             {beach.name}
                         </div>
@@ -206,7 +207,7 @@ export default function BeachMapPage({ initialUser }: { initialUser: any }) {
             <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
-                    {/* Map Section */}
+                    {}
                     <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
                             {error && <MapErrorDisplay onRetry={fetchAllData} />}
@@ -246,9 +247,9 @@ export default function BeachMapPage({ initialUser }: { initialUser: any }) {
                         </div>
                     </div>
 
-                    {/* Sidebar Section */}
+                    {}
                     <div className="w-full space-y-4 sm:space-y-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                        {/* Controls Card */}
+                        {}
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                             <div className="mb-6">
                                 <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>

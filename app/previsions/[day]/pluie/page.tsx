@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import RainClient from '@/components/prevision-pluie-client'

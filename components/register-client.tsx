@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect } from "react"
@@ -6,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 
-// Icons
+
 const CheckIcon = ({ className }: { className?: string }) => (
     <svg className={className || "w-4 h-4"} viewBox="0 0 24 24" fill="none" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
@@ -20,7 +21,7 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
     const [isLoading, setIsLoading] = useState(false)
     const [submitAttempted, setSubmitAttempted] = useState(false)
 
-    // Form Data
+    
     const [formData, setFormData] = useState({
         email: "",
         phone: "",
@@ -29,14 +30,14 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
         lastName: ""
     })
 
-    // Password Validation State
+    
     const [passwordCriteria, setPasswordCriteria] = useState({
         length: false,
         number: false,
         special: false
     })
 
-    // Update password criteria on change
+    
     useEffect(() => {
         const pwd = formData.password
         setPasswordCriteria({
@@ -48,10 +49,10 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
 
     const isPasswordValid = Object.values(passwordCriteria).every(Boolean)
 
-    // Check validity for field highlighting
+    
     const isFieldInvalid = (field: keyof typeof formData) => {
         if (!submitAttempted) return false
-        if (field === 'phone') return false // Optional
+        if (field === 'phone') return false 
         if (field === 'password') return !isPasswordValid
         return !formData[field]
     }
@@ -60,7 +61,7 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
         e.preventDefault()
         setSubmitAttempted(true)
 
-        // Validation Check
+        
         if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
             return
         }
@@ -215,7 +216,7 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
                                             />
                                         </div>
 
-                                        {/* Password Checklist */}
+                                        {}
                                         <div className="grid grid-cols-1 gap-2 bg-slate-50 p-3 rounded-xl">
                                             <div className={`flex items-center gap-2 text-xs font-medium transition-all duration-300 ${passwordCriteria.length ? 'text-emerald-600' : 'text-slate-400'}`}>
                                                 <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-all duration-300 ${passwordCriteria.length ? 'bg-emerald-100' : 'bg-slate-200'}`}>

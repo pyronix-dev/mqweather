@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState } from "react"
@@ -10,7 +11,7 @@ export default function ContactPage({ initialUser }: { initialUser: any }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setStatus('sending')
-        // Simulate sending
+        
         await new Promise(resolve => setTimeout(resolve, 1500))
         setStatus('success')
     }

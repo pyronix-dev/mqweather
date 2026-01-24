@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState } from "react"
@@ -44,7 +45,7 @@ export function EditProfileDialog({ isOpen, onClose, user }: EditProfileDialogPr
 
             if (!res.ok) throw new Error("Failed to update")
 
-            router.refresh() // Reload data
+            router.refresh() 
             onClose()
             showToast("Profil mis à jour avec succès !", "success")
         } catch (e) {

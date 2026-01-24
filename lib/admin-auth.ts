@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createSupabaseAdmin } from '@/lib/supabase'
@@ -9,10 +10,7 @@ export interface AdminUser {
     role: 'admin' | 'super_admin'
 }
 
-/**
- * Verify that the current request is from an authenticated admin user.
- * Returns the admin user if valid, or a NextResponse error if not.
- */
+
 export async function requireAdmin(): Promise<AdminUser | NextResponse> {
     try {
         const cookieStore = await cookies()
@@ -57,9 +55,7 @@ export async function requireAdmin(): Promise<AdminUser | NextResponse> {
     }
 }
 
-/**
- * Log an admin action to the audit log.
- */
+
 export async function logAdminAction(
     adminId: string,
     action: string,
@@ -83,9 +79,7 @@ export async function logAdminAction(
     }
 }
 
-/**
- * Get IP address from request headers.
- */
+
 export function getClientIP(request: Request): string {
     const forwarded = request.headers.get('x-forwarded-for')
     if (forwarded) {

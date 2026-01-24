@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { cn } from '@/lib/utils'
 
 function Kbd({ className, ...props }: React.ComponentProps<'kbd'>) {

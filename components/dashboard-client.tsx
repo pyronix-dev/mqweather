@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useState } from "react"
@@ -8,7 +9,7 @@ import { Footer } from "@/components/footer"
 import { useToast } from "@/components/ui/toast-context"
 import { EditProfileDialog } from "@/components/edit-profile-dialog"
 
-// Icons
+
 const UserIcon = () => (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -67,42 +68,42 @@ interface UserData {
 
 export function DashboardClient({ initialUser }: { initialUser: any }) {
     const { showToast } = useToast()
-    // If initialUser is provided, use it. But we might need to cast or ensure structure matches UserData
-    // The server returns { name, email, role }, but dashboard needs full profile (subscription etc).
-    // Ah, getUserFromSession only returns minimal data.
-    // Dashboard needs FULL data.
-    // So we should:
-    // 1. Use initialUser to show Header immediately + basic welcome.
-    // 2. Fetch full data in background if needed? OR fetch FULL data server-side.
+    
+    
+    
+    
+    
+    
+    
 
-    // Better: Update getUserFromSession to return more? No, it's for session.
-    // DashboardPage (server) can fetch full /api/auth/me data server side?
-    // We can import the logic from /api/auth/me/route.ts into a shared helper?
-    // YES.
+    
+    
+    
+    
 
-    // For now, to fix flicker:
-    // Initialize user with what we have (even if partial) so at least Header is good.
-    // And "Bonjour [Name]" works.
+    
+    
+    
 
     const [user, setUser] = useState<UserData | null>(initialUser ? {
-        reference: initialUser.reference || initialUser.name, // Mapping mismatch potential
+        reference: initialUser.reference || initialUser.name, 
         full_name: initialUser.name,
         email: initialUser.email,
         phone: null,
         role: initialUser.role,
-        subscription: null // We don't have this yet from session
+        subscription: null 
     } as any : null)
 
-    // Note: If initialUser comes from DB fetch in page.tsx (server), we can pass full object!
-    // Let's assume we will update auth-server.ts or create a new fetcher for dashboard.
+    
+    
 
     const [loading, setLoading] = useState(!initialUser)
     const [isEditOpen, setIsEditOpen] = useState(false)
     const router = useRouter()
 
     useEffect(() => {
-        // Fetch full user data from API to get subscription etc (if we only passed partial)
-        // OR if null.
+        
+        
 
         const fetchUserData = async () => {
             try {
@@ -112,7 +113,7 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
                     return
                 }
                 const data = await res.json()
-                setUser(data) // Use full data
+                setUser(data) 
             } catch (error) {
                 console.error('Failed to fetch user data:', error)
             } finally {
@@ -140,7 +141,7 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
         return null
     }
 
-    // Determine display name
+    
     let displayName = user.reference
     if (user.full_name) {
         displayName = user.full_name.split(' ')[0]
@@ -148,17 +149,17 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
         displayName = user.email
     }
 
-    // If we have initialUser (from server), use that for Header. 
-    // Wait, 'user' state is updated. Header needs { name, email, role }.
-    // Our 'user' object (UserData) matches broadly but checking fields.
+    
+    
+    
     const headerUser = {
         name: displayName,
         email: user.email || '',
         role: user.role
     }
 
-    // ... rest of rendering
-    // Determine primary contact based on subscription
+    
+    
     let primaryContact = user.email || user.phone || 'Non défini';
     let contactLabel = 'Email';
     let isSmsPlan = false;
@@ -192,7 +193,7 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
             <Header initialUser={headerUser} />
 
             <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-                {/* Welcome Header */}
+                {}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-black text-slate-800">
@@ -212,10 +213,10 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Main Info Column */}
+                    {}
                     <div className="lg:col-span-2 space-y-6">
 
-                        {/* Active Subscription Card */}
+                        {}
                         {user.subscription ? (
                             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                                 <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -295,10 +296,10 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
                         )}
                     </div>
 
-                    {/* Sidebar */}
+                    {}
                     <div className="space-y-6">
 
-                        {/* Admin Access Card */}
+                        {}
                         {(user.role === 'admin' || user.role === 'super_admin') && (
                             <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl shadow-lg p-6 text-white overflow-hidden relative group">
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -319,7 +320,7 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
                             </div>
                         )}
 
-                        {/* Profile Card */}
+                        {}
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md">
@@ -358,7 +359,7 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
                                             Notifications
                                         </div>
                                         <button
-                                            // ... simplified handler for clarity
+                                            
                                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${(user.notifications ? (user.notifications.sms || user.notifications.email) : user.notifications_enabled) ? 'bg-emerald-500' : 'bg-slate-200'}`}
                                         >
                                             <span

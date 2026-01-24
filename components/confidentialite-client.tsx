@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import Link from "next/link"
@@ -9,7 +10,7 @@ export default function Confidentialite({ initialUser }: { initialUser: any }) {
     <div className="flex flex-col min-h-screen bg-slate-50">
       <Header initialUser={initialUser} />
 
-      {/* Hero Section */}
+      {}
       <div className="bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-900 text-white py-16 sm:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">

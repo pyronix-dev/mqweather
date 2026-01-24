@@ -1,10 +1,11 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
 
-// Helper
+
 function hash(data: string) {
     return crypto.createHash('sha256').update(data).digest('hex')
 }
@@ -20,8 +21,8 @@ export async function GET(request: NextRequest) {
 
     const supabase = createSupabaseAdmin()
 
-    // 1. Find the OTP record
-    // We reuse the logic from the login route: find a valid, unused OTP for this user
+    
+    
     const { data: otpRecord, error } = await supabase
         .from('otp_codes')
         .select('*')
@@ -36,22 +37,22 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(new URL('/login?error=Lien expiré ou invalide', request.url))
     }
 
-    // 2. Verify the code
-    // The "Magic Link" here just carries the OTP code to allow auto-verification
+    
+    
     const codeHash = hash(code)
 
-    // Check against stored hash
-    if (otpRecord.code_hash !== codeHash && code !== '123456') { // Allow dev bypass if needed, though link has real code
+    
+    if (otpRecord.code_hash !== codeHash && code !== '123456') { 
         return NextResponse.redirect(new URL('/login?error=Code invalide', request.url))
     }
 
-    // 3. Mark as used
+    
     await supabase
         .from('otp_codes')
         .update({ used: true })
         .eq('id', otpRecord.id)
 
-    // 4. Get User Info for Session
+    
     const { data: user } = await supabase
         .from('users')
         .select('id, reference_code, email')
@@ -62,10 +63,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(new URL('/login?error=Utilisateur introuvable', request.url))
     }
 
-    // 5. Create Session & Redirect
+    
     const response = NextResponse.redirect(new URL('/dashboard', request.url))
 
-    // Set Auth Cookie
+    
     response.cookies.set('auth_session', JSON.stringify({
         userId: user.id,
         referenceCode: user.reference_code,
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 // 7 days
+        maxAge: 7 * 24 * 60 * 60 
     })
 
     return response

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, use } from "react"
@@ -215,7 +216,7 @@ export default function UserDetailPage({ params, initialUser }: { params: { id: 
                     <h1 className="text-2xl font-black text-slate-800">Détails Utilisateur</h1>
                 </div>
 
-                {/* User Info Card */}
+                {}
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
                     <div className="flex items-start justify-between mb-6">
                         <div>
@@ -291,7 +292,7 @@ export default function UserDetailPage({ params, initialUser }: { params: { id: 
                     )}
                 </div>
 
-                {/* Login History */}
+                {}
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
                     <h3 className="text-lg font-bold text-slate-800 mb-4">Historique de Connexion</h3>
                     {data.loginHistory.length === 0 ? (
@@ -311,7 +312,7 @@ export default function UserDetailPage({ params, initialUser }: { params: { id: 
                     )}
                 </div>
 
-                {/* Subscriptions */}
+                {}
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold text-slate-800">Abonnements</h3>

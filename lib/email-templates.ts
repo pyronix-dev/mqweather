@@ -1,9 +1,8 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
-/**
- * HTML Email Templates
- */
 
-// Logo URLs
+
+
 const LOGO_TEXT_URL = "https://raw.githubusercontent.com/pyronix-dev/upwork/main/logo-text.png"
 const LOGO_ICON_URL = "https://raw.githubusercontent.com/pyronix-dev/upwork/main/logo.png"
 
@@ -291,7 +290,7 @@ export function getCancellationEmailHtml(planName: string, endDate: string): str
 `
 }
 
-// ... existing code ...
+
 export function getPlanChangeEmailHtml(planName: string, price: string): string {
     return `
 <!DOCTYPE html>
@@ -350,33 +349,33 @@ interface VigilanceTheme {
 
 const VIGILANCE_THEMES: Record<string, VigilanceTheme> = {
     jaune: {
-        color: '#f59e0b', // Yellow-500
-        bgColor: '#fffbeb', // Yellow-50
-        borderColor: '#fcd34d', // Yellow-300
+        color: '#f59e0b', 
+        bgColor: '#fffbeb', 
+        borderColor: '#fcd34d', 
         title: 'Vigilance Jaune',
         message: 'Soyez attentif',
         animation: ''
     },
     orange: {
-        color: '#f97316', // Orange-500
-        bgColor: '#fff7ed', // Orange-50
-        borderColor: '#fdba74', // Orange-300
+        color: '#f97316', 
+        bgColor: '#fff7ed', 
+        borderColor: '#fdba74', 
         title: 'Vigilance Orange',
         message: 'Soyez vigilant',
         animation: ''
     },
     rouge: {
-        color: '#dc2626', // Red-600
-        bgColor: '#fef2f2', // Red-50
-        borderColor: '#fca5a5', // Red-300
+        color: '#dc2626', 
+        bgColor: '#fef2f2', 
+        borderColor: '#fca5a5', 
         title: 'Vigilance Rouge',
         message: 'Vigilance absolue',
         animation: 'pulse-border'
     },
     violet: {
-        color: '#7c3aed', // Violet-600
-        bgColor: '#f5f3ff', // Violet-50
-        borderColor: '#c4b5fd', // Violet-300
+        color: '#7c3aed', 
+        bgColor: '#f5f3ff', 
+        borderColor: '#c4b5fd', 
         title: 'Vigilance Violette',
         message: 'Danger extrême',
         animation: 'pulse-border-violet'
@@ -386,8 +385,8 @@ const VIGILANCE_THEMES: Record<string, VigilanceTheme> = {
 export function getVigilanceAlertEmailHtml(colorName: string): string {
     const theme = VIGILANCE_THEMES[colorName.toLowerCase()] || VIGILANCE_THEMES.jaune
 
-    // Use a reliable ext icon or base64. Using Icons8 for now as placeholder is reliable.
-    // White icon for colored background
+    
+    
     const iconUrl = "https://img.icons8.com/ios-filled/100/ffffff/high-priority-message.png"
 
     return `

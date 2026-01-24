@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
@@ -256,7 +257,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [acceptSmsterms, setAcceptSmsTerms] = useState(false)
 
-  // Reset states when switching modes
+  
   useEffect(() => {
     if (showEmailSubscription) {
       setPhoneVerified(user?.email ? true : false)
@@ -282,9 +283,9 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
   const [codeSent, setCodeSent] = useState(false)
   const [phoneVerified, setPhoneVerified] = useState(false)
 
-  // Check Auth on Mount - REMOVED since we use SSR data
+  
 
-  // Pre-fill data from URL (override if present)
+  
   useEffect(() => {
     const urlEmail = searchParams.get('email')
     const urlPhone = searchParams.get('phone')
@@ -329,7 +330,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
 
   const [rateLimitUntil, setRateLimitUntil] = useState<number | null>(null)
 
-  // Effect to clear rate limit when time expires
+  
   useEffect(() => {
     if (!rateLimitUntil) return
     const interval = setInterval(() => {
@@ -351,8 +352,8 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
       const data = await res.json()
 
       if (res.status === 429) {
-        // Block user for 5 minutes (default) or parse from message if possible
-        // The API says "patienter X minute(s)"
+        
+        
         const waitMinutes = 5
         setRateLimitUntil(Date.now() + waitMinutes * 60 * 1000)
         alert(data.error)
@@ -361,7 +362,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
 
       if (res.ok) {
         setPhoneVerified(true)
-        setStep(2) // Move to confirmation step visually
+        setStep(2) 
       } else {
         alert(data.error || "Code invalide")
       }
@@ -408,7 +409,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
       })
       const data = await res.json()
       if (res.ok) {
-        setPhoneVerified(true) // Reuse phoneVerified state to mean "Contact Verified" generally
+        setPhoneVerified(true) 
       } else {
         alert(data.error || "Code invalide")
       }
@@ -419,13 +420,13 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
     }
   }
 
-  // Handle Stripe Checkout redirect (Embedded)
+  
   const router = useRouter()
   const handleCheckout = (plan: 'sms-monthly' | 'sms-annual' | 'email-annual') => {
     const params = new URLSearchParams()
     params.set('plan', plan)
 
-    // Add relevant data based on plan
+    
     if (plan.includes('sms')) {
       if (phone) params.set('phone', phone)
       if (selectedProfile) params.set('profile', selectedProfile)
@@ -437,7 +438,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
     router.push(`/alertes/checkout?${params.toString()}`)
   }
 
-  // Email Subscription View - Redesigned to match SMS flow
+  
   if (showEmailSubscription) {
     return (
       <div className="min-h-screen bg-stone-50">
@@ -456,7 +457,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
             <div className="flex-1">
               <div className="relative bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm animate-fade-in-up overflow-hidden">
-                {/* Header */}
+                {}
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white">
                     <EmailIcon />
@@ -473,7 +474,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                   automatiquement.
                 </p>
 
-                {/* Steps Indicator */}
+                {}
                 <div className="flex items-center gap-4 mb-10">
                   <button
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${!phoneVerified ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600 border border-slate-300"}`}
@@ -642,7 +643,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                   </label>
                 </div>
 
-                {/* Submit button */}
+                {}
                 <button
                   disabled={!email || !acceptTerms || isLoading || (!phoneVerified && !user?.email)}
                   onClick={() => handleCheckout('email-annual')}
@@ -661,12 +662,12 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
     )
   }
 
-  // Main Page
+  
   return (
     <div className="min-h-screen bg-stone-50">
       <Header initialUser={initialUser} />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* Page Title */}
+        {}
         <div className="text-center mb-10 sm:mb-14 animate-fade-in-up">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 border border-slate-200 mb-4">
             <BellIcon />
@@ -707,7 +708,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                     automatiquement.
                   </p>
 
-                  {/* Steps Indicator */}
+                  {}
                   <div className="flex items-center gap-4 mb-10">
                     <button
                       onClick={() => setStep(1)}
@@ -945,7 +946,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                     </label>
                   </div>
 
-                  {/* Submit button */}
+                  {}
                   <button
                     disabled={isLoading || !acceptSmsterms || !phoneVerified}
                     onClick={() => handleCheckout(smsBillingCycle === 'monthly' ? 'sms-monthly' : 'sms-annual')}
@@ -958,7 +959,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                         : "Payer 49,90€ et s'abonner pour 1 an"}
                   </button>
 
-                  {/* Phenomena Covered */}
+                  {}
                   <div>
                     <h3 className="text-sm font-black text-slate-700 mb-4 uppercase tracking-wide">
                       Phénomènes couverts
@@ -982,12 +983,12 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
               </>
             )}
 
-            {/* Formules Alertes - show when not in SMS subscription */}
+            {}
             {!showSmsSubscription && (
               <div className="animate-slide-in-left">
                 <h2 className="text-2xl sm:text-3xl font-black text-slate-800 mb-6">Formules Alertes</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Alertes Email */}
+                  {}
                   <div
                     className="relative bg-white border-2 border-emerald-500 rounded-2xl p-6 transition-all duration-500 cursor-pointer group flex flex-col hover:shadow-lg hover:-translate-y-1"
                     onClick={() => setShowEmailSubscription(true)}
@@ -1056,7 +1057,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                     </button>
                   </div>
 
-                  {/* SMS Pro */}
+                  {}
                   <a
                     href="/alertes/devis"
                     className={`relative bg-white border rounded-2xl p-6 transition-all duration-500 flex flex-col ${isHoveredPro ? "border-slate-400 shadow-lg -translate-y-1" : "border-slate-200"}`}
@@ -1093,7 +1094,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
 
 
 
-            {/* FAQ Section - only show when not in SMS subscription */}
+            {}
             {!showSmsSubscription && (
               <div
                 className="relative bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm animate-slide-in-left overflow-hidden"

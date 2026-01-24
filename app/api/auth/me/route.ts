@@ -1,17 +1,18 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 import { cookies } from 'next/headers'
 import { createSupabaseAdmin } from '@/lib/supabase'
 
-// Plan display names
+
 const PLAN_NAMES: Record<string, string> = {
     'sms-monthly': 'SMS Standard - Mensuel',
     'sms-annual': 'SMS Standard - Annuel',
     'email-annual': 'Alertes Email - Annuel'
 }
 
-// Plan prices
+
 const PLAN_PRICES: Record<string, string> = {
     'sms-monthly': '4,99€',
     'sms-annual': '49,90€',
@@ -47,7 +48,7 @@ export async function GET() {
 
         const supabase = createSupabaseAdmin()
 
-        // Fetch user data
+        
         const { data: user, error: userError } = await supabase
             .from('users')
             .select('id, reference_code, email, phone, full_name, notifications_enabled, notif_sms, notif_email, role')
@@ -59,7 +60,7 @@ export async function GET() {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
-        // Fetch active subscription
+        
         const { data: subscription } = await supabase
             .from('subscriptions')
             .select('plan, status, expires_at, amount')
@@ -69,7 +70,7 @@ export async function GET() {
             .limit(1)
             .single()
 
-        // Format subscription data
+        
         let subscriptionData = null
         if (subscription) {
             const expiresAt = subscription.expires_at ? new Date(subscription.expires_at) : null
@@ -85,22 +86,22 @@ export async function GET() {
             }
         }
 
-        // Extract first name
+        
         const firstName = user.full_name ? user.full_name.split(' ')[0] : ''
 
         return NextResponse.json({
-            name: user.full_name, // Keep for backward compatibility if needed, or just use full_name
+            name: user.full_name, 
             first_name: firstName,
             full_name: user.full_name,
             reference: user.reference_code,
             email: user.email,
             phone: user.phone,
             notifications: {
-                enabled: user.notifications_enabled, // Keep generic flag
+                enabled: user.notifications_enabled, 
                 sms: user.notif_sms,
                 email: user.notif_email
             },
-            notifications_enabled: user.notifications_enabled, // Legacy support
+            notifications_enabled: user.notifications_enabled, 
             role: user.role,
             subscription: subscriptionData
         })

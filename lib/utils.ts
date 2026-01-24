@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import DOMPurify from 'isomorphic-dompurify'
@@ -10,7 +11,7 @@ export function getSlugFromIndex(index: number): string {
   if (index === 0) return "today"
   const date = new Date()
   date.setDate(date.getDate() + index)
-  // Get day name in French, lowercase, strip accents
+  
   return date.toLocaleDateString("fr-FR", { weekday: "long" })
     .toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -19,7 +20,7 @@ export function getSlugFromIndex(index: number): string {
 export function getDayIndexFromSlug(slug: string): number {
   if (slug === "today" || slug === "0") return 0
 
-  // Try to match slug against next 7 days
+  
   const today = new Date()
   for (let i = 0; i < 7; i++) {
     const d = new Date(today)
@@ -31,7 +32,7 @@ export function getDayIndexFromSlug(slug: string): number {
     if (daySlug === slug) return i
   }
 
-  // Fallback: check if slug is a number
+  
   const num = Number(slug)
   if (!isNaN(num)) return num
 

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 export interface VigilanceContent {
     headline: string;
     description: string;

@@ -1,3 +1,4 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import TemperatureMapPage from '@/components/maps/temperature-client'
@@ -11,7 +12,7 @@ export default async function TemperaturePage(props: { params: Promise<{ city?: 
     const searchParams = await props.searchParams
     const user = await getUserFromSession()
 
-    // Validate City if present
+    
     const citySlug = params.city?.[0] ? decodeURIComponent(params.city[0]) : null
     const cityParam = citySlug || searchParams.ville
 
