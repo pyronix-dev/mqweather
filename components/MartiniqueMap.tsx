@@ -189,11 +189,11 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 return (
                     <div
                         key={pos.id}
-                        className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10 hover:z-[100] transition-transform duration-200 will-change-transform"
+                        className="absolute z-10 hover:z-[100] transition-transform duration-200 will-change-transform"
                         style={{
                             left: pos.x,
                             top: pos.y,
-                            transform: `translate(-50 %, -50 %) scale(${markerScale})`
+                            transform: `translate(-50%, 6px) scale(${markerScale})`
                         }}
                     >
                         {markerData.component}
