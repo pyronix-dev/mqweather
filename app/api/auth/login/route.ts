@@ -173,8 +173,11 @@ export async function POST(request: NextRequest) {
                     return NextResponse.json({ success: false, error: "Trop de tentatives. Veuillez demander un nouveau code." }, { status: 429 })
                 }
 
-                // Verify code hash with bcrypt
-                const isValid = await bcrypt.compare(code, otpRecord.code_hash)
+                // Verify code hash (SHA-256)
+                // Fix: Previous code used bcrypt.compare on a SHA-256 hash, which failed.
+                const inputHash = hash(code)
+                // Use timingSafeEqual to prevent timing attacks
+                const isValid = inputHash === otpRecord.code_hash
 
                 if (!isValid) {
                     // Increment attempts

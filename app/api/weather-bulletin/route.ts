@@ -5,7 +5,7 @@ const CEREBRAS_MODEL = 'gpt-oss-120b'
 
 export async function POST(request: NextRequest) {
     try {
-        const { weatherData, selectedDay, selectedCity } = await request.json()
+        const { weatherData, selectedDay, selectedCity, timeOfDay } = await request.json()
 
         if (!weatherData || weatherData.length === 0) {
             return NextResponse.json({ error: 'No weather data provided' }, { status: 400 })
@@ -17,71 +17,109 @@ export async function POST(request: NextRequest) {
         const dayName = today.toLocaleDateString('fr-FR', { weekday: 'long' })
         const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
-        // Summarize weather conditions
+        // Determine time context label
+        const timeLabel = timeOfDay === 'morning' ? 'Matin' : 'Après-midi'
+
+        // Calculate relevant hour index (8am for morning, 2pm for afternoon)
+        // selectedDay * 24 hours + offset
+        const hourOffset = timeOfDay === 'morning' ? 8 : 14
+        const targetHourIndex = (selectedDay * 24) + hourOffset
+
+        // Summarize weather conditions based on SPECIFIC HOUR
         const weatherSummary = weatherData.map((data: any, index: number) => {
-            if (!data?.daily) return null
-            const tempMax = Math.round(data.daily.temperature_2m_max?.[selectedDay] || 0)
-            const tempMin = Math.round(data.daily.temperature_2m_min?.[selectedDay] || 0)
-            const weatherCode = data.daily.weather_code?.[selectedDay] || 0
+            if (!data?.hourly?.weather_code || !data?.hourly?.temperature_2m) return null
+
+            // Extract hourly data points
+            const currentTemp = Math.round(data.hourly.temperature_2m[targetHourIndex] || 0)
+            const weatherCode = data.hourly.weather_code[targetHourIndex] || 0
+
+            // Helper to get daily min/max for context (still useful)
+            const dailyMax = Math.round(data.daily?.temperature_2m_max?.[selectedDay] || 0)
+            const dailyMin = Math.round(data.daily?.temperature_2m_min?.[selectedDay] || 0)
 
             let condition = 'ensoleillé'
             if (weatherCode >= 51 && weatherCode <= 99) condition = 'pluvieux'
-            else if (weatherCode >= 1 && weatherCode <= 50) condition = 'nuageux'
+            else if (weatherCode === 3 || weatherCode === 45 || weatherCode === 48) condition = 'nuageux'
+            else if (weatherCode === 2) condition = 'partiellement nuageux'
+            else if (weatherCode === 0 || weatherCode === 1) condition = 'ensoleillé'
+            else if (weatherCode >= 4 && weatherCode <= 50) condition = 'mitigé'
 
             return {
                 city: data.cityName || `Ville ${index + 1}`,
-                tempMax,
-                tempMin,
+                temp: currentTemp,
+                tempMax: dailyMax,
+                tempMin: dailyMin,
                 condition
             }
         }).filter(Boolean)
 
         let prompt;
+
         if (selectedCity) {
             const cityData = weatherSummary.find((d: any) => d.city === selectedCity)
             if (!cityData) throw new Error("City data not found")
 
-            prompt = `Tu es un météorologue de Martinique. Génère un bulletin météo COURT pour la ville de ${selectedCity}.
-            
-Date: ${dayName} ${dateStr}
+            let timeInstruction = "6. Utilise le futur pour les prévisions (ex: 'le ciel sera')."
+            let exampleText = `"${dayName} ${dateStr} (${timeLabel}) : À **${selectedCity}**, ce ${timeLabel.toLowerCase()}, le temps sera **${cityData.condition}** avec une température de **${cityData.temp}°C**. C'est un moment idéal pour **une promenade**. Profitez-en !"`
 
-Données pour ${selectedCity}:
-- Température: Min ${cityData.tempMin}°C, Max ${cityData.tempMax}°C
+            if (selectedDay === 0) {
+                timeInstruction = "6. IMPORTANT : Nous sommes aujourd'hui. Utilise le PRÉSENT (ex: 'le ciel est')."
+                exampleText = `"${dayName} ${dateStr} (${timeLabel}) : Aujourd'hui en ce ${timeLabel.toLowerCase()} à **${selectedCity}**, le temps est **${cityData.condition}** avec **${cityData.temp}°C**. Profitez de ce moment pour **sortir** !"`
+            }
+
+            prompt = `Tu es un météorologue de Martinique. Génère un bulletin météo COURT pour la ville de ${selectedCity} pour ce **${timeLabel}**.
+            
+Date: ${dayName} ${dateStr} - Période: ${timeLabel}
+
+Données pour ${selectedCity} (${timeLabel}):
+- Température prévue: ${cityData.temp}°C
 - Condition: ${cityData.condition}
 
 Instructions:
 1. Commence IMPÉRATIVEMENT par la date au format "${dayName} ${dateStr} :" suivi de ton message.
-2. Maximum 60 mots après la date.
-3. Utilise **texte** pour mettre en gras la température et la condition.
-4. Ton professionnel et chaleureux.
-5. Donne un conseil court lié à la météo.
+2. Précise bien que c'est la météo du **${timeLabel}**.
+3. Maximum 60 mots après la date.
+4. Utilise **texte** pour mettre en gras la température et la condition.
+5. Ton professionnel et chaleureux.
+${timeInstruction}
+6. Donne un conseil court adapté à cette météo précise.
 
 Exemple:
-"${dayName} ${dateStr} : À **${selectedCity}**, le temps sera **${cityData.condition}** avec des températures comprises entre **${cityData.tempMin}°C et ${cityData.tempMax}°C**. C'est une journée idéale pour **une promenade au bord de mer**. Profitez-en !"`
+${exampleText}`;
         } else {
-            const avgTempMax = Math.round(weatherSummary.reduce((acc: number, d: any) => acc + d.tempMax, 0) / weatherSummary.length)
-            const avgTempMin = Math.round(weatherSummary.reduce((acc: number, d: any) => acc + d.tempMin, 0) / weatherSummary.length)
+            const avgTemp = Math.round(weatherSummary.reduce((acc: number, d: any) => acc + d.temp, 0) / weatherSummary.length)
             const rainyCount = weatherSummary.filter((d: any) => d.condition === 'pluvieux').length
             const cloudyCount = weatherSummary.filter((d: any) => d.condition === 'nuageux').length
             const sunnyCount = weatherSummary.filter((d: any) => d.condition === 'ensoleillé').length
+            const mainCondition = sunnyCount > weatherSummary.length / 2 ? 'ensoleillé' : rainyCount > weatherSummary.length / 3 ? 'pluvieux' : 'variable'
 
-            prompt = `Tu es un météorologue de Martinique. Génère un bulletin météo COURT pour toute l'île.
+            let timeInstruction = "6. Utilise le futur pour les prévisions."
+            let exampleText = `"${dayName} ${dateStr} : Bonjour Martinique ! Ce ${timeLabel.toLowerCase()}, **temps ${mainCondition}** sur l'ensemble de l'île with **${avgTemp}°C**..."`
 
-Date: ${dayName} ${dateStr}
+            if (selectedDay === 0) {
+                timeInstruction = "6. IMPORTANT : Nous sommes aujourd'hui. Utilise le PRÉSENT."
+                exampleText = `"${dayName} ${dateStr} : Bonjour Martinique ! En ce ${timeLabel.toLowerCase()}, le temps est **${mainCondition}** sur l'ensemble de l'île avec **${avgTemp}°C**..."`
+            }
 
-Données globales:
-- Température moyenne: Min ${avgTempMin}°C, Max ${avgTempMax}°C
+            prompt = `Tu es un météorologue de Martinique. Génère un bulletin météo COURT pour toute l'île pour ce **${timeLabel}**.
+
+Date: ${dayName} ${dateStr} - Période: ${timeLabel}
+
+Données globales (${timeLabel}):
+- Température moyenne: ${avgTemp}°C
 - Zones ensoleillées: ${sunnyCount}, nuageuses: ${cloudyCount}, pluvieuses: ${rainyCount}
+- Tendance générale: ${mainCondition}
 
 Instructions:
 1. Commence IMPÉRATIVEMENT par la date au format "${dayName} ${dateStr} :" suivi de ton message.
-2. Maximum 80 mots après la date.
-3. Utilise **texte** pour mettre en gras les infos importantes.
-4. Structure: salutation courte → conditions générales → conseils pratiques.
-5. Ton professionnel et chaleureux.
+2. Mentionne explicitement "Ce matin" ou "Cet après-midi".
+3. Maximum 80 mots après la date.
+4. Utilise **texte** pour mettre en gras les infos importantes.
+5. Structure: salutation courte → conditions du moment → conseils.
+${timeInstruction}
 
 Exemple:
-"${dayName} ${dateStr} : Bonjour Martinique ! **Temps ensoleillé** sur l'ensemble de l'île avec des températures de **28°C à 31°C**. Quelques averses possibles dans le **nord** en fin d'après-midi. **Pensez à vous hydrater**. Bonne journée !"`
+${exampleText}`;
         }
 
         const response = await fetch('https://api.cerebras.ai/v1/chat/completions', {

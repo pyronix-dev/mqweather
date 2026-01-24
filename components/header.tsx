@@ -74,12 +74,16 @@ const CrosshairIcon = () => (
 
 import { MARTINIQUE_CITIES } from "@/lib/constants"
 
-export function Header() {
+export interface HeaderProps {
+  initialUser?: { name: string; email: string; role?: string } | null
+}
+
+export function Header({ initialUser }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [showCitySuggestions, setShowCitySuggestions] = useState(false)
   const [locating, setLocating] = useState(false)
-  const [user, setUser] = useState<{ name: string; email: string; role?: string } | null>(null)
+  const [user, setUser] = useState<{ name: string; email: string; role?: string } | null>(initialUser || null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [mapsMenuOpen, setMapsMenuOpen] = useState(false)
 
@@ -90,8 +94,10 @@ export function Header() {
   const pathname = usePathname()
   const router = useRouter()
 
-  // Fetch user session on mount
+  // Fetch user session on mount (only if not provided initially or to revalidate)
   useEffect(() => {
+    if (initialUser) return // Skip fetch if we have server data
+
     const checkSession = async () => {
       try {
         const res = await fetch('/api/auth/me')
@@ -195,7 +201,7 @@ export function Header() {
   const currentPage = getPageName()
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+    <header className="sticky top-0 z-[100] bg-white border-b border-slate-200 shadow-sm">
       <div className="w-full px-4 sm:px-6 py-3 sm:py-4">
         {/* Desktop Header */}
         <div className="hidden sm:flex items-center justify-between gap-4">
@@ -212,12 +218,7 @@ export function Header() {
 
           {/* Navigation */}
           <nav className="flex items-center gap-4 lg:gap-6 flex-wrap justify-center flex-1">
-            <span
-              className="flex items-center gap-1 text-red-500 font-bold text-sm animate-slide-in-left"
-              style={{ animationDelay: "0.1s" }}
-            >
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> EN DIRECT
-            </span>
+
             <Link
               href="/previsions"
               className={`font-bold transition whitespace-nowrap animate-slide-in-left relative ${pathname === "/previsions" || pathname.startsWith("/previsions/")
@@ -483,11 +484,7 @@ export function Header() {
         {
           mobileMenuOpen && (
             <nav className="sm:hidden mt-4 space-y-3 animate-slide-in-left border-t border-slate-200 pt-4">
-              <span
-                className="flex items-center gap-1 text-red-500 font-bold text-sm"
-              >
-                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> EN DIRECT
-              </span>
+
               <Link
                 href="/previsions"
                 className={`font-bold hover:text-slate-600 transition block ${pathname === "/previsions" || pathname.startsWith("/previsions/") ? "text-slate-800 border-l-2 border-slate-800 pl-2" : "text-slate-600"}`}

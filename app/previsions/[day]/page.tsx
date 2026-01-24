@@ -1,33 +1,15 @@
+
 import { Suspense } from "react"
-import { getSlugFromIndex } from "@/lib/utils"
 import DayDetailContent from "./day-detail-content"
+import { getUserFromSession } from "@/lib/auth-server"
 
-export function generateStaticParams() {
-  return Array.from({ length: 7 }, (_, i) => ({
-    day: getSlugFromIndex(i),
-  }))
-}
+export const dynamic = "force-dynamic"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export default function DayDetailPage() {
+export default async function DayDetailPage() {
+  const user = await getUserFromSession()
   return (
     <Suspense fallback={null}>
-      <DayDetailContent />
+      <DayDetailContent initialUser={user} />
     </Suspense>
   )
 }

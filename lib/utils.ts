@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import DOMPurify from 'isomorphic-dompurify'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -35,4 +36,9 @@ export function getDayIndexFromSlug(slug: string): number {
   if (!isNaN(num)) return num
 
   return 0
+}
+
+export function sanitizeInput(input: string): string {
+  if (!input) return ""
+  return DOMPurify.sanitize(input).trim()
 }

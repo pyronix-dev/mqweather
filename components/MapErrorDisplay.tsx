@@ -6,7 +6,7 @@ interface MapErrorDisplayProps {
 
 export function MapErrorDisplay({ onRetry }: MapErrorDisplayProps) {
     return (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#1a1a1a] p-6 animate-fade-in">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#1a1a1a] p-6 animate-fade-in">
             {/* Error Icon */}
             <div className="w-16 h-16 rounded-full bg-red-900/30 flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -31,7 +31,7 @@ interface BeachData {
 
 import { MapErrorDisplay } from "@/components/MapErrorDisplay"
 
-export default function BeachMapPage() {
+export default function BeachMapPage({ initialUser }: { initialUser: any }) {
     const { selectedDay, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [beachData, setBeachData] = useState<Record<string, BeachData>>({})
     const [markers, setMarkers] = useState<MapMarker[]>([])
@@ -98,25 +98,37 @@ export default function BeachMapPage() {
     const fetchAllData = async () => {
         setLoading(true)
         setError(false)
-        const data: Record<string, BeachData> = {}
 
         try {
-            await Promise.all(BEACH_LOCATIONS.map(async (beach) => {
-                const [weatherRes, marineRes] = await Promise.all([
-                    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${beach.lat}&longitude=${beach.lon}&hourly=weather_code,uv_index&timezone=America/Martinique`),
-                    fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${beach.lat}&longitude=${beach.lon}&hourly=sea_surface_temperature,wave_height&timezone=America/Martinique`)
-                ])
-                if (!weatherRes.ok || !marineRes.ok) throw new Error('Failed to fetch')
-                const weatherJson = await weatherRes.json()
-                const marineJson = await marineRes.json()
-                data[beach.name] = { weather: weatherJson, marine: marineJson }
-            }))
+            // Build batch coordinates for all beaches
+            const lats = BEACH_LOCATIONS.map(b => b.lat).join(',')
+            const lons = BEACH_LOCATIONS.map(b => b.lon).join(',')
 
-            if (Object.keys(data).length === 0) throw new Error('No data loaded')
+            const [weatherRes, marineRes] = await Promise.all([
+                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&hourly=weather_code,uv_index&timezone=America/Martinique`),
+                fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${lats}&longitude=${lons}&hourly=sea_surface_temperature,wave_height&timezone=America/Martinique`)
+            ])
+
+            if (!weatherRes.ok || !marineRes.ok) throw new Error('Failed to fetch data from weather APIs')
+
+            const weatherJsonArray = await weatherRes.json()
+            const marineJsonArray = await marineRes.json()
+
+            const data: Record<string, BeachData> = {}
+
+            BEACH_LOCATIONS.forEach((beach, index) => {
+                // Open-Meteo returns an array of objects when multiple coordinates are passed
+                // But wait, it returns a single object if there's only one, or an array if there are multiple.
+                // Actually for batch requests it's always an array.
+                data[beach.name] = {
+                    weather: weatherJsonArray[index],
+                    marine: marineJsonArray[index]
+                }
+            })
 
             setBeachData(data)
         } catch (error) {
-            console.error(`Failed to fetch data`, error)
+            console.error(`Failed to fetch beach data`, error)
             setError(true)
         } finally {
             setLoading(false)
@@ -191,7 +203,7 @@ export default function BeachMapPage() {
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
-            <Header />
+            <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
                     {/* Map Section */}

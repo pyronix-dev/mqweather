@@ -200,7 +200,7 @@ const Skeleton = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
 )
 
-export default function DayDetailContent() {
+export default function DayDetailContent({ initialUser }: { initialUser: any }) {
   const params = useParams()
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -235,7 +235,7 @@ export default function DayDetailContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header initialUser={initialUser} />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Back Button */}

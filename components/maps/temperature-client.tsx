@@ -7,13 +7,12 @@ import { MartiniqueMap, MapMarker } from "@/components/MartiniqueMap"
 import { MapControls } from "@/components/MapControls"
 import { MARTINIQUE_CITIES } from "@/lib/constants"
 import { useMapUrlState } from "@/hooks/useMapUrlState"
-import { getWeatherIcon } from "@/lib/weather-icons"
 import { getWeatherIconClass } from "@/lib/weather-icons"
 
 import { MapErrorDisplay } from "@/components/MapErrorDisplay"
 import { MorningIcon, AfternoonIcon } from "@/components/TimeIcons"
 
-export default function TemperatureMapPage() {
+export default function TemperatureMapPage({ initialUser }: { initialUser: any }) {
     const [markers, setMarkers] = useState<MapMarker[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
@@ -141,7 +140,7 @@ export default function TemperatureMapPage() {
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
-            <Header />
+            <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
                     {/* Map Section */}

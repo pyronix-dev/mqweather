@@ -1,111 +1,134 @@
-export const VIGILANCE_TEXTS = {
-    vert: [
-        "Aucun danger météorologique n'est à signaler. Profitez de cette belle journée en toute sérénité.",
-        "Le ciel est clair et les conditions sont idéales. Aucune vigilance particulière n'est requise.",
-        "Temps calme sur l'ensemble de l'île. C'est le moment parfait pour des activités en extérieur.",
-        "La météo est clémente aujourd'hui. Pas de perturbations prévues à l'horizon.",
-        "Situation normale. L'alizé souffle doucement et aucun phénomène dangereux ne s'approche.",
-        "Soleil prédominant avec quelques passages nuageux inoffensifs. Une journée typique et agréable.",
-        "Les alizés ventilent agréablement l'île, dispersant les rares nuages. Mer belle à peu agitée.",
-        "Conditions stables et ensoleillées. Idéal pour la plage ou la randonnée.",
-        "Ciel bleu azur, quelques cumulus de beau temps sur les mornes. Risque de pluie quasi nul.",
-        "Belle journée en perspective. Les températures sont de saison et le vent est faible.",
-        "Le soleil brille généreusement du Nord au Sud. Profitez-en !",
-        "Pas de vigilance en cours. La mer est calme et le vent modéré.",
-        "Une météo tropicale classique : du soleil, de la chaleur et une légère brise.",
-        "Le temps est au beau fixe. Visibilité excellente sur les sommets.",
-        "Journée radiieuse sans nuage significatif. Indice UV élevé, pensez à vous protéger."
-    ],
-    jaune: [
-        "Soyez attentifs si vous pratiquez des activités sensibles au risque météorologique. Des phénomènes habituels mais occasionnellement dangereux sont prévus.",
-        "Vigilance Jaune : Prudence près des cours d'eau et sur le littoral. Tenez-vous au courant de l'évolution de la situation.",
-        "Quelques perturbations sont possibles. Restez informés des bulletins météo si vous devez vous déplacer.",
-        "Attention aux averses localement orageuses. Les sols peuvent être glissants et la visibilité réduite.",
-        "Le temps se dégrade légèrement. Une vigilance est de mise pour les activités nautiques et de plein air.",
-        "Passage d'une onde tropicale peu active. Des averses modérées peuvent survenir, accompagnées de quelques rafales.",
-        "Mer agitée en Atlantique et canaux. Soyez prudents lors des sorties en mer.",
-        "Risque d'orages isolés en fin de journée, particulièrement sur le relief.",
-        "Vents soutenus de secteur Est, rendant la mer hachée. Baignade déconseillée sur la côte au vent.",
-        "Des paquets de mer peuvent affecter les zones basses du littoral Nord-Atlantique.",
-        "Atmosphère instable favorisant le développement de nuages porteurs d'averses soutenues.",
-        "Les cumuls de pluie pourraient être significatifs localement. Soyez vigilants sur les routes.",
-        "Risque de fortes chaleurs associées à une panne d'alizé. Hydratez-vous.",
-        "Temps maussade avec des passages pluvieux fréquents. Visibilité réduite sous les grains.",
-        "Une dégradation pluvio-orageuse aborde l'archipel. Prudence dans les zones inondables."
-    ],
-    orange: [
-        "Soyez très vigilants, des phénomènes dangereux sont prévus. Tenez-vous au courant de l'évolution de la situation et suivez les conseils de sécurité émis par les pouvoirs publics.",
-        "Vigilance Orange : Limitez vos déplacements et mettez-vous à l'abri. Conditions météorologiques difficiles attendues.",
-        "Alerte Orange : Fortes pluies et risques d'inondations. Évitez les zones basses et les passages à gué.",
-        "Situation dégradée : Des vents violents ou une mer très agitée sont annoncés. Sécurisez vos biens et restez prudents.",
-        "Prudence absolue. Les conditions météo peuvent causer des accidents. Respectez strictement les consignes des autorités.",
-        "Approche d'une onde tropicale active. Des cumuls de pluie importants sont attendus en peu de temps.",
-        "Risque élevé d'inondations et de glissements de terrain. Évitez absolument le réseau secondaire.",
-        "Mer forte à très forte. Houle cyclonique dangereuse déferlant sur les côtes exposées.",
-        "Orages violents avec forte activité électrique. Débranchez les appareils sensibles.",
-        "Vents tempétueux possibles sous les grains les plus forts. Attention aux chutes d'arbres.",
-        "La rivière est en crue. Ne tentez jamais de traverser un gué submergé.",
-        "Épisode de brume de sable intense réduisant fortement la visibilité et la qualité de l'air.",
-        "Mer démontée. Les sorties en mer sont formellement interdites.",
-        "Dégradation majeure rapide. Rejoignez votre domicile et limitez vos sorties au strict nécessaire.",
-        "Les sols sont saturés. De nouveaux éboulements sont à craindre sur les routes de montagne."
-    ],
-    rouge: [
-        "Une vigilance absolue s'impose. Des phénomènes dangereux d'intensité exceptionnelle sont prévus. Tenez-vous régulièrement au courant de la situation et respectez impérativement les consignes de sécurité.",
-        "ALERTE ROUGE : Danger extrême. Restez confinés et n'entreprenez aucun déplacement.",
-        "Situation critique. Des intempéries majeures impactent l'île. Suivez les instructions de la préfecture à la lettre.",
-        "Danger de mort potentiel dû aux conditions météo. Protégez-vous et vos proches immédiatement.",
-        "Vigilance Rouge activée. Tous les services de secours sont en alerte. Ne sortez sous aucun prétexte.",
-        "Passage d'un cyclone à proximité immédiate. Vents destructeurs et pluies diluviennes attendus.",
-        "Risque de submersion marine majeure. Évacuez les zones côtières si ordonné par les autorités.",
-        "Inondations généralisées catastrophiques possibles. Réfugiez-vous en hauteur.",
-        "Le réseau routier est impraticable. Restez chez vous en sécurité.",
-        "Conditions d'ouragan. Protégez les ouvertures et consolidez votre abri.",
-        "Coupures d'électricité et d'eau probables. Constituez des réserves d'urgence.",
-        "La mer envahit les terres sur le littoral exposé. Danger extrême.",
-        "Vents dépassant les 120 km/h en rafales. Ne restez pas près des fenêtres.",
-        "Alerte Maximale. La situation est hors de contrôle. Attendez les secours ou la fin de l'épisode.",
-        "Phénomène cyclonique majeur. La Martinique est en alerte rouge cyclone."
-    ],
-    violet: [
-        "Vigilance Violette : Confinement strict obligatoire. Le cyclone est imminent ou en cours. Danger de mort immédiat.",
-        "URGENCE ABSOLUE : L'œil du cyclone passe sur la Martinique. Restez barricadés jusqu'à la levée de l'alerte.",
-        "Conditions cycloniques extrêmes. Ne sortez jamais, même si le temps semble se calmer (passage de l'œil).",
-        "Alerte Violette. Protégez-vous dans la pièce la plus sûre de votre habitation. Éloignez-vous des ouvertures.",
-        "Danger maximal. L'impact est en cours. Attendez les consignes officielles avant toute action.",
-        "Passage du mur de l'œil. Vents cataclysmiques dévastant tout sur leur passage.",
-        "Ne tentez aucune sortie, même pour sécuriser votre maison. Votre vie est en jeu.",
-        "Confinement TOTAL. Les secours ne peuvent plus intervenir.",
-        "Le cyclone frappe de plein fouet. Restez à l'abri, loin des baies vitrées.",
-        "Vigilance Violette Cyclone. C'est la phase la plus critique. Courage et prudence.",
-        "Isilement total requis. Préparez-vous à un impact violent et durable.",
-        "Attention au calme trompeur de l'œil. Les vents reprendront violemment en sens inverse.",
-        "Toutes les routes sont coupées. Restez où vous êtes.",
-        "Risque d'effondrement des structures légères. Abritez-vous sous des tables solides si nécessaire.",
-        "Situation de catastrophe naturelle majeure en cours."
-    ],
-    gris: [
-        "Fin de l'épisode de vigilance. Restez tout de même prudents, les sols peuvent rester gorgés d'eau et les infrastructures fragilisées.",
-        "Le danger s'éloigne. La vigilance est levée mais la prudence reste de mise lors de vos déplacements.",
-        "Retour progressif à la normale. Vérifiez l'état des routes avant de circuler.",
-        "L'alerte est terminée. Les services de l'État procèdent aux vérifications d'usage.",
-        "Amélioration confirmée. Bon retour à vos activités habituelles.",
-        "Vigilance levée. Attention aux chutes d'arbres ou câbles électriques résiduelles.",
-        "Le temps se rétablit mais la mer reste agitée. Prudence sur le littoral.",
-        "Épisode terminé. Nettoyez les abords de votre maison avec prudence.",
-        "Les cours d'eau peuvent encore être en crue. Ne vous approchez pas des berges.",
-        "Reprise progressive de l'activité. Restez informés des conditions de circulation.",
-        "Le calme est revenu. Une pensée pour ceux touchés par les intempéries.",
-        "Fin de la menace cyclonique. Déconfinement autorisé mais restez vigilants.",
-        "Les écoles et administrations rouvriront selon les consignes préfectorales.",
-        "L'onde tropicale s'est éloignée. Le soleil revient progressivement.",
-        "Rétablissement progressif des réseaux (eau, électricité). Patience."
-    ],
-    erreur: [
-        "Oups, quelque chose ne va pas... Impossible de récupérer les données de vigilance pour le moment.",
-        "Erreur de connexion aux services météo. Nous réessayons de charger les informations.",
-        "Données indisponibles. Veuillez vérifier votre connexion internet ou réessayer plus tard.",
-        "Un problème technique empêche l'affichage de la vigilance. Nos équipes sont sur le coup.",
-        "Météo Martinique ne répond pas. Veuillez consulter les médias officiels en attendant le rétablissement du service."
-    ]
+export interface VigilanceContent {
+    headline: string;
+    description: string;
+    showSubscription?: boolean;
+    impacts?: string[];
+    recommendations?: string[];
+    footer?: string;
+}
+
+export const VIGILANCE_TEXTS: Record<string, VigilanceContent> = {
+    vert: {
+        headline: "La Martinique est actuellement placée en vigilance verte.",
+        description: `Cela signifie qu’aucun phénomène météorologique dangereux n’est prévu sur le territoire dans l’immédiat et que les conditions restent globalement favorables.
+
+Le temps observé et attendu correspond à une situation météo habituelle pour la saison, avec des conditions généralement stables. Les déplacements et les activités du quotidien peuvent donc se dérouler normalement, tout comme les sorties et les événements en extérieur, sous réserve de respecter les règles élémentaires de prudence.
+
+Cependant, même en vigilance verte, la météo peut évoluer. Il est donc recommandé de rester attentif, notamment en cas d’averses ponctuelles, de rafales isolées ou d’une mer parfois un peu agitée selon les secteurs.`,
+        recommendations: [
+            "Restez informés via les bulletins météo officiels et les canaux habituels de communication.",
+            "Adaptez vos activités extérieures en fonction de l’évolution du temps, surtout en fin de journée ou en zones exposées.",
+            "En mer, maintenez les précautions usuelles : vérification du matériel, prudence lors des sorties et respect des consignes de sécurité."
+        ],
+        footer: "À ce stade, aucune restriction particulière n’est en vigueur et aucune mesure spécifique n’est nécessaire.\nNous vous invitons simplement à conserver une vigilance normale et à suivre les informations qui pourraient être diffusées en cas d’évolution de la situation."
+    },
+    jaune: {
+        headline: "La Martinique est actuellement placée en vigilance jaune.",
+        description: `Cela signifie que des phénomènes météorologiques pouvant présenter un risque limité sont possibles sur le territoire. La situation ne nécessite pas de mesures particulières à ce stade, mais elle demande une attention renforcée, notamment lors des activités en extérieur.
+
+Le temps observé et attendu peut être marqué par des conditions moins stables, avec la possibilité d’averses localement soutenues, de rafales ponctuelles ou d’une mer parfois agitée selon les secteurs. Ces phénomènes peuvent entraîner des désagréments (routes glissantes, visibilité réduite, conditions de navigation moins favorables).
+
+Les déplacements et les activités du quotidien peuvent généralement se poursuivre, mais il est recommandé de faire preuve de prudence, en particulier dans les zones exposées et lors des périodes les plus actives.`,
+        showSubscription: true,
+        footer: "Il est donc conseillé de rester vigilant et de suivre l’évolution de la situation, notamment en consultant régulièrement les bulletins météorologiques officiels.",
+        recommendations: [
+            "Limitez les activités sensibles à la météo (randonnées, sorties en mer, chantiers en extérieur) si les conditions se dégradent.",
+            "Redoublez de prudence sur la route en cas de pluie (aquaplaning, chaussée glissante).",
+            "En mer, reportez ou adaptez vos sorties selon l’état de la houle et du vent."
+        ]
+    },
+    orange: {
+        headline: "La Martinique est actuellement placée en vigilance orange.",
+        description: `Cela signifie que des phénomènes météorologiques dangereux sont prévus sur le territoire et peuvent entraîner des conséquences importantes sur les personnes, les biens et les activités.
+
+La situation météorologique nécessite une grande prudence. Selon l’évolution observée, des conditions dégradées peuvent se manifester par des pluies fortes et persistantes, des orages actifs, des rafales soutenues, ainsi qu’une mer dangereuse ou une dégradation rapide des conditions de circulation.
+
+Dans ce contexte, il est fortement recommandé de limiter les déplacements et de reporter les activités extérieures. Les événements en plein air, les chantiers, les randonnées ainsi que les activités nautiques doivent être évités, en particulier dans les zones exposées.`,
+        showSubscription: true,
+        impacts: [
+            "inondations localisées, ruissellements importants, montée rapide des eaux",
+            "chutes d’arbres ou de branches, objets emportés par le vent",
+            "coupures d’électricité ou perturbations des réseaux",
+            "routes difficiles ou dangereuses, glissements de terrain dans certains secteurs"
+        ],
+        recommendations: [
+            "Restez chez vous autant que possible et évitez toute sortie non indispensable.",
+            "Mettez à l’abri les objets pouvant être emportés par le vent (mobilier, bacs, outils).",
+            "Ne vous engagez jamais sur une route inondée et évitez les abords des ravines.",
+            "Évitez le littoral en cas de houle/mer agitée et ne prenez pas la mer.",
+            "Tenez-vous informés en suivant les bulletins météo officiels et les consignes des autorités."
+        ],
+        footer: "La vigilance orange implique une surveillance renforcée : la situation peut évoluer rapidement.\nIl est donc essentiel de rester attentif aux informations diffusées et d’adapter son comportement en conséquence."
+    },
+    rouge: {
+        headline: "La Martinique est actuellement placée en vigilance rouge.",
+        description: `Cela signifie qu’un phénomène météorologique exceptionnel et très dangereux est en cours ou imminent, pouvant entraîner des conséquences majeures pour la population, les infrastructures et les activités.
+
+La situation nécessite une vigilance maximale et le respect strict des consignes de sécurité. Les conditions météorologiques attendues peuvent être particulièrement violentes, avec notamment des pluies torrentielles, des orages très actifs, des rafales intenses, une mer très dangereuse et des risques importants d’inondations, de glissements de terrain et de dégâts matériels.
+
+Dans ce contexte, il est fortement recommandé de rester à l’abri et de limiter strictement tous les déplacements. Toute sortie non indispensable peut mettre votre sécurité en danger. Les activités extérieures, nautiques et les déplacements sur les zones exposées doivent être évités.`,
+        showSubscription: true,
+        impacts: [
+            "inondations soudaines, montée rapide des eaux, ruissellements extrêmes",
+            "coupures d’électricité, perturbations des réseaux de communication",
+            "routes impraticables, chutes d’arbres, coulées de boue",
+            "dangers majeurs sur le littoral, vagues fortes et submersion possible selon les secteurs",
+            "risques pour les personnes, notamment en zones vulnérables"
+        ],
+        recommendations: [
+            "Restez confinés et ne vous déplacez qu’en cas d’urgence absolue.",
+            "Éloignez-vous des ravines, des rivières, des pentes instables et des zones inondables.",
+            "Ne vous engagez jamais sur une route inondée, même partiellement.",
+            "Mettez en sécurité vos biens (objets extérieurs, documents importants, matériel sensible).",
+            "Évitez totalement le littoral et ne prenez pas la mer.",
+            "Suivez les consignes des autorités et les bulletins météo officiels."
+        ],
+        footer: "La vigilance rouge implique un danger imminent ou en cours. La situation peut évoluer rapidement et exiger des mesures supplémentaires.\nRestez informés en continu et appliquez immédiatement les consignes de sécurité."
+    },
+    violet: {
+        headline: "La Martinique est actuellement placée en vigilance violette.",
+        description: `Cela correspond à un niveau d’alerte exceptionnel, indiquant une situation extrêmement dangereuse et imminente. Un phénomène météorologique majeur est en cours ou sur le point de toucher le territoire, nécessitant une mobilisation maximale et l’application immédiate des consignes de sécurité.
+
+Les conditions attendues peuvent être extrêmes, avec des impacts potentiellement très lourds : vents violents, pluies diluviennes, orages intenses, houle dangereuse, risques importants d’inondations rapides, de glissements de terrain, de submersion marine et de dégâts majeurs sur les infrastructures.
+
+Dans ce contexte, il est impératif de rester à l’abri et de stopper toute activité extérieure.
+Les déplacements doivent être strictement évités, sauf urgence vitale. Toute sortie peut mettre votre vie en danger.`,
+        showSubscription: true,
+        impacts: [
+            "inondations soudaines et généralisées, montée rapide des eaux",
+            "coupures d’électricité, ruptures de communication, réseaux perturbés",
+            "routes impraticables, chutes d’arbres, coulées de boue",
+            "submersion marine et vagues dangereuses sur le littoral",
+            "dégâts importants sur les habitations et infrastructures"
+        ],
+        recommendations: [
+            "Restez confinés et ne sortez sous aucun prétexte non vital.",
+            "Éloignez-vous des fenêtres, mettez-vous dans une pièce sûre et protégez-vous des projectiles.",
+            "Ne vous engagez pas sur les routes, ne traversez pas les zones inondées.",
+            "Évitez ravines, rivières, pentes instables et tout secteur à risque.",
+            "N’approchez pas du littoral et ne prenez absolument pas la mer.",
+            "Suivez en continu les consignes des autorités et les bulletins météo officiels."
+        ],
+        footer: "La vigilance violette implique un danger extrême : la situation peut évoluer très rapidement.\nRestez informés en continu et appliquez immédiatement toutes les consignes de sécurité."
+    },
+    gris: {
+        headline: "La Martinique est actuellement placée en vigilance grise.",
+        description: `Cela signifie qu’il n’y a pas de phénomène dangereux clairement identifié à cette heure, mais que la situation météo reste incertaine, nécessitant une surveillance attentive. Cette vigilance est généralement utilisée lorsque les conditions peuvent évoluer rapidement ou lorsque des phénomènes localisés sont possibles, sans certitude sur leur intensité.
+
+Le temps observé et attendu peut être marqué par une variabilité importante, avec des averses ponctuelles, des rafales isolées ou une mer parfois agitée selon les zones. Des phénomènes limités mais soudains peuvent provoquer des désagréments localisés (routes glissantes, visibilité réduite, conditions de navigation moins favorables).
+
+Les déplacements et les activités peuvent généralement se poursuivre, mais il est recommandé de rester prudent et de se tenir informé, notamment si vous prévoyez des activités en extérieur ou en mer.`,
+        showSubscription: true,
+        footer: "Il est conseillé de suivre l’évolution de la situation à travers les bulletins météorologiques officiels et les informations diffusées par les autorités.",
+        recommendations: [
+            "Restez attentifs à l’évolution du temps, surtout en zones exposées.",
+            "Adaptez vos déplacements en cas d’averses ou de rafales ponctuelles.",
+            "En mer, maintenez les précautions habituelles et adaptez vos sorties selon l’état de la houle et du vent."
+        ]
+    },
+    erreur: {
+        headline: "Données indisponibles",
+        description: "Oups, quelque chose ne va pas... Impossible de récupérer les données de vigilance pour le moment.",
+        footer: "Veuillez vérifier votre connexion internet ou réessayer plus tard."
+    }
 }

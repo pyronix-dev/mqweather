@@ -20,40 +20,41 @@ interface MartiniqueMapProps {
 export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps) {
     const mapContainer = useRef<HTMLDivElement>(null)
     const map = useRef<maplibregl.Map | null>(null)
+    const [currentZoom, setCurrentZoom] = useState(9) // Fallback initial
+
     const [loaded, setLoaded] = useState(false)
-    const [showResetButton, setShowResetButton] = useState(false)
-    const [isMobile, setIsMobile] = useState(false)
-
-    useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 768)
-        checkMobile()
-        window.addEventListener('resize', checkMobile)
-        return () => window.removeEventListener('resize', checkMobile)
-    }, [])
-
-    const initialCenter: [number, number] = [-61.0242, 14.6415]
-    const getInitialZoom = () => 9.3
-
-    // Store marker positions (x, y) in pixels to render React components
-    const [projectedMarkers, setProjectedMarkers] = useState<{ id: string, x: number, y: number }[]>([])
-
-    // Keep markers ref up to date for the resize handler (which is a closure formed on mount)
+    const [projectedMarkers, setProjectedMarkers] = useState<{ id: string; x: number; y: number }[]>([])
     const markersRef = useRef(markers)
+    const [showResetButton, setShowResetButton] = useState(false)
 
-    // Handle centerOn changes
+    // Initial map center (Martinique)
+    const initialCenter: [number, number] = [-61.0242, 14.6415]
+
+    // Helper to get initial zoom based on screen size
+    const getInitialZoom = () => {
+        if (typeof window === 'undefined') return 9.5 // Default for SSR
+        return window.innerWidth < 768 ? 8.5 : 9.5
+    }
+
+    // Update markersRef whenever markers prop changes
     useEffect(() => {
-        if (map.current && centerOn && !isNaN(centerOn.lat) && !isNaN(centerOn.lon)) {
+        markersRef.current = markers
+        if (loaded) {
+            updateMarkerPositions()
+        }
+    }, [markers, loaded])
+
+    // Effect to handle centering the map when centerOn prop changes
+    useEffect(() => {
+        if (loaded && map.current && centerOn) {
             map.current.flyTo({
                 center: [centerOn.lon, centerOn.lat],
-                zoom: 12,
-                essential: true
+                zoom: 12, // Zoom in when centering on a specific point
+                essential: true,
+                duration: 1500
             })
-            // Iterate checking just in case moveend doesn't fire perfectly or we want faster feedback
-            // But moveend is safest to avoid flickering.
         }
-    }, [centerOn])
-
-    useEffect(() => { markersRef.current = markers }, [markers])
+    }, [centerOn, loaded])
 
     useEffect(() => {
         if (map.current) return
@@ -76,18 +77,19 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 checkResetButtonVisibility()
             })
 
-            // Even though locked, resize might change positions
+            // Track zoom for dynamic sizing
+            map.current.on('zoom', () => {
+                setCurrentZoom(map.current!.getZoom())
+                updateMarkerPositions()
+                checkResetButtonVisibility()
+            })
+
             map.current.on('resize', updateMarkerPositions)
             map.current.on('move', () => {
                 updateMarkerPositions()
                 checkResetButtonVisibility()
             })
-            map.current.on('zoom', () => {
-                updateMarkerPositions()
-                checkResetButtonVisibility()
-            })
 
-            // Add ResizeObserver to force map resize when container changes (e.g. mobile/desktop switch)
             const resizeObserver = new ResizeObserver(() => {
                 map.current?.resize()
                 updateMarkerPositions()
@@ -129,6 +131,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 y: point.y
             }
         })
+
         if (JSON.stringify(newPositions) !== JSON.stringify(projectedMarkers)) {
             setProjectedMarkers(newPositions)
         }
@@ -146,8 +149,23 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         }
     }
 
+    // Calculate scale based on zoom
+    // Base scale 1 at initial zoom (~9), max scale 1.5 at zoom 12+
+    const getMarkerScale = () => {
+        const base = 1
+        const max = 2.5 // Increased max scale for better visibility
+        const zoomThreshold = 11 // Start scaling up after this zoom
+
+        if (currentZoom <= zoomThreshold) return base
+
+        const scale = base + ((currentZoom - zoomThreshold) * 0.8) // Aggressive scaling
+        return Math.min(scale, max)
+    }
+
+    const markerScale = getMarkerScale()
+
     return (
-        <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-sm border border-slate-200 bg-slate-100">
+        <div className="relative w-full h-full">
             <div ref={mapContainer} className="w-full h-full" />
 
             {/* Reset View Button */}
@@ -171,8 +189,12 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 return (
                     <div
                         key={pos.id}
-                        className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10 hover:z-[100]"
-                        style={{ left: pos.x, top: pos.y }}
+                        className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10 hover:z-[100] transition-transform duration-200 will-change-transform"
+                        style={{
+                            left: pos.x,
+                            top: pos.y,
+                            transform: `translate(-50 %, -50 %) scale(${markerScale})`
+                        }}
                     >
                         {markerData.component}
                     </div>

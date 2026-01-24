@@ -27,7 +27,7 @@ const getUVLabel = (uv: number) => {
 import { MapErrorDisplay } from "@/components/MapErrorDisplay"
 import { MorningIcon, AfternoonIcon } from "@/components/TimeIcons"
 
-export default function UVMapPage() {
+export default function UVMapPage({ initialUser }: { initialUser: any }) {
     const { selectedDay, selectedCity, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [allData, setAllData] = useState<any[]>([])
     const [markers, setMarkers] = useState<MapMarker[]>([])
@@ -156,7 +156,7 @@ export default function UVMapPage() {
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
-            <Header />
+            <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
                     {/* Map Section */}
