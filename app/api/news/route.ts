@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 
-// ⚠️ REPLACE THIS WITH YOUR CLIENT'S WORDPRESS URL
-const WORDPRESS_SITE_URL = "https://techcrunch.com"
+const WORDPRESS_SITE_URL = process.env.WORDPRESS_SITE_URL || "https://techcrunch.com"
 
 export async function GET() {
     try {
