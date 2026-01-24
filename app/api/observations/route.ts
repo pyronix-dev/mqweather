@@ -9,6 +9,7 @@ export async function GET() {
         const supabase = createSupabaseAdmin()
 
 
+        // Fetch observations from the last 24 hours
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
         const { data: observations, error } = await supabase
