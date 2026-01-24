@@ -186,33 +186,34 @@ BEGIN
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage otp_codes') THEN
-        CREATE POLICY "Service can manage otp_codes" ON public.otp_codes FOR ALL USING (true) WITH CHECK (true);
+        CREATE POLICY "Service can manage otp_codes" ON public.otp_codes FOR ALL TO service_role USING (true) WITH CHECK (true);
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage vigilance_state') THEN
-        CREATE POLICY "Service can manage vigilance_state" ON public.vigilance_state FOR ALL USING (true) WITH CHECK (true);
+        CREATE POLICY "Service can manage vigilance_state" ON public.vigilance_state FOR ALL TO service_role USING (true) WITH CHECK (true);
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage users') THEN
-        CREATE POLICY "Service can manage users" ON public.users FOR ALL USING (true) WITH CHECK (true);
+        CREATE POLICY "Service can manage users" ON public.users FOR ALL TO service_role USING (true) WITH CHECK (true);
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage subscriptions') THEN
-        CREATE POLICY "Service can manage subscriptions" ON public.subscriptions FOR ALL USING (true) WITH CHECK (true);
+        CREATE POLICY "Service can manage subscriptions" ON public.subscriptions FOR ALL TO service_role USING (true) WITH CHECK (true);
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage verification_codes') THEN
-        CREATE POLICY "Service can manage verification_codes" ON public.verification_codes FOR ALL USING (true) WITH CHECK (true);
+        CREATE POLICY "Service can manage verification_codes" ON public.verification_codes FOR ALL TO service_role USING (true) WITH CHECK (true);
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage deleted_users') THEN
-        CREATE POLICY "Service can manage deleted_users" ON public.deleted_users FOR ALL USING (true) WITH CHECK (true);
+        CREATE POLICY "Service can manage deleted_users" ON public.deleted_users FOR ALL TO service_role USING (true) WITH CHECK (true);
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage ip_limit_tracking') THEN
-        CREATE POLICY "Service can manage ip_limit_tracking" ON public.ip_limit_tracking FOR ALL USING (true) WITH CHECK (true);
+        CREATE POLICY "Service can manage ip_limit_tracking" ON public.ip_limit_tracking FOR ALL TO service_role USING (true) WITH CHECK (true);
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage login_history') THEN
-        CREATE POLICY "Service can manage login_history" ON public.login_history FOR ALL USING (true) WITH CHECK (true);
+        CREATE POLICY "Service can manage login_history" ON public.login_history FOR ALL TO service_role USING (true) WITH CHECK (true);
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service can manage admin_audit_log') THEN
-        CREATE POLICY "Service can manage admin_audit_log" ON public.admin_audit_log FOR ALL USING (true) WITH CHECK (true);
+        CREATE POLICY "Service can manage admin_audit_log" ON public.admin_audit_log FOR ALL TO service_role USING (true) WITH CHECK (true);
     END IF;
 END $$;
+
 
 DO $$
 BEGIN
