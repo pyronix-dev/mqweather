@@ -4,7 +4,6 @@
 import { useEffect, useRef, useState } from "react"
 import maplibregl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
-import Supercluster from "supercluster"
 
 export interface MapMarker {
     id: string
@@ -25,15 +24,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
     const [currentZoom, setCurrentZoom] = useState(9)
 
     const [loaded, setLoaded] = useState(false)
-    // We now store clusters or leaves. 
-    // If it's a cluster, it has point_count etc. If leaf, it has markerId.
-    const [visiblePoints, setVisiblePoints] = useState<any[]>([])
-
-    const indexRef = useRef<Supercluster>(new Supercluster({
-        radius: 40,
-        maxZoom: 15
-    }))
-
+    const [projectedMarkers, setProjectedMarkers] = useState<{ id: string; x: number; y: number }[]>([])
     const markersRef = useRef(markers)
     const [showResetButton, setShowResetButton] = useState(false)
 
@@ -45,32 +36,18 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         return window.innerWidth < 768 ? 8.5 : 9.5
     }
 
-    // Load markers into Supercluster when they change
     useEffect(() => {
         markersRef.current = markers
-
-        const points = markers.map(m => ({
-            type: "Feature" as const,
-            properties: { cluster: false, markerId: m.id },
-            geometry: {
-                type: "Point" as const,
-                coordinates: [m.lon, m.lat]
-            }
-        }))
-
-        indexRef.current.load(points)
-
         if (loaded) {
             updateMarkerPositions()
         }
     }, [markers, loaded])
 
-    // Fly to location
     useEffect(() => {
         if (loaded && map.current && centerOn) {
             map.current.flyTo({
                 center: [centerOn.lon, centerOn.lat],
-                zoom: 13,
+                zoom: 12,
                 essential: true,
                 duration: 1500
             })
@@ -88,7 +65,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 style: "https://api.maptiler.com/maps/dataviz-v4/style.json?key=UxUuNKolwcBvNiLEf3iZ",
                 center: initialCenter,
                 zoom: zoomLevel,
-                interactive: true, // Make sure interactive is true for dragging etc
+                interactive: true,
                 attributionControl: false
             })
 
@@ -133,31 +110,18 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
     const updateMarkerPositions = () => {
         if (!map.current) return
 
-        const bounds = map.current.getBounds()
-        const zoom = Math.floor(map.current.getZoom())
-
-        // Create bbox [minX, minY, maxX, maxY]
-        const bbox: [number, number, number, number] = [
-            bounds.getWest(),
-            bounds.getSouth(),
-            bounds.getEast(),
-            bounds.getNorth()
-        ]
-
-        const clusters = indexRef.current.getClusters(bbox, zoom)
-
-        const newVisiblePoints = clusters.map(cluster => {
-            const [lon, lat] = cluster.geometry.coordinates
-            const point = map.current!.project([lon, lat])
-
+        const newPositions = markersRef.current.map(marker => {
+            const point = map.current!.project([marker.lon, marker.lat])
             return {
-                ...cluster,
+                id: marker.id,
                 x: point.x,
                 y: point.y
             }
         })
 
-        setVisiblePoints(newVisiblePoints)
+        if (JSON.stringify(newPositions) !== JSON.stringify(projectedMarkers)) {
+            setProjectedMarkers(newPositions)
+        }
     }
 
     const handleResetView = () => {
@@ -172,16 +136,6 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         }
     }
 
-    const handleClusterClick = (clusterId: number, lat: number, lon: number) => {
-        const expansionZoom = indexRef.current.getClusterExpansionZoom(clusterId)
-        map.current?.flyTo({
-            center: [lon, lat],
-            zoom: expansionZoom,
-            duration: 500
-        })
-    }
-
-    // Scale calculation (only for leaf markers, optional)
     const getMarkerScale = () => {
         const base = 1
         const max = 2.5
@@ -196,7 +150,6 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         <div className="relative w-full h-full">
             <div ref={mapContainer} className="w-full h-full" />
 
-            {/* Reset Button */}
             {showResetButton && (
                 <button
                     onClick={handleResetView}
@@ -209,42 +162,17 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 </button>
             )}
 
-            {/* Render Points (Clusters or Leaves) */}
-            {visiblePoints.map((point) => {
-                const isCluster = point.properties.cluster
-
-                if (isCluster) {
-                    return (
-                        <div
-                            key={`cluster-${point.id}`}
-                            className="absolute z-20 hover:z-[100] cursor-pointer"
-                            style={{
-                                left: point.x,
-                                top: point.y,
-                                transform: 'translate(-50%, -50%)'
-                            }}
-                            onClick={() => handleClusterClick(point.id, point.geometry.coordinates[1], point.geometry.coordinates[0])}
-                        >
-                            <div className="bg-slate-800 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center border-2 border-white shadow-lg transition-transform hover:scale-110">
-                                {point.properties.point_count}
-                            </div>
-                        </div>
-                    )
-                }
-
-                // Leaf marker
-                const markerId = point.properties.markerId
-                const markerData = markersRef.current.find(m => m.id === markerId)
+            {projectedMarkers.map((pos, index) => {
+                const markerData = markers[index]
                 if (!markerData) return null
 
                 return (
                     <div
-                        key={markerId}
+                        key={pos.id}
                         className="absolute z-10 hover:z-[100] transition-transform duration-200 will-change-transform"
                         style={{
-                            left: point.x,
-                            top: point.y,
-                            // If user is zooming in deeply, scale up slightly
+                            left: pos.x,
+                            top: pos.y,
                             transform: `translate(-50%, 6px) scale(${markerScale})`
                         }}
                     >

@@ -95,31 +95,31 @@ export function Header({ initialUser }: HeaderProps) {
   const pathname = usePathname()
   const router = useRouter()
 
-  
+
   useEffect(() => {
-    if (initialUser) return 
+    if (initialUser) return
 
     const checkSession = async () => {
       try {
         const res = await fetch('/api/auth/me')
         if (res.ok) {
           const data = await res.json()
-          
+
           const name = data.first_name || data.full_name || data.reference
           setUser({
             name: name,
             email: data.email || '',
-            role: data.role 
+            role: data.role
           })
         }
       } catch (e) {
-        
+
       }
     }
     checkSession()
   }, [])
 
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -156,7 +156,7 @@ export function Header({ initialUser }: HeaderProps) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords
-          
+
           const nearest = MARTINIQUE_CITIES.reduce((prev, curr) => {
             const prevDist = Math.abs(prev.lat - latitude) + Math.abs(prev.lon - longitude)
             const currDist = Math.abs(curr.lat - latitude) + Math.abs(curr.lon - longitude)
@@ -204,21 +204,32 @@ export function Header({ initialUser }: HeaderProps) {
   return (
     <header className="sticky top-0 z-[100] bg-white border-b border-slate-200 shadow-sm">
       <div className="w-full px-4 sm:px-6 py-3 sm:py-4">
-        {}
+        { }
         <div className="hidden sm:flex items-center justify-between gap-4">
-          {}
+          { }
           <div className="flex-shrink-0 animate-fade-in-up">
-            <Link href="/">
-              <img
-                src="https://raw.githubusercontent.com/pyronix-dev/upwork/main/logo-text.png"
-                alt="Météo Martinique"
-                className="h-10 object-contain hover:scale-105 transition-transform"
-              />
-            </Link>
+            <img
+              src="https://raw.githubusercontent.com/pyronix-dev/upwork/main/logo-text.png"
+              alt="Météo Martinique"
+              className="h-10 object-contain"
+            />
           </div>
 
-          {}
+          { }
           <nav className="flex items-center gap-4 lg:gap-6 flex-wrap justify-center flex-1">
+            <Link
+              href="/"
+              className={`font-bold transition whitespace-nowrap animate-slide-in-left relative ${pathname === "/"
+                ? "text-slate-800"
+                : "text-slate-600 hover:text-slate-800"
+                }`}
+              style={{ animationDelay: "0.1s" }}
+            >
+              Accueil
+              {pathname === "/" && (
+                <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-slate-800 rounded-full" />
+              )}
+            </Link>
 
             <Link
               href="/previsions"
@@ -255,7 +266,7 @@ export function Header({ initialUser }: HeaderProps) {
                 <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-slate-800 rounded-full" />
               )}
             </Link>
-            {}
+            { }
             <div
               className="relative group"
               onMouseEnter={() => setMapsMenuOpen(true)}
@@ -304,7 +315,7 @@ export function Header({ initialUser }: HeaderProps) {
             </div>
           </nav>
 
-          {}
+          { }
           <div className="flex items-center gap-3 flex-shrink-0 animate-slide-in-right">
             <div className="hidden lg:block relative" ref={searchRef}>
               <div className="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 focus-within:border-slate-400 transition-colors">
@@ -333,7 +344,7 @@ export function Header({ initialUser }: HeaderProps) {
                 )}
               </div>
 
-              {}
+              { }
               {showCitySuggestions && (
                 <div className="absolute top-full mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 max-h-80 overflow-hidden animate-fade-in-up">
                   <button
@@ -388,7 +399,7 @@ export function Header({ initialUser }: HeaderProps) {
               Alertes
             </Link>
 
-            {}
+            { }
             {user ? (
               <div className="relative" ref={userMenuRef}>
                 <button
@@ -458,7 +469,7 @@ export function Header({ initialUser }: HeaderProps) {
           </div>
         </div>
 
-        {}
+        { }
         <div className="sm:hidden flex items-center justify-between gap-3">
           <div className="flex-shrink-0 animate-fade-in-up">
             <Link href="/">
@@ -481,7 +492,7 @@ export function Header({ initialUser }: HeaderProps) {
           </button>
         </div>
 
-        {}
+        { }
         {
           mobileMenuOpen && (
             <nav className="sm:hidden mt-4 space-y-3 animate-slide-in-left border-t border-slate-200 pt-4">
@@ -556,7 +567,7 @@ export function Header({ initialUser }: HeaderProps) {
 
                   {showCitySuggestions && (
                     <div className="absolute top-full mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-60 overflow-hidden">
-                      {}
+                      { }
                       <button
                         onClick={() => {
                           handleGetLocation()
@@ -614,7 +625,7 @@ export function Header({ initialUser }: HeaderProps) {
                   Alertes
                 </Link>
 
-                {}
+                { }
                 {user ? (
                   <>
                     {(user.role === 'admin' || user.role === 'super_admin') && (

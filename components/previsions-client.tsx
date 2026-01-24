@@ -367,16 +367,16 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
 
     const cityName = searchParams.get("city")
 
-    
+
     const validCity = cityName ? MARTINIQUE_CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase()) : null
 
     if (validCity) {
-      
+
       setSelectedCity(validCity)
       setSearchQuery(validCity.name)
     }
     initializedFromUrl.current = true
-  }, []) 
+  }, [])
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -429,7 +429,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
 
   useEffect(() => {
     if (loading) return
-    if (map.current) return 
+    if (map.current) return
 
     if (mapContainer.current) {
       map.current = new maplibregl.Map({
@@ -442,7 +442,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
 
       map.current.addControl(new maplibregl.NavigationControl({ showCompass: false, showZoom: false }), "top-right")
 
-      
+
       const el = document.createElement("div")
       el.className = "w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg"
 
@@ -450,14 +450,14 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
         .setLngLat([selectedCity.lon, selectedCity.lat])
         .addTo(map.current)
 
-      
+
       return () => {
         marker.current?.remove()
         map.current?.remove()
         map.current = null
       }
     }
-  }, [loading]) 
+  }, [loading])
 
   useEffect(() => {
     if (!map.current) return
@@ -468,11 +468,11 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
       essential: true,
     })
 
-    
+
     if (marker.current) {
       marker.current.setLngLat([selectedCity.lon, selectedCity.lat])
     }
-  }, [selectedCity.lat, selectedCity.lon, zoom]) 
+  }, [selectedCity.lat, selectedCity.lon, zoom])
 
   const filteredSuggestions = MARTINIQUE_CITIES.filter((city) =>
     city.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -525,7 +525,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
     <div className="min-h-screen bg-background">
       <Header initialUser={initialUser} />
 
-      {}
+      { }
       <div className="bg-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="max-w-sm relative z-40" ref={searchRef}>
@@ -581,7 +581,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
         </div>
       </div>
 
-      {}
+      { }
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {loading ? (
           <div className="space-y-6 sm:space-8">
@@ -600,9 +600,9 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
         ) : (
           <>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              {}
+              { }
               <div className="order-2 lg:order-1">
-                {}
+                { }
                 <div className="mb-4 sm:mb-6 animate-fade-in">
                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
                     {selectedCity.name}
@@ -610,10 +610,10 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                   <p className="text-muted-foreground text-sm sm:text-base">Martinique - Aujourd&apos;hui</p>
                 </div>
 
-                {}
+                { }
                 <div className="border border-border rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 animate-slide-in-left shadow-sm bg-white">
                   <div className="flex flex-col gap-4">
-                    {}
+                    { }
                     <div className="bg-amber-50/50 rounded-2xl p-6 border border-amber-100 flex items-center gap-6">
                       <div className="p-4 bg-white rounded-full shadow-sm text-amber-500">
                         <ThermometerIcon />
@@ -626,9 +626,9 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                       </div>
                     </div>
 
-                    {}
+                    { }
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                      {}
+                      { }
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-amber-500">
@@ -642,7 +642,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         </p>
                       </div>
 
-                      {}
+                      { }
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-orange-500">
@@ -655,7 +655,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         </p>
                       </div>
 
-                      {}
+                      { }
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-blue-500">
@@ -666,7 +666,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         <p className="text-2xl sm:text-3xl font-black text-foreground">{weather?.relative_humidity_2m}%</p>
                       </div>
 
-                      {}
+                      { }
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-teal-500">
@@ -680,7 +680,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         </p>
                       </div>
 
-                      {}
+                      { }
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-green-500">
@@ -694,7 +694,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         </p>
                       </div>
 
-                      {}
+                      { }
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-blue-500">
@@ -708,7 +708,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                         </p>
                       </div>
 
-                      {}
+                      { }
                       <div className="rounded-xl p-4 border border-border bg-slate-50/50 hover:bg-white transition-colors duration-200 col-span-2 sm:col-span-2">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="text-indigo-500">
@@ -730,18 +730,18 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                 </div>
               </div>
 
-              {}
+              { }
               <div className="order-1 lg:order-2">
                 <div className="relative border border-border rounded-xl overflow-hidden h-80 sm:h-[432px] animate-fade-in-up shadow-sm">
                   <div ref={mapContainer} className="w-full h-full" />
 
-                  {}
+                  { }
                   <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg z-20 border border-border">
                     <p className="font-bold text-foreground">{selectedCity.name}</p>
                     <p className="text-xs text-muted-foreground">Martinique</p>
                   </div>
 
-                  {}
+                  { }
                   <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
                     <button
                       onClick={handleZoomIn}
@@ -772,7 +772,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              {}
+              { }
               <div className="border border-border rounded-xl p-4 sm:p-5 animate-slide-in-up shadow-sm">
                 <h3 className="text-base sm:text-lg font-bold text-foreground mb-4">Température (24h)</h3>
                 <ResponsiveContainer width="100%" height={200}>
@@ -809,7 +809,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                 </ResponsiveContainer>
               </div>
 
-              {}
+              { }
               <div className="border border-border rounded-xl p-4 sm:p-5 animate-slide-in-up shadow-sm">
                 <h3 className="text-base sm:text-lg font-bold text-foreground mb-4">Humidité & Précipitations</h3>
                 <ResponsiveContainer width="100%" height={200}>
@@ -820,6 +820,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                     <Tooltip
                       contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px" }}
                       labelStyle={{ color: "#374151" }}
+                      formatter={(value: number) => [`${value}%`, undefined]}
                     />
                     <Line
                       type="monotone"
@@ -844,7 +845,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
               </div>
             </div>
 
-            {}
+            { }
             <div className="border border-border rounded-2xl p-4 sm:p-6 animate-fade-in-up shadow-sm bg-slate-50">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="bg-slate-700 p-2 rounded-xl">
@@ -881,25 +882,25 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
                       <ChevronRightIcon />
                     </div>
 
-                    {}
+                    { }
                     <p className="text-slate-800 font-bold text-sm mb-3 capitalize">{day.date}</p>
 
-                    {}
+                    { }
                     <div className="flex justify-center mb-3 text-amber-500 group-hover:scale-110 transition-transform duration-300">
                       <div className="w-12 h-12 flex items-center justify-center">
                         {getWeatherIcon(day.precipitation)}
                       </div>
                     </div>
 
-                    {}
+                    { }
                     <p className="text-3xl font-bold text-slate-800 mb-1">{Math.round(day.max)}°C</p>
 
                     <div className="text-xs text-slate-500 mb-1">
-                      <span className="font-semibold text-slate-700">Max {Math.round(day.max)}°C</span>
+                      <span className="font-bold text-red-500">Max {Math.round(day.max)}°C</span>
                     </div>
-                    <div className="text-xs text-slate-400 mb-3">Min {Math.round(day.min)}°C</div>
+                    <div className="text-xs font-bold text-blue-500 mb-3">Min {Math.round(day.min)}°C</div>
 
-                    {}
+                    { }
                     <p className="text-xs text-slate-600 font-medium mb-4 pb-3 border-b border-slate-100">
                       {getWeatherLabel(day.precipitation)} ({day.precipitation}%)
                     </p>

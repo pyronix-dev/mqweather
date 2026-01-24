@@ -10,7 +10,7 @@ import { MARTINIQUE_CITIES } from "@/lib/constants"
 import { useMapUrlState } from "@/hooks/useMapUrlState"
 import { getWeatherIcon } from "@/lib/weather-icons"
 import { MorningIcon, AfternoonIcon } from "@/components/TimeIcons"
-import { LatestNews } from "@/components/LatestNews"
+
 import dynamic from "next/dynamic"
 
 const MartiniqueMap = dynamic(() => import("@/components/MartiniqueMap").then((mod) => mod.MartiniqueMap), {
@@ -35,7 +35,7 @@ function generateWeatherSummary(weatherData: any[], selectedDay: number): string
     const dayName = today.toLocaleDateString('fr-FR', { weekday: 'long' })
     const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
 
-    
+
     let rainyCount = 0
     let cloudyCount = 0
     let sunnyCount = 0
@@ -126,20 +126,20 @@ export function HomeClient({ initialUser }: HomeClientProps) {
         }
         fetchData()
 
-        
+
         const interval = setInterval(fetchData, 3 * 60 * 60 * 1000)
 
         return () => clearInterval(interval)
     }, [])
 
-    
+
     useEffect(() => {
         if (!allData.length) return
 
-        
+
         setWeatherSummary(generateWeatherSummary(allData, selectedDay))
 
-        
+
         async function fetchAIBulletin() {
             setBulletinLoading(true)
             try {
@@ -167,17 +167,17 @@ export function HomeClient({ initialUser }: HomeClientProps) {
 
         fetchAIBulletin()
 
-        
+
         const newMarkers = MARTINIQUE_CITIES.map((city, index) => {
             const cityData = allData[index]
             if (!cityData || !cityData.daily || !cityData.hourly) return null
 
-            
+
             const baseIndex = selectedDay * 24
             const hourOffset = timeOfDay === 'morning' ? 8 : 14
             const dataIndex = baseIndex + hourOffset
 
-            
+
             if (!cityData.hourly.temperature_2m || !cityData.hourly.temperature_2m[dataIndex]) return null
 
             const temp = Math.round(cityData.hourly.temperature_2m[dataIndex])
@@ -203,7 +203,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                             <span className="font-bold text-xs leading-none tracking-tight text-slate-800">{temp}°</span>
                         </div>
 
-                        {}
+                        { }
                         <span className="text-[10px] font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full mt-2 shadow-md border border-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1">
                             {city.name}
                         </span>
@@ -219,13 +219,13 @@ export function HomeClient({ initialUser }: HomeClientProps) {
         <div className="min-h-screen bg-slate-100 flex flex-col">
             <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
-                {}
-                {}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch max-w-[1800px] mx-auto">
+                { }
+                { }
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch max-w-[1800px] mx-auto">
 
                     <div className="lg:col-span-2 relative w-full h-auto min-h-[800px] md:min-h-[650px] lg:min-h-[700px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
-                            {}
+                            { }
                             <div className="p-5 border-b border-slate-200 flex-shrink-0">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div className="flex items-center gap-4">
@@ -243,7 +243,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                     </div>
                                 </div>
 
-                                {}
+                                { }
                                 <div className="mt-4">
                                     <MapControls
                                         onSearch={handleSearch}
@@ -251,7 +251,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                         selectedDay={selectedDay}
                                     />
 
-                                    {}
+                                    { }
                                     <div className="flex justify-center mt-4">
                                         <div className="bg-slate-100 p-1 rounded-xl flex items-center shadow-inner">
                                             <button
@@ -277,7 +277,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                 </div>
                             </div>
 
-                            {}
+                            { }
                             <div className="flex-1 relative">
                                 {loading ? (
                                     <div className="absolute inset-0 flex items-center justify-center bg-slate-50">
@@ -307,7 +307,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                     <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
                                 )}
 
-                                {}
+                                { }
                                 <div className="hidden sm:block absolute bottom-4 left-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-100 z-10 animate-slide-in-left">
                                     <div className="text-xs font-bold text-slate-600 mb-3 uppercase tracking-wider">Légende</div>
                                     <div className="flex flex-col gap-2">
@@ -329,11 +329,11 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <div className="space-y-5 animate-slide-in-right lg:col-span-1">
-                        {}
+                        { }
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[450px] flex flex-col">
-                            {}
+                            { }
                             <div className="bg-slate-800 p-5 flex-shrink-0">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-white/10 rounded-lg">
@@ -348,7 +348,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                 </div>
                             </div>
 
-                            {}
+                            { }
                             <div className="flex-1 flex flex-col min-h-0 bg-white">
                                 {loading || bulletinLoading ? (
                                     <div className="flex-1 flex flex-col items-center justify-center p-5 space-y-3 opacity-60">
@@ -388,20 +388,20 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                             </div>
                                         </div>
 
-                                        {}
+                                        { }
                                         {allData.length > 0 && allData[0]?.daily && (
                                             <div className="p-4 border-t border-slate-100 bg-white z-10">
                                                 <div className="grid grid-cols-2 gap-3">
-                                                    <div className="bg-red-50 rounded-lg p-3 border border-red-100 text-center">
-                                                        <span className="text-xs text-red-600 font-bold block mb-1">Après-midi</span>
-                                                        <p className="text-xl font-black text-red-700 leading-none">
-                                                            {Math.round(Math.max(...allData.map(d => d.daily?.temperature_2m_max?.[selectedDay] || 0)))}°C
-                                                        </p>
-                                                    </div>
                                                     <div className="bg-blue-50 rounded-lg p-3 border border-blue-100 text-center">
                                                         <span className="text-xs text-blue-600 font-bold block mb-1">Matin</span>
                                                         <p className="text-xl font-black text-blue-700 leading-none">
                                                             {Math.round(Math.min(...allData.map(d => d.daily?.temperature_2m_min?.[selectedDay] || 99)))}°C
+                                                        </p>
+                                                    </div>
+                                                    <div className="bg-red-50 rounded-lg p-3 border border-red-100 text-center">
+                                                        <span className="text-xs text-red-600 font-bold block mb-1">Après-midi</span>
+                                                        <p className="text-xl font-black text-red-700 leading-none">
+                                                            {Math.round(Math.max(...allData.map(d => d.daily?.temperature_2m_max?.[selectedDay] || 0)))}°C
                                                         </p>
                                                     </div>
                                                 </div>
@@ -412,7 +412,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                             </div>
                         </div>
 
-                        {}
+                        { }
                         <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
                             <h3 className="text-sm font-bold text-slate-600 uppercase tracking-wider mb-4">Cartes Détaillées</h3>
                             <div className="grid grid-cols-2 gap-3">
@@ -460,7 +460,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                             </div>
                         </div>
 
-                        {}
+                        { }
                         <a
                             href="/vigilance"
                             className="group block bg-slate-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200"
@@ -481,17 +481,11 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                             </div>
                         </a>
                     </div>
-
-                    {}
-                    <div className="space-y-5 animate-slide-in-right lg:col-span-1" style={{ animationDelay: '0.2s' }}>
-                        {}
-                        <LatestNews />
-                    </div>
                 </div>
             </main>
             <Footer />
 
-            {}
+            { }
             <style jsx global>{`
                 @keyframes spin-slow {
                     from { transform: rotate(0deg); }
