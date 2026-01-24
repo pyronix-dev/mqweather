@@ -11,6 +11,7 @@ import { useMapUrlState } from "@/hooks/useMapUrlState"
 import { getWeatherIcon } from "@/lib/weather-icons"
 import { MorningIcon, AfternoonIcon } from "@/components/TimeIcons"
 
+import { LatestNews } from "@/components/LatestNews"
 import dynamic from "next/dynamic"
 
 const MartiniqueMap = dynamic(() => import("@/components/MartiniqueMap").then((mod) => mod.MartiniqueMap), {
@@ -221,9 +222,12 @@ export function HomeClient({ initialUser }: HomeClientProps) {
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 { }
                 { }
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch max-w-[1800px] mx-auto">
+                <div
+                    className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch max-w-[1800px] mx-auto"
+                    suppressHydrationWarning
+                >
 
-                    <div className="lg:col-span-2 relative w-full h-auto min-h-[800px] md:min-h-[650px] lg:min-h-[700px] animate-fade-in-up">
+                    <div className="lg:col-span-2 relative w-full h-auto flex flex-col animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
                             { }
                             <div className="p-5 border-b border-slate-200 flex-shrink-0">
@@ -480,6 +484,12 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                                 </svg>
                             </div>
                         </a>
+
+                    </div>
+
+                    {/* Latest News - Moves to next row in separate column on desktop to avoid stretching the map */}
+                    <div className="lg:col-start-3 animate-slide-in-right">
+                        <LatestNews />
                     </div>
                 </div>
             </main>

@@ -66,7 +66,8 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 center: initialCenter,
                 zoom: zoomLevel,
                 interactive: true,
-                attributionControl: false
+                attributionControl: false,
+                scrollZoom: false // Disable scroll zoom
             })
 
             map.current.on('load', () => {

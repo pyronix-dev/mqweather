@@ -438,6 +438,7 @@ export default function PrevisionPage({ initialUser }: { initialUser: any }) {
         center: [selectedCity.lon, selectedCity.lat],
         zoom: zoom,
         attributionControl: false,
+        scrollZoom: false, // Disable scroll zoom
       })
 
       map.current.addControl(new maplibregl.NavigationControl({ showCompass: false, showZoom: false }), "top-right")
