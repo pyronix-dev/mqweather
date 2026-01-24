@@ -38,6 +38,25 @@ export function MapControls({ onSearch, onDaySelect, selectedDay }: MapControlsP
         }
     })
 
+    const [canScrollLeft, setCanScrollLeft] = useState(false)
+    const [canScrollRight, setCanScrollRight] = useState(true) // Assume true initially if content might overflow
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+    const checkScroll = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
+            setCanScrollLeft(scrollLeft > 0)
+            // Use a small threshold (1px) to handle potential rounding errors
+            setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1)
+        }
+    }
+
+    useEffect(() => {
+        checkScroll()
+        window.addEventListener('resize', checkScroll)
+        return () => window.removeEventListener('resize', checkScroll)
+    }, [])
+
     const filteredCities = MARTINIQUE_CITIES.filter(c =>
         c.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
@@ -110,13 +129,19 @@ export function MapControls({ onSearch, onDaySelect, selectedDay }: MapControlsP
                     }
                 `}</style>
                 {/* Scroll container replacement happens in next chunk */}
-                <div className="flex items-center gap-2 w-full">
+                {/* Dynamic Scroll Container */}
+                <div className="flex items-center gap-2 w-full relative group">
+                    {/* Left Arrow */}
                     <button
                         onClick={() => {
-                            const container = document.getElementById('days-container')
-                            if (container) container.scrollBy({ left: -200, behavior: 'smooth' })
+                            if (scrollContainerRef.current) {
+                                scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' })
+                            }
                         }}
-                        className="p-2 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex-shrink-0"
+                        className={`p-2 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex-shrink-0 transition-opacity duration-300 ${canScrollLeft ? 'opacity-100' : 'opacity-0 pointer-events-none w-0 p-0 border-0'
+                            }`}
+                        aria-hidden={!canScrollLeft}
+                        tabIndex={canScrollLeft ? 0 : -1}
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
@@ -124,7 +149,9 @@ export function MapControls({ onSearch, onDaySelect, selectedDay }: MapControlsP
                     </button>
 
                     <div
+                        ref={scrollContainerRef}
                         id="days-container"
+                        onScroll={checkScroll}
                         className="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth flex-1"
                     >
                         {days.map(day => (
@@ -141,12 +168,17 @@ export function MapControls({ onSearch, onDaySelect, selectedDay }: MapControlsP
                         ))}
                     </div>
 
+                    {/* Right Arrow */}
                     <button
                         onClick={() => {
-                            const container = document.getElementById('days-container')
-                            if (container) container.scrollBy({ left: 200, behavior: 'smooth' })
+                            if (scrollContainerRef.current) {
+                                scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' })
+                            }
                         }}
-                        className="p-2 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex-shrink-0"
+                        className={`p-2 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex-shrink-0 transition-opacity duration-300 ${canScrollRight ? 'opacity-100' : 'opacity-0 pointer-events-none w-0 p-0 border-0'
+                            }`}
+                        aria-hidden={!canScrollRight}
+                        tabIndex={canScrollRight ? 0 : -1}
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
