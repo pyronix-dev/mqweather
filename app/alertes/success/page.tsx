@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import AlertesSuccessClient from '@/components/alertes-success-client'
@@ -9,3 +8,5 @@ export default async function SuccessPage() {
     const user = await getUserFromSession()
     return <AlertesSuccessClient initialUser={user} />
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

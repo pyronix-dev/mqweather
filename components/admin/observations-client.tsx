@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState } from "react"
@@ -77,3 +76,5 @@ export default function ObservationsModeration({ initialUser }: { initialUser: a
         </div>
     )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

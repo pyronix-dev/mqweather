@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import { requireAdmin } from '@/lib/admin-auth'
@@ -121,3 +120,5 @@ export async function GET() {
         topCities
     })
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

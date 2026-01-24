@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import * as React from 'react'
 import {
   ChevronLeftIcon,
@@ -126,3 +125,5 @@ export {
   PaginationNext,
   PaginationEllipsis,
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

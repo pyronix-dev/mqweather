@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState } from "react"
@@ -304,3 +303,5 @@ export default function DevisPage({ initialUser }: { initialUser: any }) {
         </div>
     )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

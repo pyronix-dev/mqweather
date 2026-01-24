@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import { useMemo } from 'react'
@@ -243,3 +242,5 @@ export {
   FieldContent,
   FieldTitle,
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

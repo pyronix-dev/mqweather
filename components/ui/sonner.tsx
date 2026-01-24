@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import { useTheme } from 'next-themes'
@@ -24,3 +23,5 @@ const Toaster = ({ ...props }: ToasterProps) => {
 }
 
 export { Toaster }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
@@ -87,3 +86,5 @@ export async function POST(request: NextRequest) {
         )
     }
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

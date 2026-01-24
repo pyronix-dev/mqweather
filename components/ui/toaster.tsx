@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import { useToast } from '@/hooks/use-toast'
@@ -34,3 +33,5 @@ export function Toaster() {
     </ToastProvider>
   )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

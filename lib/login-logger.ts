@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { createSupabaseAdmin } from '@/lib/supabase'
 
@@ -61,3 +60,5 @@ function getClientIP(request: Request): string {
     }
     return request.headers.get('x-real-ip') || 'unknown'
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

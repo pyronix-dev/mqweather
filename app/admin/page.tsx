@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import { redirect } from 'next/navigation'
@@ -16,3 +15,5 @@ export default async function AdminPage() {
 
     return <AdminDashboardClient initialUser={user} />
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

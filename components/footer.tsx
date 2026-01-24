@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 import Link from "next/link"
 
@@ -230,3 +229,5 @@ export function Footer() {
     </footer>
   )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

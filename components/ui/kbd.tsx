@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { cn } from '@/lib/utils'
 
 function Kbd({ className, ...props }: React.ComponentProps<'kbd'>) {
@@ -27,3 +26,5 @@ function KbdGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 export { Kbd, KbdGroup }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

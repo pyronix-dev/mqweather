@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useState } from "react"
@@ -106,3 +105,5 @@ export function LatestNews() {
         </div>
     )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

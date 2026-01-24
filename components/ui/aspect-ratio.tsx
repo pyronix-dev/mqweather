@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import * as AspectRatioPrimitive from '@radix-ui/react-aspect-ratio'
@@ -10,3 +9,5 @@ function AspectRatio({
 }
 
 export { AspectRatio }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

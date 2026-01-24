@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
@@ -1149,3 +1148,5 @@ export default function AlertesPage({ initialUser }: { initialUser: any }) {
     </Suspense>
   )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import crypto from 'crypto'
@@ -80,3 +79,5 @@ export async function GET(request: NextRequest) {
 
     return response
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

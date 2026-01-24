@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useParams, useSearchParams, useRouter } from "next/navigation"
@@ -121,3 +120,5 @@ export default function TemperaturePage({ initialUser }: { initialUser: any }) {
         </div>
     )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

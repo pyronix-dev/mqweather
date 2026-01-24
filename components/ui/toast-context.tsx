@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
@@ -95,3 +94,5 @@ const ToastItem = ({ message, type, onClose }: Toast & { onClose: () => void }) 
         </div>
     )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

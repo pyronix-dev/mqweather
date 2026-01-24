@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { cn } from '@/lib/utils'
 
 function Skeleton({ className, ...props }: React.ComponentProps<'div'>) {
@@ -12,3 +11,5 @@ function Skeleton({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 export { Skeleton }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

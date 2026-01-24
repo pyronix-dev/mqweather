@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -111,3 +110,5 @@ export async function GET() {
         return NextResponse.json({ error: 'Server error' }, { status: 500 })
     }
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

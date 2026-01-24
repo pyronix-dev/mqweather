@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import * as React from 'react'
@@ -27,3 +26,5 @@ function Separator({
 }
 
 export { Separator }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

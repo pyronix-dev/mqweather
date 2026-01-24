@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import BeachMapPage from '@/components/maps/plages-client'
@@ -24,3 +23,5 @@ export default async function PlagesPage(props: { params: Promise<{ city?: strin
 
     return <BeachMapPage initialUser={user} />
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

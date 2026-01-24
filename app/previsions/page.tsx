@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import PrevisionPage from '@/components/previsions-client'
@@ -14,3 +13,5 @@ export default async function PrevisionsPage() {
         </Suspense>
     )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

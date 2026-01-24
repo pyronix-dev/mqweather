@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextRequest, NextResponse } from 'next/server'
 
 const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY
@@ -162,3 +161,5 @@ ${exampleText}`;
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

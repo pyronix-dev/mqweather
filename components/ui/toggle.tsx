@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import * as React from 'react'
@@ -46,3 +45,5 @@ function Toggle({
 }
 
 export { Toggle, toggleVariants }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

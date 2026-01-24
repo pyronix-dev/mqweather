@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import * as React from 'react'
@@ -115,3 +114,5 @@ export {
   TableCell,
   TableCaption,
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

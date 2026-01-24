@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import React, { createContext, useContext, useState, useCallback, ReactNode, useRef } from 'react'
@@ -162,3 +161,5 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
         </ConfirmContext.Provider>
     )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

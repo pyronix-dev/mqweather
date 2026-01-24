@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 
@@ -65,3 +64,5 @@ function AlertDescription({
 }
 
 export { Alert, AlertTitle, AlertDescription }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

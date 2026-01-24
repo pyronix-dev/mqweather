@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 
@@ -190,3 +189,5 @@ function useToast() {
 }
 
 export { useToast, toast }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

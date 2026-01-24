@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import RainMapPage from '@/components/maps/pluie-client'
@@ -26,3 +25,5 @@ export default async function PluiePage(props: { params: Promise<{ city?: string
 
     return <RainMapPage initialUser={user} />
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
@@ -150,3 +149,5 @@ export function useMapUrlState() {
         resetView
     }
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

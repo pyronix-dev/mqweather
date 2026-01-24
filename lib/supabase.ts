@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { createClient } from '@supabase/supabase-js'
 
 
@@ -63,3 +62,5 @@ export function generateReferenceCode(sessionId?: string): string {
     const random = Math.floor(100000 + Math.random() * 900000).toString()
     return `${prefix}${random}`
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useEffect, useRef, useState } from "react"
@@ -204,3 +203,5 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         </div>
     )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

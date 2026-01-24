@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { cookies } from 'next/headers'
 
 export async function getUserSession() {
@@ -72,3 +71,5 @@ export async function getUserFromSession() {
         }
     }
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

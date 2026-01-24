@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import { requireAdmin, logAdminAction, getClientIP } from '@/lib/admin-auth'
@@ -67,3 +66,5 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true })
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

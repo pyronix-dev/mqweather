@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import * as React from 'react'
@@ -47,3 +46,5 @@ function PopoverAnchor({
 }
 
 export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

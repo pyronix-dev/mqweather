@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -12,3 +11,5 @@ export async function POST() {
 
     return response
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

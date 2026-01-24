@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import { useSearchParams } from "next/navigation"
@@ -140,3 +139,5 @@ export default function CancelPage({ initialUser }: { initialUser: any }) {
         </Suspense>
     )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

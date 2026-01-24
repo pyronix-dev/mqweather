@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from 'next/server';
 import { fetchAndParseVigilanceData } from '@/app/api/vigilance/route';
 import { createClient } from '@supabase/supabase-js';
@@ -131,3 +130,5 @@ export async function GET(request: Request) {
         return NextResponse.json({ message: 'Internal Server Error', error: String(error) }, { status: 500 });
     }
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import type React from "react"
@@ -660,3 +659,5 @@ export function Header({ initialUser }: HeaderProps) {
     </header >
   )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

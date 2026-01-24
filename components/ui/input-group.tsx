@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 'use client'
 
 import { cva, type VariantProps } from 'class-variance-authority'
@@ -168,3 +167,5 @@ export {
   InputGroupInput,
   InputGroupTextarea,
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

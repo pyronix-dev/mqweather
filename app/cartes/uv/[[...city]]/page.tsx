@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import UVMapPage from '@/components/maps/uv-client'
@@ -23,3 +22,5 @@ export default async function UVPage(props: { params: Promise<{ city?: string[] 
 
     return <UVMapPage initialUser={user} />
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

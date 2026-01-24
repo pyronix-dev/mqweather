@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 "use client"
 
 import React, { useEffect, useState } from 'react';
@@ -98,3 +97,5 @@ export default function ReturnPage({ initialUser }: { initialUser: any }) {
         </div>
     )
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

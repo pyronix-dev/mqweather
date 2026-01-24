@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextResponse } from "next/server"
 import JSZip from "jszip"
 
@@ -318,3 +317,5 @@ export async function GET() {
     )
   }
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me

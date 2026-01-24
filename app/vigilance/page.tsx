@@ -1,4 +1,3 @@
-// Developed by Omar Rafik (OMX) - omx001@proton.me
 
 import { getUserFromSession } from '@/lib/auth-server'
 import { VigilanceClient } from '@/components/vigilance-client'
@@ -9,3 +8,5 @@ export default async function VigilancePage() {
     const user = await getUserFromSession()
     return <VigilanceClient initialUser={user} />
 }
+
+// Developed by Omar Rafik (OMX) - omx001@proton.me
