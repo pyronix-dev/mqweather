@@ -3,13 +3,19 @@
 import { useEffect, useState } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { MartiniqueMap, MapMarker } from "@/components/MartiniqueMap"
+import type { MapMarker } from "@/components/MartiniqueMap"
 import { MapControls } from "@/components/MapControls"
 import { MARTINIQUE_CITIES } from "@/lib/constants"
 import { useMapUrlState } from "@/hooks/useMapUrlState"
 import { getWeatherIcon } from "@/lib/weather-icons"
 import { MorningIcon, AfternoonIcon } from "@/components/TimeIcons"
 import { LatestNews } from "@/components/LatestNews"
+import dynamic from "next/dynamic"
+
+const MartiniqueMap = dynamic(() => import("@/components/MartiniqueMap").then((mod) => mod.MartiniqueMap), {
+    ssr: false,
+    loading: () => <div className="w-full h-full bg-slate-100 animate-pulse rounded-2xl" />,
+})
 
 // Simple weather icon for header
 const WeatherIcon = () => (
