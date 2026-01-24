@@ -16,7 +16,9 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    Legend
+    Legend,
+    BarChart,
+    Bar
 } from "recharts"
 import {
     Users,
@@ -291,7 +293,7 @@ export default function AdminDashboard({ initialUser }: { initialUser: any }) {
                                 </div>
                             ) : (
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={stats.topCities} layout="vertical" margin={{ left: 40 }}>
+                                    <BarChart data={stats.topCities} layout="vertical" margin={{ left: 0, right: 30, top: 10, bottom: 10 }}>
                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
                                         <XAxis type="number" hide />
                                         <YAxis
