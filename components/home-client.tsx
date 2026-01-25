@@ -227,7 +227,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                     suppressHydrationWarning
                 >
 
-                    <div className="lg:col-span-2 relative w-full h-[600px] lg:h-auto flex flex-col animate-fade-in-up">
+                    <div className="lg:col-span-2 relative w-full h-[75vh] lg:h-auto flex flex-col animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
                             { }
                             <div className="p-5 border-b border-slate-200 flex-shrink-0">

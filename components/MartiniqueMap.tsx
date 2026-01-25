@@ -65,15 +65,22 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 style: "https://api.maptiler.com/maps/dataviz-v4/style.json?key=UxUuNKolwcBvNiLEf3iZ",
                 center: initialCenter,
                 zoom: zoomLevel,
-                interactive: true,
-                attributionControl: false,
-                scrollZoom: false // Disable scroll zoom
+                dragPan: false,
+                boxZoom: false,
+                dragRotate: false,
+                keyboard: false,
+                doubleClickZoom: false,
+                touchZoomRotate: false,
+                scrollZoom: false
             })
 
             map.current.on('load', () => {
                 setLoaded(true)
                 updateMarkerPositions()
                 checkResetButtonVisibility()
+                // Disable touch interactions completely
+                map.current?.touchZoomRotate.disable()
+                map.current?.dragPan.disable()
             })
 
             map.current.on('zoom', () => {
@@ -148,7 +155,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
     const markerScale = getMarkerScale()
 
     return (
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full overflow-hidden rounded-2xl">
             <div ref={mapContainer} className="w-full h-full" />
 
             {showResetButton && (
