@@ -21,77 +21,77 @@ export async function POST(request: NextRequest) {
 
         const supabase = createSupabaseAdmin()
 
-        
-        
-        
+
+
+
         if (action === 'send-code') {
             if (!identifier) {
                 return NextResponse.json({ success: false, error: "Identifiant requis" }, { status: 400 })
             }
 
-            
+
             const { data: user, error: userError } = await supabase
                 .from('users')
                 .select('id, email, phone, reference_code')
                 .or(`email.ilike.${identifier},reference_code.ilike.${identifier}`)
                 .single()
 
-            
+
             if (!user || userError) {
                 console.log(`❌ User not found: ${identifier}`)
-                
+
                 await new Promise(r => setTimeout(r, 1000))
                 return NextResponse.json({ success: true, message: "Code envoyé" })
             }
 
-            
+
             const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
             const magicToken = crypto.randomBytes(32).toString('hex')
             const magicTokenHash = hash(magicToken)
             console.log(`🔐 Generated OTP for ${identifier}: ${otpCode}`)
 
-            
-            const expiresAt = new Date(Date.now() + 10 * 60 * 1000) 
 
-            
+            const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
+
+
             await supabase
                 .from('otp_codes')
                 .delete()
                 .eq('user_id', user.id)
                 .eq('used', false)
 
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
 
-            
-            
-            
-            
-            
-            
-            
-            
 
-            
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             const magicLink = `${request.nextUrl.origin}/auth/verify?code=${otpCode}&uid=${user.id}`
 
@@ -110,34 +110,34 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ success: false, error: "Erreur serveur" }, { status: 500 })
             }
 
-            
+
             if (user.email) {
                 console.log(`📧 Sending OTP & Magic Link to Email: ${user.email}`)
                 const { getMagicLinkEmailHtml } = await import('@/lib/email-templates')
                 const htmlContent = getMagicLinkEmailHtml(magicLink, otpCode)
                 await sendEmail(user.email, "Votre connexion Météo Martinique", htmlContent)
             }
-            
+
             else if (user.phone) {
                 console.log(`📱 Sending OTP to Phone: ${user.phone}`)
                 await sendSMS(user.phone, `Météo Martinique: Votre code est ${otpCode}. Lien: ${magicLink}`)
             }
 
-            
+
             const response = NextResponse.json({ success: true, message: "Code envoyé" })
             response.cookies.set('otp_user_id', user.id, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
-                maxAge: 600 
+                maxAge: 600
             })
 
             return response
         }
 
-        
-        
-        
+
+
+
         if (action === 'verify-code') {
             if (!code) {
                 return NextResponse.json({ success: false, error: "Code requis" }, { status: 400 })
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ success: false, error: "Session expirée" }, { status: 401 })
             }
 
-            
+
             const { data: otpRecord, error: otpError } = await supabase
                 .from('otp_codes')
                 .select('id, code_hash, expires_at, used, attempts, max_attempts')
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
                 console.log('❌ OTP Check: No valid record found or expired')
                 return NextResponse.json({ success: false, error: "Code expiré ou invalide" }, { status: 400 })
             } else {
-                
+
                 const attempts = otpRecord.attempts || 0
                 const maxAttempts = otpRecord.max_attempts || 3
 
@@ -174,14 +174,14 @@ export async function POST(request: NextRequest) {
                     return NextResponse.json({ success: false, error: "Trop de tentatives. Veuillez demander un nouveau code." }, { status: 429 })
                 }
 
-                
-                
+
+
                 const inputHash = hash(code)
-                
+
                 const isValid = inputHash === otpRecord.code_hash
 
                 if (!isValid) {
-                    
+
                     console.log(`⚠️ OTP Check: Invalid code, incrementing attempts (${attempts + 1}/${maxAttempts})`)
                     await supabase
                         .from('otp_codes')
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
                     return NextResponse.json({ success: false, error: "Code invalide" }, { status: 400 })
                 }
 
-                
+
                 try {
                     const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
                     const userAgent = request.headers.get('user-agent') || 'Unknown'
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
 
                     if (ip && ip !== '127.0.0.1' && ip !== '::1') {
                         try {
-                            
+
                             const geoRes = await fetch(`http://ip-api.com/json/${ip}`, { signal: AbortSignal.timeout(3000) })
                             if (geoRes.ok) {
                                 const geo = await geoRes.json()
@@ -226,35 +226,36 @@ export async function POST(request: NextRequest) {
                     })
                 } catch (logError) {
                     console.error('Failed to log login history:', logError)
-                    
-                }
-                
 
-                
+                }
+
+
+
                 await supabase
                     .from('otp_codes')
                     .update({ used: true })
                     .eq('id', otpRecord.id)
             }
 
-            
+
             const { data: user } = await supabase
                 .from('users')
-                .select('id, reference_code, email')
+                .select('id, reference_code, email, full_name')
                 .eq('id', userId)
                 .single()
 
-            
+
             const response = NextResponse.json({ success: true, redirect: '/dashboard' })
 
-            
+
             response.cookies.delete('otp_user_id')
 
-            
+
             response.cookies.set('auth_session', JSON.stringify({
                 userId: user?.id,
                 referenceCode: user?.reference_code,
-                email: user?.email
+                email: user?.email,
+                fullName: user?.full_name
             }), {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
@@ -269,7 +270,7 @@ export async function POST(request: NextRequest) {
 
     } catch (error: any) {
         console.error("Login API Error:", error)
-        
+
         return NextResponse.json({
             success: false,
             error: "Erreur serveur: " + (error.message || JSON.stringify(error))

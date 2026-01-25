@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
 
     const supabase = createSupabaseAdmin()
 
-    
-    
+
+
     const { data: otpRecord, error } = await supabase
         .from('otp_codes')
         .select('*')
@@ -37,25 +37,25 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(new URL('/login?error=Lien expiré ou invalide', request.url))
     }
 
-    
-    
+
+
     const codeHash = hash(code)
 
-    
-    if (otpRecord.code_hash !== codeHash && code !== '123456') { 
+
+    if (otpRecord.code_hash !== codeHash && code !== '123456') {
         return NextResponse.redirect(new URL('/login?error=Code invalide', request.url))
     }
 
-    
+
     await supabase
         .from('otp_codes')
         .update({ used: true })
         .eq('id', otpRecord.id)
 
-    
+
     const { data: user } = await supabase
         .from('users')
-        .select('id, reference_code, email')
+        .select('id, reference_code, email, full_name')
         .eq('id', uid)
         .single()
 
@@ -63,19 +63,20 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(new URL('/login?error=Utilisateur introuvable', request.url))
     }
 
-    
+
     const response = NextResponse.redirect(new URL('/dashboard', request.url))
 
-    
+
     response.cookies.set('auth_session', JSON.stringify({
         userId: user.id,
         referenceCode: user.reference_code,
-        email: user.email
+        email: user.email,
+        fullName: user.full_name
     }), {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 
+        maxAge: 7 * 24 * 60 * 60
     })
 
     return response

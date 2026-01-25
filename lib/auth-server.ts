@@ -43,7 +43,7 @@ export async function getUserFromSession() {
             console.warn('⚠️ Server Auth: DB User not found or error, falling back to cookie data', error)
 
             return {
-                name: session.email ? session.email.split('@')[0] : 'Utilisateur',
+                name: session.fullName ? session.fullName.split(' ')[0] : (session.email ? session.email.split('@')[0] : 'Utilisateur'),
                 reference: session.referenceCode,
                 email: session.email || '',
                 role: 'user'
@@ -111,7 +111,7 @@ export async function getUserFromSession() {
         console.error('Error fetching user server-side:', e)
 
         return {
-            name: session.email ? session.email.split('@')[0] : 'Utilisateur',
+            name: session.fullName ? session.fullName.split(' ')[0] : (session.email ? session.email.split('@')[0] : 'Utilisateur'),
             reference: session.referenceCode,
             email: session.email || '',
             role: 'user'
