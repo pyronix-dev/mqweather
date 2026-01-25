@@ -29,12 +29,12 @@ export default function WindMapPage({ initialUser }: { initialUser: any }) {
     const stats = useMemo(() => {
         if (!allData.length) return { dominantDir: '--', maxGusts: 0, analysis: "Chargement en cours...", avgDirCode: 0 }
 
-        
+
         const baseIndex = selectedDay * 24
         const hourOffset = timeOfDay === 'morning' ? 8 : 14
         const dataIndex = baseIndex + hourOffset
 
-        
+
         const windData = MARTINIQUE_CITIES.map((city, idx) => {
             const data = allData[idx]
             if (!data?.hourly) return null
@@ -48,7 +48,7 @@ export default function WindMapPage({ initialUser }: { initialUser: any }) {
         if (!windData.length && !loading && !error) return { dominantDir: '--', maxGusts: 0, analysis: "Données indisponibles pour cette période.", avgDirCode: 0 }
         if (loading) return { dominantDir: '--', maxGusts: 0, analysis: "Chargement...", avgDirCode: 0 }
 
-        
+
         let sinSum = 0;
         let cosSum = 0;
         let maxGusts = 0;
@@ -65,25 +65,25 @@ export default function WindMapPage({ initialUser }: { initialUser: any }) {
         const dominantDir = getCardinalDirection(avgAngle);
         const avgSpeed = totalSpeed / windData.length;
 
-        
+
         let analysis = "";
 
-        
+
         if (avgSpeed < 15) analysis += "Les conditions sont calmes avec une brise légère dominante sur l'ensemble de l'île. ";
         else if (avgSpeed < 30) analysis += "Un régime d'alizés modéré souffle régulièrement, apportant une ventilation agréable sur les côtes. ";
         else analysis += "Le vent souffle de manière soutenue aujourd'hui, nécessitant une vigilance particulière sur le littoral. ";
 
-        
+
         if (maxGusts > 50) analysis += `Des rafales importantes pouvant atteindre ${Math.round(maxGusts)} km/h sont attendues sur les caps exposés et les hauteurs. `;
         else if (maxGusts > 30) analysis += `Quelques rafales modérées autour de ${Math.round(maxGusts)} km/h pourront être ressenties sous les averses. `;
         else analysis += "Les rafales restent faibles et ne présentent aucun risque particulier pour les activités extérieures. ";
 
-        
+
         if (dominantDir === 'E' || dominantDir === 'NE') analysis += "Le flux de secteur Est/Nord-Est maintient un temps classique pour la saison. ";
         else if (dominantDir === 'SE') analysis += "Le vent s'oriente au secteur Sud-Est, apportant une ambiance plus humide et lourde. ";
         else analysis += `Le vent est changeant, s'orientant temporairement au secteur ${dominantDir}. `;
 
-        
+
         if (maxGusts > 60 || avgSpeed > 40) analysis += "Il est recommandé d'éviter les sorties en mer et les activités nautiques exposées.";
         else analysis += "Les conditions sont globalement favorables pour la navigation de plaisance et les loisirs nautiques.";
 
@@ -146,7 +146,7 @@ export default function WindMapPage({ initialUser }: { initialUser: any }) {
                         className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
                     >
                         <div className={`
-                            px-2 py-1.5 rounded-lg shadow-lg border backdrop-blur-md flex items-center gap-1
+                            px-2 py-1.5 rounded-lg shadow-lg border flex items-center gap-1
                             transition-all duration-300 hover:shadow-xl
                             ${isStrong ? 'bg-gradient-to-br from-red-500/95 to-pink-500/95 border-red-400/50 text-white shadow-red-500/30' :
                                 isModerate ? 'bg-gradient-to-br from-teal-500/95 to-cyan-500/95 border-teal-400/50 text-white shadow-teal-500/30' :
@@ -165,8 +165,8 @@ export default function WindMapPage({ initialUser }: { initialUser: any }) {
                                 <span className="text-[8px] font-medium opacity-80 ml-0.5">km/h</span>
                             </span>
                         </div>
-                        {}
-                        <div className="absolute top-full mt-2 bg-white/95 backdrop-blur-md px-4 py-3 rounded-xl shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 pointer-events-none min-w-[140px] transform group-hover:translate-y-0 translate-y-1">
+                        { }
+                        <div className="absolute top-full mt-2 bg-white/95 px-4 py-3 rounded-xl shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 pointer-events-none min-w-[140px] transform group-hover:translate-y-0 translate-y-1">
                             <p className="font-black text-slate-800 text-sm text-center mb-2">{city.name}</p>
                             <div className="flex justify-between items-center text-xs text-slate-500 border-t border-slate-100 pt-2">
                                 <span>Rafales</span>
@@ -186,8 +186,8 @@ export default function WindMapPage({ initialUser }: { initialUser: any }) {
             <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
-                    {}
-                    <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
+                    { }
+                    <div className="relative w-full h-[85vh] min-h-[500px] lg:h-[700px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
                             {error && <MapErrorDisplay onRetry={fetchData} />}
 
@@ -210,7 +210,7 @@ export default function WindMapPage({ initialUser }: { initialUser: any }) {
                             <div className="flex-1 relative overflow-hidden">
                                 <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
 
-                                {}
+                                { }
                                 <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
                                     <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Intensité</div>
                                     <div className="flex flex-col gap-2">
@@ -232,9 +232,9 @@ export default function WindMapPage({ initialUser }: { initialUser: any }) {
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <div className="w-full space-y-4 sm:space-y-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                        {}
+                        { }
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                             <div className="mb-6">
                                 <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>

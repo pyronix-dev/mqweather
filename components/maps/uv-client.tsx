@@ -55,25 +55,25 @@ export default function UVMapPage({ initialUser }: { initialUser: any }) {
         const maxUV = Math.round(Math.max(...uvValues))
         const avgUV = uvValues.reduce((a, b) => a + b, 0) / uvValues.length
 
-        
+
         let analysis = "";
 
-        
+
         if (maxUV >= 11) analysis += "L'indice UV atteint des niveaux extrêmes sur l'ensemble de l'île aujourd'hui. ";
         else if (maxUV >= 8) analysis += "Le rayonnement solaire est très intense, avec des indices UV particulièrement élevés. ";
         else if (maxUV >= 6) analysis += "L'ensoleillement est généreux, entraînant un indice UV élevé sur toutes les communes. ";
         else analysis += "L'intensité du rayonnement UV reste modérée grâce à une couverture nuageuse protectrice. ";
 
-        
+
         if (timeOfDay === 'afternoon') analysis += "Le risque est maximal actuellement, correspondant au pic d'intensité solaire. ";
         else analysis += "L'intensité va augmenter rapidement au cours des prochaines heures pour atteindre son maximum à la mi-journée. ";
 
-        
+
         if (maxUV >= 8) analysis += "Le risque de brûlures est très rapide pour les peaux non protégées (moins de 15 minutes). ";
         else if (maxUV >= 5) analysis += "Une exposition prolongée sans protection peut entraîner des coups de soleil significatifs. ";
         else analysis += "Le risque de lésions cutanées est limité pour les expositions de courte durée. ";
 
-        
+
         if (maxUV >= 8) analysis += "La protection maximale est impérative : écran total, chapeau, lunettes et vêtements couvrants.";
         else if (maxUV >= 3) analysis += "L'application de crème solaire et le port de lunettes sont vivement recommandés.";
         else analysis += "Aucune protection particulière n'est requise, sauf pour les peaux les plus sensibles.";
@@ -132,8 +132,8 @@ export default function UVMapPage({ initialUser }: { initialUser: any }) {
                         onClick={() => handleSearch(city)}
                         className="group relative cursor-pointer transition-all duration-300 hover:scale-110 hover:z-[100] animate-fade-in-up"
                     >
-                        {}
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-white/95 backdrop-blur-md text-slate-800 rounded-xl shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap z-[200] pointer-events-none transform group-hover:translate-y-0 -translate-y-1">
+                        { }
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-white/95 text-slate-800 rounded-xl shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap z-[200] pointer-events-none transform group-hover:translate-y-0 -translate-y-1">
                             <div className="font-black text-sm mb-1">{city.name}</div>
                             <div className="flex items-center gap-2 text-xs">
                                 <span className="text-slate-500">Indice UV:</span>
@@ -160,8 +160,8 @@ export default function UVMapPage({ initialUser }: { initialUser: any }) {
             <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
-                    {}
-                    <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
+                    { }
+                    <div className="relative w-full h-[85vh] min-h-[500px] lg:h-[700px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
                             {error && <MapErrorDisplay onRetry={fetchData} />}
 
@@ -184,8 +184,8 @@ export default function UVMapPage({ initialUser }: { initialUser: any }) {
                             <div className="flex-1 relative overflow-hidden">
                                 <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
 
-                                {}
-                                <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
+                                { }
+                                <div className="absolute bottom-6 left-6 bg-white/95 p-4 rounded-2xl shadow-xl border border-white/50 z-10">
                                     <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Indices UV</div>
                                     <div className="flex flex-col gap-2">
                                         <div className="flex items-center gap-3">
@@ -214,9 +214,9 @@ export default function UVMapPage({ initialUser }: { initialUser: any }) {
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <div className="w-full space-y-4 sm:space-y-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                        {}
+                        { }
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                             <div className="mb-6">
                                 <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>

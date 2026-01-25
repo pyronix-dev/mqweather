@@ -191,12 +191,11 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                 component: (
                     <div
                         onClick={() => handleSearch(city)}
-                        className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
+                        className="flex flex-col items-center group cursor-pointer transition-transform hover:z-50 hover:scale-110"
                     >
                         <div className={`
-                px-1.5 py-1 rounded-xl shadow-md border border-white/50 backdrop-blur-md flex items-center gap-1
-                transition-all duration-300 hover:scale-110 hover:shadow-lg
-                bg-white/90
+                px-1.5 py-1 rounded-xl shadow-md border border-slate-200 flex items-center gap-1
+                bg-white
             `}>
                             <span className="text-lg drop-shadow-sm filter">
                                 {getWeatherIcon(weatherCode)}
@@ -205,7 +204,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                         </div>
 
                         { }
-                        <span className="text-[10px] font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full mt-2 shadow-md border border-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1">
+                        <span className="text-[10px] font-bold text-slate-700 bg-white px-2.5 py-1 rounded-full mt-2 shadow-md border border-slate-200 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                             {city.name}
                         </span>
                     </div>
@@ -227,7 +226,7 @@ export function HomeClient({ initialUser }: HomeClientProps) {
                     suppressHydrationWarning
                 >
 
-                    <div className="lg:col-span-2 relative w-full h-[75vh] lg:h-auto flex flex-col animate-fade-in-up">
+                    <div className="lg:col-span-2 relative w-full h-[85vh] lg:h-auto flex flex-col animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
                             { }
                             <div className="p-5 border-b border-slate-200 flex-shrink-0">

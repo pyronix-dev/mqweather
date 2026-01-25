@@ -21,30 +21,58 @@ interface MartiniqueMapProps {
 export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps) {
     const mapContainer = useRef<HTMLDivElement>(null)
     const map = useRef<maplibregl.Map | null>(null)
-    const [currentZoom, setCurrentZoom] = useState(9)
-
-    const [loaded, setLoaded] = useState(false)
-    const [projectedMarkers, setProjectedMarkers] = useState<{ id: string; x: number; y: number }[]>([])
-    const markersRef = useRef(markers)
+    const markersRef = useRef<maplibregl.Marker[]>([])
     const [showResetButton, setShowResetButton] = useState(false)
+
+    const [isMapReady, setIsMapReady] = useState(false)
 
     // Center on Martinique
     const initialCenter: [number, number] = [-61.0242, 14.6415]
 
     const getInitialZoom = () => {
-        if (typeof window === 'undefined') return 9.5
-        return window.innerWidth < 768 ? 8.5 : 9.5
+        return 9.5
     }
 
+    // Effect to handle marker updates efficiently
     useEffect(() => {
-        markersRef.current = markers
-        if (loaded) {
-            updateMarkerPositions()
-        }
-    }, [markers, loaded])
+        if (!map.current || !isMapReady) return
+
+        // 1. Clear existing markers
+        markersRef.current.forEach(marker => marker.remove())
+        markersRef.current = []
+
+        // Requires dynamic import for createRoot if not available in scope, 
+        // usually strictly typed in Next.js 13+
+        // We will assume standard import or use basic ReactDOM if needed.
+        // For safety in this environment, we'll try to use a cleaner approach:
+        // We create elements and mount React roots on them
+
+        const ReactDOM = require('react-dom/client')
+
+        // 2. Add new markers
+        markers.forEach(marker => {
+            const el = document.createElement('div')
+            el.className = 'weather-marker-container' // Hook for global CSS if needed
+
+            // Create root and render
+            const root = ReactDOM.createRoot(el)
+            root.render(marker.component)
+
+            // Create MapLibre marker
+            const newMarker = new maplibregl.Marker({
+                element: el,
+                anchor: 'center' // Default
+            })
+                .setLngLat([marker.lon, marker.lat])
+                .addTo(map.current!)
+
+            markersRef.current.push(newMarker)
+        })
+
+    }, [markers, isMapReady]) // Re-run when markers data changes or map becomes ready
 
     useEffect(() => {
-        if (loaded && map.current && centerOn) {
+        if (map.current && centerOn) {
             map.current.flyTo({
                 center: [centerOn.lon, centerOn.lat],
                 zoom: 12,
@@ -52,7 +80,7 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 duration: 1500
             })
         }
-    }, [centerOn, loaded])
+    }, [centerOn])
 
     useEffect(() => {
         if (map.current) return
@@ -75,34 +103,19 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
             })
 
             map.current.on('load', () => {
-                setLoaded(true)
-                updateMarkerPositions()
+                setIsMapReady(true)
                 checkResetButtonVisibility()
-                // Disable touch interactions completely
+                // Disable interactions
                 map.current?.touchZoomRotate.disable()
                 map.current?.dragPan.disable()
             })
 
-            map.current.on('zoom', () => {
-                if (map.current) setCurrentZoom(map.current.getZoom())
-                updateMarkerPositions()
-                checkResetButtonVisibility()
-            })
-
-            map.current.on('resize', updateMarkerPositions)
-            map.current.on('move', () => {
-                updateMarkerPositions()
-                checkResetButtonVisibility()
-            })
-
-            const resizeObserver = new ResizeObserver(() => {
-                map.current?.resize()
-                updateMarkerPositions()
-            })
-            resizeObserver.observe(mapContainer.current)
+            map.current.on('zoom', checkResetButtonVisibility)
+            map.current.on('move', checkResetButtonVisibility)
         }
 
         return () => {
+            markersRef.current.forEach(m => m.remove())
             map.current?.remove()
             map.current = null
         }
@@ -113,23 +126,6 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
         const currentZoom = map.current.getZoom()
         const initialZoom = getInitialZoom()
         setShowResetButton(currentZoom > initialZoom + 0.5)
-    }
-
-    const updateMarkerPositions = () => {
-        if (!map.current) return
-
-        const newPositions = markersRef.current.map(marker => {
-            const point = map.current!.project([marker.lon, marker.lat])
-            return {
-                id: marker.id,
-                x: point.x,
-                y: point.y
-            }
-        })
-
-        if (JSON.stringify(newPositions) !== JSON.stringify(projectedMarkers)) {
-            setProjectedMarkers(newPositions)
-        }
     }
 
     const handleResetView = () => {
@@ -143,16 +139,6 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
             onReset?.()
         }
     }
-
-    const getMarkerScale = () => {
-        const base = 1
-        const max = 2.5
-        const zoomThreshold = 11
-        if (currentZoom <= zoomThreshold) return base
-        const scale = base + ((currentZoom - zoomThreshold) * 0.8)
-        return Math.min(scale, max)
-    }
-    const markerScale = getMarkerScale()
 
     return (
         <div className="relative w-full h-full overflow-hidden rounded-2xl">
@@ -169,28 +155,6 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                     </svg>
                 </button>
             )}
-
-            {/* Markers Container - Fades in only when map is loaded */}
-            <div className={`transition-opacity duration-700 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0'}`}>
-                {projectedMarkers.map((pos, index) => {
-                    const markerData = markers[index]
-                    if (!markerData) return null
-
-                    return (
-                        <div
-                            key={pos.id}
-                            className="absolute z-10 hover:z-[100] transition-transform duration-200 will-change-transform"
-                            style={{
-                                left: pos.x,
-                                top: pos.y,
-                                transform: `translate(-50%, 6px) scale(${markerScale})`
-                            }}
-                        >
-                            {markerData.component}
-                        </div>
-                    )
-                })}
-            </div>
         </div>
     )
 }

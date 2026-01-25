@@ -21,7 +21,7 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
     const { selectedDay, selectedCity, centerOn, handleSearch, handleDaySelect, resetView } = useMapUrlState()
     const [allData, setAllData] = useState<any[]>([])
 
-    
+
     const stats = useMemo(() => {
         if (!allData.length) return { avgTemp: 0, maxTemp: 0, analysis: "Chargement des données..." }
 
@@ -35,30 +35,30 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
             return data.hourly.temperature_2m[dataIndex] as number
         }).filter((t): t is number => typeof t === 'number')
 
-        
+
         if (!temps.length && !loading && !error) return { avgTemp: 0, maxTemp: 0, analysis: "Données indisponibles." }
         if (loading) return { avgTemp: 0, maxTemp: 0, analysis: "Chargement..." }
 
         const avgTemp = temps.reduce((a, b) => a + b, 0) / temps.length
         const maxTemp = Math.max(...temps)
 
-        
+
         let analysis = "";
 
-        
+
         if (avgTemp >= 30) analysis += "Une chaleur intense règne sur l'ensemble de l'île, avec des températures nettement supérieures aux normales. ";
         else if (avgTemp >= 28) analysis += "Les températures sont chaudes et conformes à la saison, avec un ressenti agréable grâce aux alizés. ";
         else analysis += "L'ambiance est relativement clémente aujourd'hui avec des températures modérées pour la saison. ";
 
-        
+
         if (maxTemp >= 32) analysis += `Le thermomètre grimpe localement jusqu'à ${Math.round(maxTemp)}°C dans les plaines et zones abritées du vent. `;
         else analysis += `Le mercure reste raisonnable, ne dépassant pas ${Math.round(maxTemp)}°C au plus chaud de la journée sur le littoral. `;
 
-        
+
         if (timeOfDay === 'afternoon') analysis += "L'inconfort thermique est maximal en ce moment, la chaleur étant accentuée par l'humidité ambiante. ";
         else analysis += "La fraîcheur matinale se dissipe rapidement pour laisser place à une chaleur lourde dès la mi-journée. ";
 
-        
+
         if (avgTemp >= 31 || maxTemp >= 33) analysis += "Hydratez-vous fréquemment et évitez les efforts physiques intenses aux heures les plus chaudes.";
         else analysis += "Profitez de ces belles conditions climatiques, idéales pour les activités de plein air et la plage.";
 
@@ -119,7 +119,7 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
                         className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
                     >
                         <div className={`
-                            px-2 py-1.5 rounded-xl shadow-lg border border-white/30 backdrop-blur-md flex items-center justify-center gap-1.5
+                            px-2 py-1.5 rounded-xl shadow-lg border border-white/30 flex items-center justify-center gap-1.5
                             transition-all duration-300 hover:shadow-xl
                             ${temp >= 30 ? 'bg-gradient-to-br from-red-500/95 to-orange-500/95 text-white shadow-orange-500/30' :
                                 temp >= 28 ? 'bg-gradient-to-br from-orange-500/95 to-amber-500/95 text-white shadow-amber-500/30' :
@@ -128,7 +128,7 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
                             <i className={`bi ${iconClass} text-lg leading-none drop-shadow-sm`} />
                             <span className="font-black text-sm leading-none tracking-tight drop-shadow-sm pt-[2px]">{temp}°</span>
                         </div>
-                        <span className="text-[9px] font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full mt-1 shadow-md border border-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1">
+                        <span className="text-[9px] font-bold text-slate-700 bg-white/90 px-2 py-0.5 rounded-full mt-1 shadow-md border border-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-1">
                             {city.name}
                         </span>
                     </div>
@@ -144,8 +144,8 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
             <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
-                    {}
-                    <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
+                    { }
+                    <div className="relative w-full h-[85vh] min-h-[500px] lg:h-[700px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
                             {error && <MapErrorDisplay onRetry={fetchData} />}
 
@@ -198,7 +198,7 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
                             </div>
 
                             <div className="space-y-6">
-                                {}
+                                { }
                                 <div className="bg-slate-50 p-1.5 rounded-2xl flex items-center border border-slate-200">
                                     <button
                                         onClick={() => setTimeOfDay('morning')}
@@ -228,7 +228,7 @@ export default function TemperatureMapPage({ initialUser }: { initialUser: any }
                             </div>
                         </div>
 
-                        {}
+                        { }
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="text-orange-500">

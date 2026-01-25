@@ -39,25 +39,25 @@ export default function RainMapPage({ initialUser }: { initialUser: any }) {
         const avgPrecip = precipValues.reduce((a, b) => a + b, 0) / precipValues.length
         const maxPrecip = Math.max(...precipValues)
 
-        
+
         let analysis = "";
 
-        
+
         if (avgPrecip < 0.1) analysis += "Le ciel est globalement dégagé sur l'ensemble de l'île, sans précipitations notables prévues. ";
         else if (avgPrecip < 2) analysis += "Quelques averses passagères traversent l'île, arrosant principalement le relief et la côte au vent. ";
         else analysis += "Un épisode pluvieux significatif concerne la Martinique avec des pluies fréquentes et parfois soutenues. ";
 
-        
+
         if (maxPrecip > 15) analysis += `Des cumuls importants sont relevés localement, atteignant ${maxPrecip.toFixed(1)} mm sur les zones les plus exposées. `;
         else if (maxPrecip > 5) analysis += `L'intensité reste modérée, avec des cumuls maximaux autour de ${maxPrecip.toFixed(1)} mm sous les grains les plus actifs. `;
         else analysis += "Les quantités d'eau restent anecdotiques, ne dépassant pas quelques millimètres sur les sommets. ";
 
-        
+
         if (avgPrecip > 3) analysis += "La couverture nuageuse reste dense et menaçante, limitant grandement les éclaircies. ";
         else if (avgPrecip > 0.5) analysis += "Le ciel est variable, alternant entre passages nuageux porteurs d'averses et belles éclaircies. ";
         else analysis += "Le soleil domine largement malgré quelques nuages inoffensifs circulant dans le flux d'alizé. ";
 
-        
+
         if (maxPrecip > 20) analysis += "La prudence est de mise à proximité des cours d'eau en raison du risque de montée rapide des eaux.";
         else if (avgPrecip > 1) analysis += "Un parapluie ou un imperméable pourra s'avérer utile lors de vos déplacements extérieurs.";
         else analysis += "Profitez de ces conditions sèches idéales pour toutes vos activités de plein air et de plage.";
@@ -69,7 +69,7 @@ export default function RainMapPage({ initialUser }: { initialUser: any }) {
         setLoading(true)
         setError(false)
         try {
-            
+
             const lats = MARTINIQUE_CITIES.map(c => c.lat.toFixed(4)).join(",")
             const lons = MARTINIQUE_CITIES.map(c => c.lon.toFixed(4)).join(",")
             const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&hourly=precipitation,precipitation_probability&timezone=America/Martinique`)
@@ -108,7 +108,7 @@ export default function RainMapPage({ initialUser }: { initialUser: any }) {
             const precip = cityData.hourly.precipitation[dataIndex]
             const prob = cityData.hourly.precipitation_probability[dataIndex]
             const isRaining = precip > 0.1
-            const isHeavy = precip > 5 
+            const isHeavy = precip > 5
 
             return {
                 id: city.name,
@@ -120,7 +120,7 @@ export default function RainMapPage({ initialUser }: { initialUser: any }) {
                         className="flex flex-col items-center group cursor-pointer transition-all duration-300 hover:z-50 hover:scale-110 animate-fade-in-up"
                     >
                         <div className={`
-                            px-1.5 py-1 rounded-lg shadow-lg border backdrop-blur-md flex items-center gap-1
+                            px-1.5 py-1 rounded-lg shadow-lg border flex items-center gap-1
                             transition-all duration-300 hover:shadow-xl
                             ${isHeavy ? 'bg-gradient-to-br from-blue-600/95 to-indigo-600/95 border-blue-400/50 text-white shadow-blue-500/30' :
                                 isRaining ? 'bg-gradient-to-br from-blue-500/95 to-cyan-500/95 border-blue-400/50 text-white shadow-blue-500/30' :
@@ -132,8 +132,8 @@ export default function RainMapPage({ initialUser }: { initialUser: any }) {
                                 <span className="text-[8px] font-medium opacity-80 ml-0.5">mm</span>
                             </span>
                         </div>
-                        {}
-                        <div className="absolute top-full mt-2 bg-white/95 backdrop-blur-md px-4 py-3 rounded-xl shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 pointer-events-none min-w-[140px] transform group-hover:translate-y-0 translate-y-1">
+                        { }
+                        <div className="absolute top-full mt-2 bg-white/95 px-4 py-3 rounded-xl shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 pointer-events-none min-w-[140px] transform group-hover:translate-y-0 translate-y-1">
                             <p className="font-black text-slate-800 text-sm text-center mb-2">{city.name}</p>
                             <div className="flex justify-between items-center text-xs text-slate-500 border-t border-slate-100 pt-2">
                                 <span>Probabilité</span>
@@ -153,8 +153,8 @@ export default function RainMapPage({ initialUser }: { initialUser: any }) {
             <Header initialUser={initialUser} />
             <main className="flex-1 w-full px-4 sm:px-6 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-stretch my-6">
-                    {}
-                    <div className="relative w-full h-auto min-h-[500px] sm:min-h-[600px] lg:min-h-[650px] animate-fade-in-up">
+                    { }
+                    <div className="relative w-full h-[85vh] min-h-[500px] lg:h-[700px] animate-fade-in-up">
                         <div className="absolute inset-0 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
                             {error && <MapErrorDisplay onRetry={fetchData} />}
 
@@ -175,7 +175,7 @@ export default function RainMapPage({ initialUser }: { initialUser: any }) {
                             <div className="flex-1 relative overflow-hidden">
                                 <MartiniqueMap markers={markers} centerOn={centerOn} onReset={resetView} />
 
-                                {}
+                                { }
                                 <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 z-10">
                                     <div className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Intensité</div>
                                     <div className="flex flex-col gap-2">
@@ -197,9 +197,9 @@ export default function RainMapPage({ initialUser }: { initialUser: any }) {
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <div className="w-full space-y-4 sm:space-y-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                        {}
+                        { }
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
                             <div className="mb-6">
                                 <h3 className="text-lg font-bold text-slate-800 mb-2">Contrôles</h3>
