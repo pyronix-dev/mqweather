@@ -50,9 +50,11 @@ export async function getUserFromSession() {
         }
 
 
-        let displayName = user.reference_code
+        let displayName = 'Utilisateur'
         if (user.full_name) {
             displayName = user.full_name.split(' ')[0]
+        } else if (user.email) {
+            displayName = user.email.split('@')[0]
         }
 
 
