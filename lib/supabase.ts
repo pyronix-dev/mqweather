@@ -26,7 +26,8 @@ export interface User {
     email: string | null
     phone: string | null
     created_at: string
-    notifications_enabled?: boolean 
+    notifications_enabled?: boolean
+    stripe_customer_id?: string
 }
 
 export interface Subscription {
@@ -53,13 +54,13 @@ export interface OtpCode {
 export function generateReferenceCode(sessionId?: string): string {
     const prefix = "MQ"
     if (sessionId) {
-        
+
         const hash = sessionId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-        
+
         const number = (hash % 900000) + 100000
         return `${prefix}${number}`
     }
-    
+
     const random = Math.floor(100000 + Math.random() * 900000).toString()
     return `${prefix}${random}`
 }

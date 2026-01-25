@@ -47,9 +47,36 @@ export async function POST(request: NextRequest) {
         const priceConfig = PRICES[plan as keyof typeof PRICES]
         const origin = request.headers.get('origin') || 'http://localhost:3000'
 
+        // Check for authenticated user to reuse Stripe Customer ID
+        let customerId: string | undefined = undefined
+        const cookieStore = await import('next/headers').then(mod => mod.cookies())
+        const authSession = cookieStore.get('auth_session')?.value
+
+        if (authSession) {
+            try {
+                const sessionData = JSON.parse(authSession)
+                if (sessionData.userId) {
+                    const { createSupabaseAdmin } = await import('@/lib/supabase')
+                    const supabase = createSupabaseAdmin()
+                    const { data: user } = await supabase
+                        .from('users')
+                        .select('stripe_customer_id')
+                        .eq('id', sessionData.userId)
+                        .single()
+
+                    if (user?.stripe_customer_id) {
+                        customerId = user.stripe_customer_id
+                        console.log('🔄 Reusing existing Stripe Customer:', customerId)
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to parse auth session for checkout:', e)
+            }
+        }
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
+            customer: customerId, // Use existing customer if found
             ui_mode: 'embedded',
             line_items: [
                 {
@@ -75,7 +102,7 @@ export async function POST(request: NextRequest) {
                 email: email || '',
                 profile: profile || '',
             },
-            customer_email: email || undefined,
+            customer_email: customerId ? undefined : (email || undefined), // Don't send email if we provide customer ID
         })
 
         return NextResponse.json({ clientSecret: session.client_secret })

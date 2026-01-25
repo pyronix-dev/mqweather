@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     const body = await request.text()
     const signature = request.headers.get('stripe-signature')
 
-    
+
     console.log('📥 Received Stripe Webhook')
 
     if (!signature) {
@@ -39,12 +39,12 @@ export async function POST(request: NextRequest) {
     let event: Stripe.Event
 
     try {
-        
+
         if (webhookSecret) {
             event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
             console.log('✅ Signature verified')
         } else {
-            
+
             event = JSON.parse(body) as Stripe.Event
             console.warn('⚠️ Webhook signature verification skipped (no STRIPE_WEBHOOK_SECRET)')
         }
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         )
     }
 
-    
+
     switch (event.type) {
         case 'checkout.session.completed': {
             const session = event.data.object as Stripe.Checkout.Session
@@ -66,33 +66,33 @@ export async function POST(request: NextRequest) {
             console.log('Customer email:', session.customer_email)
             console.log('Metadata:', session.metadata)
 
-            
+
             const plan = session.metadata?.plan || ''
             const phone = session.metadata?.phone || ''
             const email = session.customer_email || session.metadata?.email || ''
 
-            
-            const fullName = session.customer_details?.name || ''
-            const country = session.customer_details?.address?.country || 'MQ' 
 
-            
-            
-            
-            
+            const fullName = session.customer_details?.name || ''
+            const country = session.customer_details?.address?.country || 'MQ'
+
+
+
+
+
             const paymentDetails = session.payment_method_details?.card
             const cardBrand = paymentDetails?.brand || ''
             const cardLast4 = paymentDetails?.last4 || ''
 
-            
+
             let referenceCode = ''
 
             try {
                 const supabase = createSupabaseAdmin()
 
-                
+
                 let userId: string
 
-                
+
                 const { data: existingUser } = await supabase
                     .from('users')
                     .select('id, reference_code')
@@ -101,18 +101,19 @@ export async function POST(request: NextRequest) {
 
                 if (existingUser) {
                     userId = existingUser.id
-                    referenceCode = existingUser.reference_code 
+                    referenceCode = existingUser.reference_code
                     console.log('📦 Found existing user:', userId, 'Ref:', referenceCode)
 
-                    
+
                     await supabase.from('users').update({
                         full_name: fullName,
-                        country: country
+                        country: country,
+                        stripe_customer_id: session.customer as string
                     }).eq('id', userId)
 
                 } else {
-                    
-                    
+
+
                     referenceCode = generateReferenceCode(session.id)
                     console.log('Generating new reference:', referenceCode)
 
@@ -123,7 +124,8 @@ export async function POST(request: NextRequest) {
                             email: email || null,
                             phone: phone || null,
                             full_name: fullName,
-                            country: country
+                            country: country,
+                            stripe_customer_id: session.customer as string
                         })
                         .select('id')
                         .single()
@@ -137,7 +139,7 @@ export async function POST(request: NextRequest) {
                     console.log('👤 Created new user:', userId)
                 }
 
-                
+
                 const { error: subError } = await supabase
                     .from('subscriptions')
                     .insert({
@@ -161,15 +163,15 @@ export async function POST(request: NextRequest) {
 
             } catch (dbError) {
                 console.error('❌ Database error:', dbError)
-                
+
             }
 
-            
-            
-            
+
+
+
 
             if (plan.includes('sms')) {
-                
+
                 if (phone) {
                     console.log(`📱 Sending SMS confirmation to ${phone}...`)
                     const smsResult = await sendSMSConfirmation(phone, plan, referenceCode)
@@ -180,7 +182,7 @@ export async function POST(request: NextRequest) {
                     }
                 }
 
-                
+
                 if (email) {
                     console.log(`📧 Sending Email confirmation to ${email}...`)
                     const emailResult = await sendEmailConfirmation(email, plan, referenceCode)
@@ -210,7 +212,7 @@ export async function POST(request: NextRequest) {
             console.log('📝 Subscription updated:', subscription.id)
             console.log('Status:', subscription.status)
 
-            
+
             try {
                 const supabase = createSupabaseAdmin()
                 await supabase
@@ -218,9 +220,9 @@ export async function POST(request: NextRequest) {
                     .update({ status: subscription.status === 'active' ? 'active' : 'cancelled' })
                     .eq('stripe_subscription_id', subscription.id)
 
-                
-                
-                
+
+
+
                 const previousAttributes = event.data.previous_attributes
                 const itemsChanged = previousAttributes && previousAttributes.items
 
@@ -229,7 +231,7 @@ export async function POST(request: NextRequest) {
                     const newPrice = subscription.items.data[0].price.unit_amount
 
                     if (newPrice) {
-                        
+
                         const getPlanFromAmount = (amount: number) => {
                             for (const [key, val] of Object.entries(PLAN_PRICES)) {
                                 if (val === amount) return key
@@ -240,7 +242,7 @@ export async function POST(request: NextRequest) {
                         const newPlan = getPlanFromAmount(newPrice)
 
                         if (newPlan) {
-                            
+
                             const { data: subData } = await supabase
                                 .from('subscriptions')
                                 .select('user_id')
@@ -274,7 +276,7 @@ export async function POST(request: NextRequest) {
             const subscription = event.data.object as Stripe.Subscription
             console.log('❌ Subscription cancelled:', subscription.id)
 
-            
+
             try {
                 const supabase = createSupabaseAdmin()
                 await supabase
@@ -290,7 +292,19 @@ export async function POST(request: NextRequest) {
         case 'invoice.payment_failed': {
             const invoice = event.data.object as Stripe.Invoice
             console.log('⚠️ Payment failed for invoice:', invoice.id)
-            
+
+            break
+        }
+
+        case 'payment_method.attached': {
+            const paymentMethod = event.data.object as Stripe.PaymentMethod
+            console.log('💳 Payment method attached:', paymentMethod.id)
+            break
+        }
+
+        case 'payment_method.detached': {
+            const paymentMethod = event.data.object as Stripe.PaymentMethod
+            console.log('🗑️ Payment method detached:', paymentMethod.id)
             break
         }
 
