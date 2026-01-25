@@ -76,7 +76,11 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
             try {
                 const res = await fetch('/api/auth/me')
                 if (!res.ok) {
-                    router.push('/login')
+                    // Only redirect if we don't have an initial user (session might have expired)
+                    // If we have initialUser, it means server rendered it fine, so maybe API error is temporary
+                    if (!initialUser) {
+                        router.push('/login')
+                    }
                     return
                 }
                 const data = await res.json()
