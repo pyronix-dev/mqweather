@@ -498,7 +498,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                   </div>
                   <h2 className="text-xl sm:text-2xl font-black text-slate-800">Alertes Email</h2>
                   <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">
-                    1.00€/an
+                    0.01€/an
                   </span>
                 </div>
                 <p className="text-slate-500 font-medium mb-8 ml-14">
@@ -683,7 +683,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                   onClick={() => handleCheckout('email-annual')}
                   className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:from-slate-300 disabled:to-slate-300 disabled:cursor-not-allowed text-white font-black text-lg rounded-xl transition-all duration-300 hover:shadow-xl active:scale-[0.98]"
                 >
-                  {isLoading ? 'Chargement...' : "Payer 1.00€ et s'abonner pour 1 an"}
+                  {isLoading ? 'Chargement...' : "Payer 0.01€ et s'abonner pour 1 an"}
                 </button>
               </div>
             </div>

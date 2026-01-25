@@ -23,7 +23,7 @@ const PRICES = {
         interval: 'year' as const,
     },
     'email-annual': {
-        amount: 100, // 1.00€ for testing (was 1000)
+        amount: 1, // 0.01€ for testing (was 1000)
         name: 'Alertes Email - Annuel',
         description: 'Alertes météo Email - Abonnement annuel',
         mode: 'subscription' as const,
