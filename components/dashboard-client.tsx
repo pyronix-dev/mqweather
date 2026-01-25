@@ -323,11 +323,35 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
                                             Notifications
                                         </div>
                                         <button
+                                            onClick={async () => {
+                                                const newState = !user.notifications_enabled
+                                                // Optimistic update
+                                                setUser(prev => prev ? { ...prev, notifications_enabled: newState } : null)
 
-                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${(user.notifications ? (user.notifications.sms || user.notifications.email) : user.notifications_enabled) ? 'bg-emerald-500' : 'bg-slate-200'}`}
+                                                try {
+                                                    const res = await fetch('/api/user/notifications', {
+                                                        method: 'PATCH',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({ enabled: newState })
+                                                    })
+                                                    if (!res.ok) throw new Error('Failed')
+
+                                                    // Refresh data to get granular updates (sms/email might have changed)
+                                                    const updatedRes = await fetch('/api/auth/me')
+                                                    if (updatedRes.ok) {
+                                                        const updatedData = await updatedRes.json()
+                                                        setUser(updatedData)
+                                                    }
+                                                } catch (e) {
+                                                    // Revert
+                                                    setUser(prev => prev ? { ...prev, notifications_enabled: !newState } : null)
+                                                    showToast("Erreur lors de la mise à jour", "error")
+                                                }
+                                            }}
+                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${user.notifications_enabled ? 'bg-emerald-500' : 'bg-slate-200'}`}
                                         >
                                             <span
-                                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${(user.notifications ? (user.notifications.sms || user.notifications.email) : user.notifications_enabled) ? 'translate-x-6' : 'translate-x-1'}`}
+                                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${user.notifications_enabled ? 'translate-x-6' : 'translate-x-1'}`}
                                             />
                                         </button>
                                     </div>

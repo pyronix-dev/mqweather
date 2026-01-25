@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { Switch } from "@headlessui/react"
 
 const ArrowLeftIcon = () => (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,7 +19,11 @@ const MoonIcon = () => (
     </svg>
 )
 
-
+const BellIcon = () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+)
 
 const ShieldExclamationIcon = () => (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -30,20 +35,26 @@ import { DeleteAccountDialog } from "@/components/delete-account-dialog"
 
 export default function SettingsPage({ initialUser }: { initialUser: any }) {
     const [darkMode, setDarkMode] = useState(false)
+    const [smsAlerts, setSmsAlerts] = useState(false)
+    const [emailAlerts, setEmailAlerts] = useState(false)
 
     const [loading, setLoading] = useState(true)
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 
-    
+    // Initial load
     useEffect(() => {
         const fetchSettings = async () => {
             try {
                 const res = await fetch('/api/auth/me')
                 if (res.ok) {
                     const data = await res.json()
-                    
-
-                    
+                    // Assuming data.notifications has { sms: bool, email: bool }
+                    // OR data has notif_sms, notif_email at root if getUserFromSession differs.
+                    // Based on api/auth/me read previously, it returns data.notifications object.
+                    if (data.notifications) {
+                        setSmsAlerts(!!data.notifications.sms)
+                        setEmailAlerts(!!data.notifications.email)
+                    }
                 }
             } catch (e) {
                 console.error(e)
@@ -54,6 +65,25 @@ export default function SettingsPage({ initialUser }: { initialUser: any }) {
         fetchSettings()
     }, [])
 
+    const handleToggle = async (type: 'sms' | 'email', value: boolean) => {
+        // Optimistic update
+        if (type === 'sms') setSmsAlerts(value)
+        if (type === 'email') setEmailAlerts(value)
+
+        try {
+            const res = await fetch('/api/user/notifications', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [type]: value })
+            })
+            if (!res.ok) throw new Error('Failed to update')
+        } catch (e) {
+            // Revert on error
+            if (type === 'sms') setSmsAlerts(!value)
+            if (type === 'email') setEmailAlerts(!value)
+            alert("Erreur lors de la mise à jour des paramètres")
+        }
+    }
 
 
     return (
@@ -77,7 +107,36 @@ export default function SettingsPage({ initialUser }: { initialUser: any }) {
                     <div className="py-12 text-center text-slate-500">Chargement...</div>
                 ) : (
                     <div className="space-y-6">
-                        {}
+
+                        {/* Notifications Section - RESTORED */}
+                        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <BellIcon />
+                                Gestion des Notifications
+                            </h2>
+                            <div className="space-y-6">
+                                {/* SMS Toggle */}
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="font-medium text-slate-700">Alertes par SMS</p>
+                                        <p className="text-sm text-slate-500">Recevez les vigilances météo directement par SMS.</p>
+                                    </div>
+                                    <ToggleSwitch enabled={smsAlerts} onChange={(val) => handleToggle('sms', val)} />
+                                </div>
+                                <div className="h-px bg-slate-100" />
+                                {/* Email Toggle */}
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="font-medium text-slate-700">Alertes par Email</p>
+                                        <p className="text-sm text-slate-500">Recevez les bulletins et alertes dans votre boîte mail.</p>
+                                    </div>
+                                    <ToggleSwitch enabled={emailAlerts} onChange={(val) => handleToggle('email', val)} />
+                                </div>
+                            </div>
+                        </section>
+
+
+                        {/* Appearance Section */}
                         <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                             <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
                                 <MoonIcon />
@@ -88,12 +147,7 @@ export default function SettingsPage({ initialUser }: { initialUser: any }) {
                                     <p className="font-medium text-slate-700">Mode Sombre</p>
                                     <p className="text-sm text-slate-500">Activer le thème sombre pour l'interface</p>
                                 </div>
-                                <button
-                                    onClick={() => setDarkMode(!darkMode)}
-                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${darkMode ? 'bg-slate-800' : 'bg-slate-200'}`}
-                                >
-                                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${darkMode ? 'translate-x-6' : 'translate-x-1'}`} />
-                                </button>
+                                <ToggleSwitch enabled={darkMode} onChange={setDarkMode} disabled={true} />
                             </div>
                             <p className="text-xs text-amber-600 mt-3 font-medium bg-amber-50 p-2 rounded-lg inline-block">
                                 🚧 Bientôt disponible
@@ -134,5 +188,17 @@ export default function SettingsPage({ initialUser }: { initialUser: any }) {
                 onClose={() => setIsDeleteOpen(false)}
             />
         </div>
+    )
+}
+
+function ToggleSwitch({ enabled, onChange, disabled = false }: { enabled: boolean, onChange: (val: boolean) => void, disabled?: boolean }) {
+    return (
+        <button
+            onClick={() => !disabled && onChange(!enabled)}
+            disabled={disabled}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${enabled ? 'bg-slate-800' : 'bg-slate-200'} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+        >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enabled ? 'translate-x-6' : 'translate-x-1'}`} />
+        </button>
     )
 }

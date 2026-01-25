@@ -6,7 +6,7 @@ import { createSupabaseAdmin } from '@/lib/supabase'
 export async function PATCH(request: Request) {
     try {
         const body = await request.json()
-        
+
         const { sms, email, enabled } = body
 
         const cookieStore = await cookies()
@@ -25,24 +25,53 @@ export async function PATCH(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
-        const updates: any = {}
-        if (typeof sms === 'boolean') updates.notif_sms = sms
-        if (typeof email === 'boolean') updates.notif_email = email
+        // 1. Fetch current user state
+        const { data: currentUser, error: fetchError } = await supabase
+            .from('users')
+            .select('notif_sms, notif_email')
+            .eq('id', userId)
+            .single()
 
-        
+        if (fetchError || !currentUser) {
+            console.error('Fetch user for notification update error:', fetchError)
+            return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        }
+
+        // 2. Determine new values
+        // If the body contains specific updates, use them, otherwise keep current
+        let newSms = typeof sms === 'boolean' ? sms : currentUser.notif_sms
+        let newEmail = typeof email === 'boolean' ? email : currentUser.notif_email
+        let newEnabled = false
+
+        // 3. Apply logic
         if (typeof enabled === 'boolean') {
-            updates.notifications_enabled = enabled
-            
-            
-            
-            if (enabled === false && sms === undefined && email === undefined) {
-                updates.notif_sms = false
-                updates.notif_email = false
+            // CASE A: Master Toggle Used
+            newEnabled = enabled
+            // If Master is turned OFF, turn everything OFF
+            if (!enabled) {
+                newSms = false
+                newEmail = false
             }
-            if (enabled === true && sms === undefined && email === undefined) {
-                updates.notif_sms = true
-                updates.notif_email = true
+            // If Master is turned ON, turn everything ON (or restore previous? User said "turn them on" -> likely means Enable All)
+            if (enabled) {
+                newSms = true
+                newEmail = true
             }
+        } else {
+            // CASE B: Sub-toggles Used (or mixed)
+            // Re-calculate Master Switch based on the state of children
+            // If ANY notification method is on, the master switch is ON
+            if (newSms || newEmail) {
+                newEnabled = true
+            } else {
+                newEnabled = false
+            }
+        }
+
+        const updates = {
+            notif_sms: newSms,
+            notif_email: newEmail,
+            notifications_enabled: newEnabled
         }
 
         const { error } = await supabase
