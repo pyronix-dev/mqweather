@@ -69,6 +69,7 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
     // If we have an initial user but no subscription, we still want to "load" 
     // to double-check with the API (handles webhook race conditions)
     const [subscriptionLoading, setSubscriptionLoading] = useState(!!initialUser && !initialUser.subscription)
+    const [isClientFetching, setIsClientFetching] = useState(true)
     const [isEditOpen, setIsEditOpen] = useState(false)
     const router = useRouter()
 
@@ -103,6 +104,7 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
             } finally {
                 setLoading(false)
                 setSubscriptionLoading(false)
+                setIsClientFetching(false)
             }
         }
 
@@ -181,8 +183,13 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
                 { }
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-slate-800">
-                            Bonjour, {displayName} 👋
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-800 flex items-center gap-2">
+                            <span>Bonjour,</span>
+                            {(!user.full_name && isClientFetching) ? (
+                                <div className="h-8 w-32 bg-slate-200 rounded-lg animate-pulse" />
+                            ) : (
+                                <span>{displayName} 👋</span>
+                            )}
                         </h1>
                         <p className="text-slate-500 font-medium">
                             Gérez votre abonnement et vos alertes
