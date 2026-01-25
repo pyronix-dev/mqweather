@@ -1,0 +1,12 @@
+// Developed by Omar Rafik (OMX) - omx001@proton.me
+'use client'
+
+import * as React from 'react'
+import {
+  ThemeProvider as NextThemesProvider,
+  type ThemeProviderProps,
+} from 'next-themes'
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+}

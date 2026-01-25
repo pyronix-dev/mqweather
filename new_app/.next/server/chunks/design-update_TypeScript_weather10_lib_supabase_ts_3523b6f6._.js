@@ -1,0 +1,3 @@
+module.exports=[52296,e=>{"use strict";var r=e.i(13235);function t(){let e="https://kcwfevcypzgcrvcjgasx.supabase.co",t=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!e||!t)throw Error("Missing Supabase environment variables");return(0,r.createClient)(e,t,{auth:{autoRefreshToken:!1,persistSession:!1}})}function s(e){if(e){let r=e.split("").reduce((e,r)=>e+r.charCodeAt(0),0);return`MQ${r%9e5+1e5}`}let r=Math.floor(1e5+9e5*Math.random()).toString();return`MQ${r}`}e.s(["createSupabaseAdmin",()=>t,"generateReferenceCode",()=>s])}];
+
+//# sourceMappingURL=design-update_TypeScript_weather10_lib_supabase_ts_3523b6f6._.js.map
