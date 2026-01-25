@@ -55,11 +55,50 @@ export async function getUserFromSession() {
             displayName = user.full_name.split(' ')[0]
         }
 
+
+        const PLAN_NAMES: Record<string, string> = {
+            'sms-monthly': 'SMS Standard - Mensuel',
+            'sms-annual': 'SMS Standard - Annuel',
+            'email-annual': 'Alertes Email - Annuel'
+        }
+
+        const PLAN_PRICES: Record<string, string> = {
+            'sms-monthly': '4,99€',
+            'sms-annual': '49,90€',
+            'email-annual': '10€'
+        }
+
+        // Fetch active subscription
+        const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('plan, status, expires_at, amount')
+            .eq('user_id', session.userId)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single()
+
+        let subscriptionData = null
+        if (subscription) {
+            const expiresAt = subscription.expires_at ? new Date(subscription.expires_at) : null
+            subscriptionData = {
+                plan: PLAN_NAMES[subscription.plan] || subscription.plan,
+                price: PLAN_PRICES[subscription.plan] || `${(subscription.amount / 100).toFixed(2)}€`,
+                status: subscription.status === 'active' ? 'Actif' : 'Inactif',
+                nextBilling: expiresAt ? expiresAt.toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                }) : 'Non défini'
+            }
+        }
+
         return {
             name: displayName,
             reference: user.reference_code,
             email: user.email || '',
-            role: user.role
+            role: user.role,
+            subscription: subscriptionData
         }
     } catch (e) {
         console.error('Error fetching user server-side:', e)

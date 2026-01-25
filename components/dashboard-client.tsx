@@ -58,7 +58,7 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
         email: initialUser.email,
         phone: null,
         role: initialUser.role,
-        subscription: null
+        subscription: initialUser.subscription
     } as any : null)
 
 
