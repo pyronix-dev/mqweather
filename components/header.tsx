@@ -442,11 +442,13 @@ export function Header({ initialUser }: HeaderProps) {
                       Mon Tableau de bord
                     </Link>
 
-                    <button
-                      className="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                    <Link
+                      href="/dashboard/settings"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="block w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                     >
                       Paramètres
-                    </button>
+                    </Link>
                     <div className="border-t border-slate-100 my-1"></div>
                     <button
                       onClick={handleLogout}
