@@ -74,16 +74,15 @@ const BrandIcon = ({ brand }: { brand: string }) => {
 
 import { DeleteAccountDialog } from "@/components/delete-account-dialog"
 
-export default function SettingsPage({ initialUser }: { initialUser: any }) {
+export default function SettingsPage({ initialUser, initialPaymentMethods = [] }: { initialUser: any, initialPaymentMethods?: any[] }) {
     const [darkMode, setDarkMode] = useState(false)
-    const [smsAlerts, setSmsAlerts] = useState(false)
-    const [emailAlerts, setEmailAlerts] = useState(false)
-    const [paymentMethods, setPaymentMethods] = useState<any[]>([])
+    const [smsAlerts, setSmsAlerts] = useState(initialUser?.notifications_sms ?? true)
+    const [emailAlerts, setEmailAlerts] = useState(initialUser?.notifications_email ?? true)
+    const [paymentMethods, setPaymentMethods] = useState<any[]>(initialPaymentMethods)
 
-    const [loading, setLoading] = useState(true)
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 
-    // Initial load
+    // Initial load - only notifications (payment methods loaded server-side)
     useEffect(() => {
         const fetchSettings = async () => {
             try {
@@ -95,16 +94,8 @@ export default function SettingsPage({ initialUser }: { initialUser: any }) {
                         setEmailAlerts(!!data.notifications.email)
                     }
                 }
-
-                const pmRes = await fetch('/api/user/payment-methods')
-                if (pmRes.ok) {
-                    const pmData = await pmRes.json()
-                    setPaymentMethods(pmData.paymentMethods || [])
-                }
             } catch (e) {
                 console.error(e)
-            } finally {
-                setLoading(false)
             }
         }
         fetchSettings()
@@ -148,120 +139,116 @@ export default function SettingsPage({ initialUser }: { initialUser: any }) {
                     <p className="text-slate-500 mt-1">Personnalisez votre expérience</p>
                 </div>
 
-                {loading ? (
-                    <div className="py-12 text-center text-slate-500">Chargement...</div>
-                ) : (
-                    <div className="space-y-6">
+                <div className="space-y-6">
 
-                        {/* Notifications Section - RESTORED */}
-                        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <BellIcon />
-                                Gestion des Notifications
-                            </h2>
-                            <div className="space-y-6">
-                                {/* SMS Toggle */}
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="font-medium text-slate-700">Alertes par SMS</p>
-                                        <p className="text-sm text-slate-500">Recevez les vigilances météo directement par SMS.</p>
-                                    </div>
-                                    <ToggleSwitch enabled={smsAlerts} onChange={(val) => handleToggle('sms', val)} />
-                                </div>
-                                <div className="h-px bg-slate-100" />
-                                {/* Email Toggle */}
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="font-medium text-slate-700">Alertes par Email</p>
-                                        <p className="text-sm text-slate-500">Recevez les bulletins et alertes dans votre boîte mail.</p>
-                                    </div>
-                                    <ToggleSwitch enabled={emailAlerts} onChange={(val) => handleToggle('email', val)} />
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Payment Methods Section */}
-                        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <CreditCardIcon />
-                                Moyens de paiement
-                            </h2>
-                            {paymentMethods.length > 0 ? (
-                                <div className="space-y-3">
-                                    {paymentMethods.map((pm) => (
-                                        <div key={pm.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                            <div className="flex items-center gap-3">
-                                                <div className="bg-white p-1 rounded border border-slate-200 shadow-sm">
-                                                    <BrandIcon brand={pm.brand} />
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-slate-800 capitalize flex items-center gap-2">
-                                                        {pm.brand}
-                                                        <span className="text-slate-500 font-mono text-sm">•••• {pm.last4}</span>
-                                                    </p>
-                                                    <p className="text-xs text-slate-500">
-                                                        Expire fin {pm.exp_month}/{pm.exp_year}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            {/* <button className="text-xs text-red-600 hover:text-red-700 font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors">
-                                                Supprimer
-                                            </button> */}
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                                    <p className="text-sm text-slate-500">Aucun moyen de paiement enregistré</p>
-                                </div>
-                            )}
-                        </section>
-
-
-                        {/* Appearance Section */}
-                        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <MoonIcon />
-                                Apparence
-                            </h2>
+                    {/* Notifications Section - RESTORED */}
+                    <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                        <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <BellIcon />
+                            Gestion des Notifications
+                        </h2>
+                        <div className="space-y-6">
+                            {/* SMS Toggle */}
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="font-medium text-slate-700">Mode Sombre</p>
-                                    <p className="text-sm text-slate-500">Activer le thème sombre pour l'interface</p>
+                                    <p className="font-medium text-slate-700">Alertes par SMS</p>
+                                    <p className="text-sm text-slate-500">Recevez les vigilances météo directement par SMS.</p>
                                 </div>
-                                <ToggleSwitch enabled={darkMode} onChange={setDarkMode} disabled={true} />
+                                <ToggleSwitch enabled={smsAlerts} onChange={(val) => handleToggle('sms', val)} />
                             </div>
-                            <p className="text-xs text-amber-600 mt-3 font-medium bg-amber-50 p-2 rounded-lg inline-block">
-                                🚧 Bientôt disponible
-                            </p>
-                        </section>
-
-
-
-                        {/* Privacy Section */}
-                        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <ShieldExclamationIcon />
-                                Confidentialité et Données
-                            </h2>
-                            <div className="space-y-4">
-                                <button className="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium transition-colors">
-                                    Télécharger mes données (GDPR)
-                                </button>
-                                <button
-                                    onClick={() => setIsDeleteOpen(true)}
-                                    className="w-full text-left px-4 py-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-medium transition-colors"
-                                >
-                                    Supprimer mon compte
-                                </button>
+                            <div className="h-px bg-slate-100" />
+                            {/* Email Toggle */}
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="font-medium text-slate-700">Alertes par Email</p>
+                                    <p className="text-sm text-slate-500">Recevez les bulletins et alertes dans votre boîte mail.</p>
+                                </div>
+                                <ToggleSwitch enabled={emailAlerts} onChange={(val) => handleToggle('email', val)} />
                             </div>
-                        </section>
+                        </div>
+                    </section>
 
-                        <p className="text-center text-xs text-slate-400 font-medium pt-4">
-                            Version 0.1.0 • ID: {Math.random().toString(36).substr(2, 9).toUpperCase()}
+                    {/* Payment Methods Section */}
+                    <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                        <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <CreditCardIcon />
+                            Moyens de paiement
+                        </h2>
+                        {paymentMethods.length > 0 ? (
+                            <div className="space-y-3">
+                                {paymentMethods.map((pm) => (
+                                    <div key={pm.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <div className="flex items-center gap-3">
+                                            <div className="bg-white p-1 rounded border border-slate-200 shadow-sm">
+                                                <BrandIcon brand={pm.brand} />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-slate-800 capitalize flex items-center gap-2">
+                                                    {pm.brand}
+                                                    <span className="text-slate-500 font-mono text-sm">•••• {pm.last4}</span>
+                                                </p>
+                                                <p className="text-xs text-slate-500">
+                                                    Expire fin {pm.exp_month}/{pm.exp_year}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {/* <button className="text-xs text-red-600 hover:text-red-700 font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors">
+                                                Supprimer
+                                            </button> */}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                <p className="text-sm text-slate-500">Aucun moyen de paiement enregistré</p>
+                            </div>
+                        )}
+                    </section>
+
+
+                    {/* Appearance Section */}
+                    <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                        <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <MoonIcon />
+                            Apparence
+                        </h2>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="font-medium text-slate-700">Mode Sombre</p>
+                                <p className="text-sm text-slate-500">Activer le thème sombre pour l'interface</p>
+                            </div>
+                            <ToggleSwitch enabled={darkMode} onChange={setDarkMode} disabled={true} />
+                        </div>
+                        <p className="text-xs text-amber-600 mt-3 font-medium bg-amber-50 p-2 rounded-lg inline-block">
+                            🚧 Bientôt disponible
                         </p>
-                    </div>
-                )}
+                    </section>
+
+
+
+                    {/* Privacy Section */}
+                    <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                        <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <ShieldExclamationIcon />
+                            Confidentialité et Données
+                        </h2>
+                        <div className="space-y-4">
+                            <button className="w-full text-left px-4 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium transition-colors">
+                                Télécharger mes données (GDPR)
+                            </button>
+                            <button
+                                onClick={() => setIsDeleteOpen(true)}
+                                className="w-full text-left px-4 py-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-medium transition-colors"
+                            >
+                                Supprimer mon compte
+                            </button>
+                        </div>
+                    </section>
+
+                    <p className="text-center text-xs text-slate-400 font-medium pt-4">
+                        Version 0.1.0
+                    </p>
+                </div>
             </main>
 
             <Footer />

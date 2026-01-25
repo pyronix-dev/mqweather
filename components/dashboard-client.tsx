@@ -56,7 +56,8 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
         reference: initialUser.reference || initialUser.name,
         full_name: initialUser.name,
         email: initialUser.email,
-        phone: null,
+        phone: initialUser.phone || null,
+        notifications_enabled: initialUser.notifications_enabled ?? true,
         role: initialUser.role,
         subscription: initialUser.subscription
     } as any : null)
@@ -65,6 +66,9 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
 
 
     const [loading, setLoading] = useState(!initialUser)
+    // If we have an initial user but no subscription, we still want to "load" 
+    // to double-check with the API (handles webhook race conditions)
+    const [subscriptionLoading, setSubscriptionLoading] = useState(!!initialUser && !initialUser.subscription)
     const [isEditOpen, setIsEditOpen] = useState(false)
     const router = useRouter()
 
@@ -84,11 +88,21 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
                     return
                 }
                 const data = await res.json()
-                setUser(data)
+                // Merge with existing state, preserve subscription if API returns null
+                setUser(prev => {
+                    if (!prev) return data
+                    return {
+                        ...prev,
+                        ...data,
+                        // Keep existing subscription if API returns null/undefined
+                        subscription: data.subscription || prev.subscription
+                    }
+                })
             } catch (error) {
                 console.error('Failed to fetch user data:', error)
             } finally {
                 setLoading(false)
+                setSubscriptionLoading(false)
             }
         }
 
@@ -256,6 +270,44 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
                                     </Link>
                                 </div>
                             </div>
+                        ) : (loading || subscriptionLoading) ? (
+                            /* Detailed Skeleton to match "Abonnement Actif" design */
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-pulse">
+                                {/* Header Skeleton */}
+                                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-6 h-6 bg-slate-200 rounded-full"></div>
+                                        <div className="h-6 bg-slate-200 rounded w-40"></div>
+                                    </div>
+                                    <div className="h-6 bg-slate-200 rounded-full w-20"></div>
+                                </div>
+
+                                {/* Body Skeleton */}
+                                <div className="p-6">
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                                        <div className="space-y-2">
+                                            <div className="h-8 bg-slate-200 rounded w-48"></div>
+                                            <div className="h-4 bg-slate-200 rounded w-32"></div>
+                                        </div>
+                                        <div className="text-right space-y-2">
+                                            <div className="h-8 bg-slate-200 rounded w-24 ml-auto"></div>
+                                            <div className="h-3 bg-slate-200 rounded w-10 ml-auto"></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Info Grid Skeleton */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-slate-100">
+                                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 h-24"></div>
+                                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 h-24"></div>
+                                    </div>
+                                </div>
+
+                                {/* Footer Skeleton */}
+                                <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+                                    <div className="h-5 bg-slate-200 rounded w-32"></div>
+                                    <div className="h-5 bg-slate-200 rounded w-40"></div>
+                                </div>
+                            </div>
                         ) : (
                             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
                                 <h2 className="font-black text-slate-800 text-xl mb-2">Aucun abonnement actif</h2>
@@ -320,7 +372,7 @@ export function DashboardClient({ initialUser }: { initialUser: any }) {
                                     Paramètres
                                 </Link>
 
-                                {user.subscription && (
+                                {(user.subscription || subscriptionLoading) && (
                                     <div className="flex items-center justify-between px-4 py-3 bg-slate-50 rounded-xl">
                                         <div className="flex items-center gap-3 text-slate-700 text-sm font-medium">
                                             <Bell className="w-5 h-5" />

@@ -163,24 +163,27 @@ export function MartiniqueMap({ markers, centerOn, onReset }: MartiniqueMapProps
                 </button>
             )}
 
-            {projectedMarkers.map((pos, index) => {
-                const markerData = markers[index]
-                if (!markerData) return null
+            {/* Markers Container - Fades in only when map is loaded */}
+            <div className={`transition-opacity duration-700 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0'}`}>
+                {projectedMarkers.map((pos, index) => {
+                    const markerData = markers[index]
+                    if (!markerData) return null
 
-                return (
-                    <div
-                        key={pos.id}
-                        className="absolute z-10 hover:z-[100] transition-transform duration-200 will-change-transform"
-                        style={{
-                            left: pos.x,
-                            top: pos.y,
-                            transform: `translate(-50%, 6px) scale(${markerScale})`
-                        }}
-                    >
-                        {markerData.component}
-                    </div>
-                )
-            })}
+                    return (
+                        <div
+                            key={pos.id}
+                            className="absolute z-10 hover:z-[100] transition-transform duration-200 will-change-transform"
+                            style={{
+                                left: pos.x,
+                                top: pos.y,
+                                transform: `translate(-50%, 6px) scale(${markerScale})`
+                            }}
+                        >
+                            {markerData.component}
+                        </div>
+                    )
+                })}
+            </div>
         </div>
     )
 }

@@ -21,6 +21,24 @@ export async function POST(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
+        // Check for cooldown (1 minute)
+        const ONE_MINUTE_AGO = new Date(Date.now() - 60 * 1000).toISOString()
+
+        const { data: recentCode } = await supabase
+            .from('verification_codes')
+            .select('created_at')
+            .eq('phone', phone)
+            .gt('created_at', ONE_MINUTE_AGO)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single()
+
+        if (recentCode) {
+            return NextResponse.json({
+                error: 'Veuillez patienter 1 minute avant de demander un nouveau code.'
+            }, { status: 429 })
+        }
+
 
 
 

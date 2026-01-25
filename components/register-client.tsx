@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { UserPhoneInput } from "./ui/phone-input"
 
 
 const CheckIcon = ({ className }: { className?: string }) => (
@@ -21,7 +22,7 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
     const [isLoading, setIsLoading] = useState(false)
     const [submitAttempted, setSubmitAttempted] = useState(false)
 
-    
+
     const [formData, setFormData] = useState({
         email: "",
         phone: "",
@@ -30,14 +31,14 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
         lastName: ""
     })
 
-    
+
     const [passwordCriteria, setPasswordCriteria] = useState({
         length: false,
         number: false,
         special: false
     })
 
-    
+
     useEffect(() => {
         const pwd = formData.password
         setPasswordCriteria({
@@ -49,10 +50,10 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
 
     const isPasswordValid = Object.values(passwordCriteria).every(Boolean)
 
-    
+
     const isFieldInvalid = (field: keyof typeof formData) => {
         if (!submitAttempted) return false
-        if (field === 'phone') return false 
+        if (field === 'phone') return false
         if (field === 'password') return !isPasswordValid
         return !formData[field]
     }
@@ -61,7 +62,7 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
         e.preventDefault()
         setSubmitAttempted(true)
 
-        
+
         if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
             return
         }
@@ -190,12 +191,9 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
 
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-700 uppercase">Téléphone (Optionnel)</label>
-                                        <input
-                                            type="tel"
+                                        <UserPhoneInput
                                             value={formData.phone}
-                                            onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-200 font-medium"
-                                            placeholder="+596 696..."
+                                            onChange={val => setFormData({ ...formData, phone: val })}
                                         />
                                     </div>
 
@@ -216,7 +214,7 @@ export default function RegisterPage({ initialUser }: { initialUser: any }) {
                                             />
                                         </div>
 
-                                        {}
+                                        { }
                                         <div className="grid grid-cols-1 gap-2 bg-slate-50 p-3 rounded-xl">
                                             <div className={`flex items-center gap-2 text-xs font-medium transition-all duration-300 ${passwordCriteria.length ? 'text-emerald-600' : 'text-slate-400'}`}>
                                                 <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-all duration-300 ${passwordCriteria.length ? 'bg-emerald-100' : 'bg-slate-200'}`}>

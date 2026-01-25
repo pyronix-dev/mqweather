@@ -5,6 +5,7 @@ import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { UserPhoneInput } from "./ui/phone-input"
 
 const CheckIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,6 +244,32 @@ const FAQ_DATA = [
 export function AlertesClient({ initialUser }: { initialUser: any }) {
   const searchParams = useSearchParams()
   const [user, setUser] = useState<{ email: string | null, phone: string | null, full_name?: string } | null>(initialUser)
+  // If we have an initial user, we might want to refresh to be sure we have latest phone (handles staled server cache)
+  // Start loading if we have a user but no phone (optimistic check) or if we want to confirm
+  const [isLoadingUser, setIsLoadingUser] = useState(!!initialUser && !initialUser.phone)
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!initialUser) return
+
+      // If we already have a phone from server, we don't strictly *need* to load, but we can do it silently
+      // If we DON'T have a phone, we definitely want to check API in case it was just added
+      if (!initialUser.phone) setIsLoadingUser(true)
+
+      try {
+        const res = await fetch('/api/auth/me')
+        if (res.ok) {
+          const data = await res.json()
+          setUser(prev => prev ? { ...prev, ...data } : data)
+        }
+      } catch (e) {
+        console.error("Failed to refresh user", e)
+      } finally {
+        setIsLoadingUser(false)
+      }
+    }
+    fetchUser()
+  }, [initialUser])
 
   const [step, setStep] = useState(1)
   const [phone, setPhone] = useState(initialUser?.phone || "")
@@ -296,10 +323,17 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
 
     if (mode === 'sms') {
       setShowSmsSubscription(true)
+      if (user?.phone) {
+        setPhoneVerified(true)
+        setStep(2)
+      }
     } else if (mode === 'email') {
       setShowEmailSubscription(true)
+      if (user?.email) {
+        setPhoneVerified(true) // Reusing this state for "verified contact" generally
+      }
     }
-  }, [searchParams])
+  }, [searchParams, user])
 
   const handleSendCode = async () => {
     if (!phone || !selectedProfile) {
@@ -742,17 +776,29 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                         Numéro de téléphone
                       </label>
                       <div className="relative">
-                        <input
-                          type="tel"
-                          placeholder="Ex : +596 696 12 34 56"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          disabled={phoneVerified || codeSent}
-                          className="w-full px-5 py-4 border border-slate-200 rounded-xl bg-white text-slate-800 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:bg-slate-100 disabled:text-slate-500"
-                        />
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                          {phoneVerified ? <span className="text-emerald-500 font-bold">✓</span> : <PhoneIcon />}
-                        </div>
+                        {isLoadingUser ? (
+                          /* Skeleton for Phone Input/Verified Box */
+                          <div className="animate-pulse">
+                            <div className="h-[58px] bg-slate-100 rounded-xl border border-slate-200"></div>
+                          </div>
+                        ) : user?.phone ? (
+                          <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3 animate-fade-in-up">
+                            <div className="p-2 bg-emerald-100 rounded-full text-emerald-600">
+                              <PhoneIcon />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-bold text-emerald-800 text-sm">Connecté</p>
+                              <p className="text-xs text-emerald-600">{user.phone}</p>
+                            </div>
+                            <span className="bg-emerald-200 text-emerald-800 text-xs font-bold px-2 py-1 rounded">Vérifié</span>
+                          </div>
+                        ) : (
+                          <UserPhoneInput
+                            value={phone}
+                            onChange={(val) => setPhone(val)}
+                            disabled={phoneVerified || codeSent}
+                          />
+                        )}
                       </div>
                     </div>
 
@@ -777,8 +823,8 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                     </div>
                   </div>
 
-                  {/* Verification Code */}
-                  {!phoneVerified && (
+                  {/* SMS Verification - COMMENTED OUT: No pre-verification needed, SMS sent on purchase success
+                  {!phoneVerified && !user?.phone && (
                     <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-200">
                       <h3 className="text-sm font-black text-slate-700 mb-4 uppercase tracking-wide">
                         Code de vérification (SMS #1)
@@ -791,7 +837,8 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                             value={verificationCode}
                             onChange={(e) => setVerificationCode(e.target.value)}
                             maxLength={6}
-                            className="flex-1 px-5 py-4 border border-slate-200 rounded-xl bg-white text-center text-xl tracking-[0.5em] font-mono font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:bg-slate-100"
+                            disabled={!codeSent}
+                            className="flex-1 px-5 py-4 border border-slate-200 rounded-xl bg-white text-center text-xl tracking-[0.5em] font-mono font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:bg-slate-100 disabled:cursor-not-allowed"
                           />
                           {!codeSent ? (
                             <button
@@ -844,6 +891,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
                       </div>
                     </div>
                   )}
+                  END SMS Verification */}
 
                   {/* Billing Cycle Selection */}
                   <div className="mb-8">
@@ -948,7 +996,7 @@ export function AlertesClient({ initialUser }: { initialUser: any }) {
 
                   { }
                   <button
-                    disabled={isLoading || !acceptSmsterms || !phoneVerified}
+                    disabled={isLoading || !acceptSmsterms || !phone || !selectedProfile}
                     onClick={() => handleCheckout(smsBillingCycle === 'monthly' ? 'sms-monthly' : 'sms-annual')}
                     className="w-full py-5 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 disabled:from-slate-400 disabled:to-slate-400 disabled:cursor-not-allowed text-white font-black text-lg rounded-xl transition-all hover:shadow-xl active:scale-95 mb-8"
                   >
