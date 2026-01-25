@@ -170,6 +170,19 @@ export async function POST(request: NextRequest) {
 
 
 
+            let invoicePdfUrl: string | undefined
+
+            if (session.invoice) {
+                try {
+                    const invoiceId = typeof session.invoice === 'string' ? session.invoice : session.invoice.id
+                    const invoice = await stripe.invoices.retrieve(invoiceId)
+                    invoicePdfUrl = invoice.invoice_pdf || undefined
+                } catch (err) {
+                    console.error('Failed to retrieve invoice for session:', err)
+                }
+            }
+
+
             if (plan.includes('sms')) {
 
                 if (phone) {
@@ -185,7 +198,7 @@ export async function POST(request: NextRequest) {
 
                 if (email) {
                     console.log(`📧 Sending Email confirmation to ${email}...`)
-                    const emailResult = await sendEmailConfirmation(email, plan, referenceCode)
+                    const emailResult = await sendEmailConfirmation(email, plan, referenceCode, invoicePdfUrl)
                     if (emailResult.success) {
                         console.log('✅ Email confirmation sent successfully')
                     } else {
@@ -196,7 +209,7 @@ export async function POST(request: NextRequest) {
 
             if (plan.includes('email') && email) {
                 console.log(`📧 Sending Email confirmation to ${email}...`)
-                const emailResult = await sendEmailConfirmation(email, plan, referenceCode)
+                const emailResult = await sendEmailConfirmation(email, plan, referenceCode, invoicePdfUrl)
                 if (emailResult.success) {
                     console.log('✅ Email confirmation sent successfully')
                 } else {
@@ -324,15 +337,20 @@ export async function POST(request: NextRequest) {
                             created_at: new Date(invoice.created * 1000).toISOString()
                         })
 
-                        // Send email
-                        const { sendInvoiceEmail } = await import('@/lib/brevo')
-                        await sendInvoiceEmail(
-                            invoice.customer_email,
-                            `${(invoice.amount_paid / 100).toFixed(2)}€`,
-                            invoice.invoice_pdf,
-                            invoice.number || invoice.id
-                        )
-                        console.log('✅ Invoice email sent')
+                        // Only send separate invoice email if it's NOT the initial subscription creation (handled by checkout.session.completed)
+                        if (invoice.billing_reason !== 'subscription_create') {
+                            // Send email
+                            const { sendInvoiceEmail } = await import('@/lib/brevo')
+                            await sendInvoiceEmail(
+                                invoice.customer_email,
+                                `${(invoice.amount_paid / 100).toFixed(2)}€`,
+                                invoice.invoice_pdf,
+                                invoice.number || invoice.id
+                            )
+                            console.log('✅ Invoice email sent')
+                        } else {
+                            console.log('⏭️ Skipped invoice email (handled by checkout session)')
+                        }
                     }
                 } catch (error) {
                     console.error('Failed to process invoice:', error)

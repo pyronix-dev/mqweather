@@ -196,7 +196,7 @@ export function getVerifyEmailHtml(code: string): string {
 `
 }
 
-export function getPaymentConfirmationEmailHtml(price: string, planName: string, referenceCode: string): string {
+export function getPaymentConfirmationEmailHtml(price: string, planName: string, referenceCode: string, invoicePdfUrl?: string): string {
     return `
 <!DOCTYPE html>
 <html>
@@ -229,6 +229,14 @@ export function getPaymentConfirmationEmailHtml(price: string, planName: string,
                 <p>✓ Abonnement: <strong>${planName}</strong></p>
                 <p>✓ Montant: <strong>${price}</strong></p>
             </div>
+
+            ${invoicePdfUrl ? `
+            <p style="text-align: center; margin: 30px 0;">
+                <a href="${invoicePdfUrl}" style="background-color: #0f172a; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px;">
+                    📄 Télécharger la facture
+                </a>
+            </p>
+            ` : ''}
             
             <h3>Que se passe-t-il ensuite ?</h3>
             <p>Vous recevrez automatiquement des alertes météo détaillées en cas de vigilance sur la Martinique.</p>
@@ -349,33 +357,33 @@ interface VigilanceTheme {
 
 const VIGILANCE_THEMES: Record<string, VigilanceTheme> = {
     jaune: {
-        color: '#f59e0b', 
-        bgColor: '#fffbeb', 
-        borderColor: '#fcd34d', 
+        color: '#f59e0b',
+        bgColor: '#fffbeb',
+        borderColor: '#fcd34d',
         title: 'Vigilance Jaune',
         message: 'Soyez attentif',
         animation: ''
     },
     orange: {
-        color: '#f97316', 
-        bgColor: '#fff7ed', 
-        borderColor: '#fdba74', 
+        color: '#f97316',
+        bgColor: '#fff7ed',
+        borderColor: '#fdba74',
         title: 'Vigilance Orange',
         message: 'Soyez vigilant',
         animation: ''
     },
     rouge: {
-        color: '#dc2626', 
-        bgColor: '#fef2f2', 
-        borderColor: '#fca5a5', 
+        color: '#dc2626',
+        bgColor: '#fef2f2',
+        borderColor: '#fca5a5',
         title: 'Vigilance Rouge',
         message: 'Vigilance absolue',
         animation: 'pulse-border'
     },
     violet: {
-        color: '#7c3aed', 
-        bgColor: '#f5f3ff', 
-        borderColor: '#c4b5fd', 
+        color: '#7c3aed',
+        bgColor: '#f5f3ff',
+        borderColor: '#c4b5fd',
         title: 'Vigilance Violette',
         message: 'Danger extrême',
         animation: 'pulse-border-violet'
@@ -385,8 +393,8 @@ const VIGILANCE_THEMES: Record<string, VigilanceTheme> = {
 export function getVigilanceAlertEmailHtml(colorName: string): string {
     const theme = VIGILANCE_THEMES[colorName.toLowerCase()] || VIGILANCE_THEMES.jaune
 
-    
-    
+
+
     const iconUrl = "https://img.icons8.com/ios-filled/100/ffffff/high-priority-message.png"
 
     return `

@@ -181,16 +181,18 @@ export async function sendSMSConfirmation(
 }
 
 
+
 export async function sendEmailConfirmation(
   email: string,
   plan: string,
-  referenceCode: string
+  referenceCode: string,
+  invoicePdfUrl?: string
 ): Promise<SendEmailResult> {
   const price = getPriceForPlan(plan)
   const planName = getPlanDisplayName(plan)
   const subject = 'Vous avez mis en place un nouvel abonnement Météo Martinique'
 
-  const htmlContent = getPaymentConfirmationEmailHtml(price, planName, referenceCode)
+  const htmlContent = getPaymentConfirmationEmailHtml(price, planName, referenceCode, invoicePdfUrl)
 
   return sendEmail(email, subject, htmlContent)
 }

@@ -84,6 +84,7 @@ export default function SettingsPage({ initialUser, initialPaymentMethods = [] }
     const [emailAlerts, setEmailAlerts] = useState(initialUser?.notifications_email ?? true)
     const [paymentMethods, setPaymentMethods] = useState<any[]>(initialPaymentMethods)
     const [invoices, setInvoices] = useState<any[]>([])
+    const [invoicesLoading, setInvoicesLoading] = useState(true)
 
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 
@@ -110,6 +111,8 @@ export default function SettingsPage({ initialUser, initialPaymentMethods = [] }
                 if (res.ok) setInvoices(await res.json())
             } catch (e) {
                 console.error("Failed to load invoices", e)
+            } finally {
+                setInvoicesLoading(false)
             }
         }
 
@@ -224,7 +227,19 @@ export default function SettingsPage({ initialUser, initialPaymentMethods = [] }
                             <InvoiceIcon />
                             Factures
                         </h2>
-                        {invoices.length > 0 ? (
+                        {invoicesLoading ? (
+                            <div className="space-y-3">
+                                {[1, 2].map((i) => (
+                                    <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 animate-pulse">
+                                        <div>
+                                            <div className="h-4 w-16 bg-slate-200 rounded mb-1"></div>
+                                            <div className="h-3 w-24 bg-slate-200 rounded"></div>
+                                        </div>
+                                        <div className="h-8 w-24 bg-slate-200 rounded-lg"></div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : invoices.length > 0 ? (
                             <div className="space-y-3">
                                 {invoices.map((inv) => (
                                     <div key={inv.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
