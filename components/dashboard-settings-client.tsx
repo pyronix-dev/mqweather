@@ -328,9 +328,19 @@ function ToggleSwitch({ enabled, onChange, disabled = false }: { enabled: boolea
         <button
             onClick={() => !disabled && onChange(!enabled)}
             disabled={disabled}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${enabled ? 'bg-slate-800' : 'bg-slate-200'} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            className={`
+                relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2
+                ${enabled ? 'bg-slate-800' : 'bg-slate-200'}
+                ${disabled ? 'cursor-not-allowed opacity-50' : ''}
+            `}
         >
-            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enabled ? 'translate-x-6' : 'translate-x-1'}`} />
+            <span
+                aria-hidden="true"
+                className={`
+                    pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out
+                    ${enabled ? 'translate-x-5' : 'translate-x-0'}
+                `}
+            />
         </button>
     )
 }
