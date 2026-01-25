@@ -11,9 +11,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Numéro de téléphone requis' }, { status: 400 })
         }
 
-        
+
         const code = Math.floor(100000 + Math.random() * 900000).toString()
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000) 
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
 
         console.log('------------------------------------------------')
         console.log(`📱 Generated OTP for ${phone}: ${code}`)
@@ -21,11 +21,11 @@ export async function POST(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
-        
-        
-        
+
+
+
         const { error: dbError } = await supabase
-            .from('phone_verification_codes')
+            .from('verification_codes')
             .insert({
                 phone,
                 code,
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Erreur base de données' }, { status: 500 })
         }
 
-        
+
         const { success, error: smsError } = await sendSMS(phone, `Votre code de vérification MQ Weather est: ${code}`)
 
         if (!success) {

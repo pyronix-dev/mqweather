@@ -12,10 +12,10 @@ export async function POST(request: Request) {
 
         const supabase = createSupabaseAdmin()
 
-        
-        
+
+
         const { data: record, error } = await supabase
-            .from('phone_verification_codes')
+            .from('verification_codes')
             .select('*')
             .eq('phone', phone)
             .eq('verified', false)
@@ -28,20 +28,20 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Code expiré ou introuvable. Veuillez renvoyer un nouveau code.' }, { status: 400 })
         }
 
-        
+
         const attempts = record.attempts || 0
         const lastAttempt = new Date(record.last_attempt_at || record.created_at).getTime()
         const now = Date.now()
         const minutesSinceLastAttempt = (now - lastAttempt) / 1000 / 60
 
-        
+
         if (attempts >= 15) {
-            
+
             return NextResponse.json({ error: 'Trop de tentatives échouées. Ce code est expiré. Veuillez en générer un nouveau.' }, { status: 400 })
         }
 
-        
-        
+
+
         if (attempts > 0 && attempts % 3 === 0) {
             if (minutesSinceLastAttempt < 5) {
                 const waitTime = Math.ceil(5 - minutesSinceLastAttempt)
@@ -49,18 +49,18 @@ export async function POST(request: Request) {
             }
         }
 
-        
+
         if (record.code !== code) {
-            
+
             await supabase
-                .from('phone_verification_codes')
+                .from('verification_codes')
                 .update({
                     attempts: attempts + 1,
                     last_attempt_at: new Date().toISOString()
                 })
                 .eq('id', record.id)
 
-            
+
             const currentAttempts = attempts + 1
             const attemptsBeforeBlock = 3 - (currentAttempts % 3)
 
@@ -71,13 +71,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: `Code incorrect.` }, { status: 400 })
         }
 
-        
+
         await supabase
-            .from('phone_verification_codes')
+            .from('verification_codes')
             .update({ verified: true })
             .eq('id', record.id)
 
-        
+
         const { data: user } = await supabase
             .from('users')
             .select('id')
