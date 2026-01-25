@@ -229,7 +229,7 @@ export default function SettingsPage({ initialUser, initialPaymentMethods = [] }
                         </h2>
                         {invoicesLoading ? (
                             <div className="space-y-3">
-                                {[1, 2].map((i) => (
+                                {[1].map((i) => (
                                     <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 animate-pulse">
                                         <div>
                                             <div className="h-4 w-16 bg-slate-200 rounded mb-1"></div>
