@@ -300,7 +300,8 @@ export async function POST(request: NextRequest) {
             const invoice = event.data.object as Stripe.Invoice
             console.log('💰 Invoice payment succeeded:', invoice.id)
 
-            if (invoice.amount_paid > 0 && invoice.invoice_pdf && invoice.customer_email) {
+            // Allow 0 amount invoices (e.g. trials or full discount)
+            if (invoice.invoice_pdf && invoice.customer_email) {
                 try {
                     const supabase = createSupabaseAdmin()
 
