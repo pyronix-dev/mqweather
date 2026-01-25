@@ -296,6 +296,50 @@ export async function POST(request: NextRequest) {
             break
         }
 
+        case 'invoice.payment_succeeded': {
+            const invoice = event.data.object as Stripe.Invoice
+            console.log('💰 Invoice payment succeeded:', invoice.id)
+
+            if (invoice.amount_paid > 0 && invoice.invoice_pdf && invoice.customer_email) {
+                try {
+                    const supabase = createSupabaseAdmin()
+
+                    // Try to find user by stripe_customer_id or email
+                    const { data: userData } = await supabase
+                        .from('users')
+                        .select('id')
+                        .or(`stripe_customer_id.eq.${invoice.customer},email.eq.${invoice.customer_email}`)
+                        .single()
+
+                    if (userData) {
+                        // Store invoice
+                        await supabase.from('invoices').insert({
+                            user_id: userData.id,
+                            stripe_invoice_id: invoice.id,
+                            amount: invoice.amount_paid,
+                            status: 'paid',
+                            invoice_pdf: invoice.invoice_pdf,
+                            invoice_number: invoice.number,
+                            created_at: new Date(invoice.created * 1000).toISOString()
+                        })
+
+                        // Send email
+                        const { sendInvoiceEmail } = await import('@/lib/brevo')
+                        await sendInvoiceEmail(
+                            invoice.customer_email,
+                            `${(invoice.amount_paid / 100).toFixed(2)}€`,
+                            invoice.invoice_pdf,
+                            invoice.number || invoice.id
+                        )
+                        console.log('✅ Invoice email sent')
+                    }
+                } catch (error) {
+                    console.error('Failed to process invoice:', error)
+                }
+            }
+            break
+        }
+
         case 'payment_method.attached': {
             const paymentMethod = event.data.object as Stripe.PaymentMethod
             console.log('💳 Payment method attached:', paymentMethod.id)

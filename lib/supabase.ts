@@ -41,6 +41,17 @@ export interface Subscription {
     expires_at: string | null
 }
 
+export interface Invoice {
+    id: string
+    user_id: string
+    stripe_invoice_id: string
+    amount: number
+    status: string
+    invoice_pdf: string
+    invoice_number: string
+    created_at: string
+}
+
 export interface OtpCode {
     id: string
     user_id: string

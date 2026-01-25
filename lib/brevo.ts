@@ -33,14 +33,14 @@ export async function sendSMS(
     return { success: false, error: 'Brevo API key not configured' }
   }
 
-  
-  let formattedPhone = phone.replace(/\s/g, '') 
 
-  
+  let formattedPhone = phone.replace(/\s/g, '')
+
+
   if (formattedPhone.startsWith('0')) {
-    
-    
-    
+
+
+
     if (formattedPhone.startsWith('0696') || formattedPhone.startsWith('0697')) {
       formattedPhone = '+596' + formattedPhone.substring(1)
     } else {
@@ -220,6 +220,54 @@ export async function sendPlanChangeEmail(
   const subject = 'Confirmation de changement d\'abonnement Météo Martinique'
 
   const htmlContent = getPlanChangeEmailHtml(planName, price)
+
+  return sendEmail(email, subject, htmlContent)
+}
+
+export async function sendInvoiceEmail(
+  email: string,
+  amount: string,
+  pdfUrl: string,
+  invoiceNumber: string
+): Promise<SendEmailResult> {
+  const subject = `Facture ${invoiceNumber} - Météo Martinique`
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Votre Facture</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #334155; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { font-size: 24px; font-weight: bold; color: #0f172a; text-decoration: none; }
+        .card { background: #f8fafc; border-radius: 12px; padding: 24px; text-align: center; border: 1px solid #e2e8f0; }
+        .amount { font-size: 32px; font-weight: 800; color: #0f172a; margin: 10px 0; }
+        .btn { display: inline-block; background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #64748b; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <a href="#" class="logo">Météo Martinique</a>
+        </div>
+        <div class="card">
+          <h2>Merci pour votre paiement</h2>
+          <p>Voici votre facture pour la période en cours.</p>
+          <div class="amount">${amount}</div>
+          <p>Facture #${invoiceNumber}</p>
+          <a href="${pdfUrl}" class="btn">Télécharger la facture (PDF)</a>
+        </div>
+        <div class="footer">
+          <p>Merci de votre confiance.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
 
   return sendEmail(email, subject, htmlContent)
 }
