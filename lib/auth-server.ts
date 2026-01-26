@@ -35,7 +35,7 @@ export async function getUserFromSession() {
 
         const { data: user, error } = await supabase
             .from('users')
-            .select('full_name, email, phone, reference_code, role, notifications_enabled, notifications_sms, notifications_email')
+            .select('full_name, email, phone, reference_code, role, notifications_enabled, notif_sms, notif_email')
             .eq('id', session.userId)
             .single()
 
@@ -102,8 +102,8 @@ export async function getUserFromSession() {
             email: user.email || '',
             phone: user.phone || null,
             notifications_enabled: user.notifications_enabled ?? true,
-            notifications_sms: user.notifications_sms ?? true,
-            notifications_email: user.notifications_email ?? true,
+            notifications_sms: user.notif_sms ?? true,
+            notifications_email: user.notif_email ?? true,
             role: user.role,
             subscription: subscriptionData
         }
