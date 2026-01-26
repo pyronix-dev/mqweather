@@ -91,7 +91,10 @@ export async function POST(request: NextRequest) {
         }
 
 
-        const response = NextResponse.json({ success: true, message: "Code envoyé" })
+        const response = NextResponse.json({
+            success: true,
+            message: "Code envoyé"
+        })
 
         // We cannot set a session cookie yet because the user doesn't exist.
         // OTP verification step will create the user and set the cookie.
