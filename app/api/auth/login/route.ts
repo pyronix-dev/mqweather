@@ -143,6 +143,8 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ success: false, error: "Code requis" }, { status: 400 })
             }
 
+            const trimmedCode = code.toString().trim()
+
             const cookieStore = await cookies()
             const userId = cookieStore.get('otp_user_id')?.value
 
@@ -176,7 +178,7 @@ export async function POST(request: NextRequest) {
 
 
 
-                const inputHash = hash(code)
+                const inputHash = hash(trimmedCode)
 
                 const isValid = inputHash === otpRecord.code_hash
 

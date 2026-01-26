@@ -1,7 +1,6 @@
 // Developed by Omar Rafik (OMX) - omx001@proton.me
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseAdmin } from '@/lib/supabase'
-import { generateReferenceCode } from '@/lib/supabase'
+import { createSupabaseAdmin, generateReferenceCode } from '@/lib/supabase'
 import { sendEmail, sendSMS } from '@/lib/brevo'
 import { getMagicLinkEmailHtml } from '@/lib/email-templates'
 import bcrypt from 'bcrypt'
@@ -16,14 +15,18 @@ function getIp(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { email, phone, password, firstName, lastName } = body
+        let { email, phone, password, firstName, lastName } = body
         const supabase = createSupabaseAdmin()
+
+        // Normalize inputs
+        if (email) email = email.toLowerCase().trim()
+        if (phone) phone = phone.replace(/\s/g, '')
 
         if (!email && !phone) {
             return NextResponse.json({ success: false, error: "Email ou téléphone requis" }, { status: 400 })
         }
 
-        
+
         const ip = getIp(request)
         const rateLimit = await checkRateLimit(ip, 'register')
 
@@ -35,7 +38,7 @@ export async function POST(request: NextRequest) {
             }, { status: 429 })
         }
 
-        
+
         const { data: existingUser } = await supabase
             .from('users')
             .select('id')
@@ -46,70 +49,52 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: "Un compte existe déjà avec cet email" }, { status: 409 })
         }
 
-        
-        const fullName = `${firstName} ${lastName}`.trim()
-        const referenceCode = generateReferenceCode()
 
-        
+        const fullName = `${firstName} ${lastName}`.trim()
+
+        // HASH PASSWORD
         const passwordHash = password ? await bcrypt.hash(password, 10) : null
 
-        const { data: newUser, error: createError } = await supabase
-            .from('users')
-            .insert({
-                email: email || null,
-                phone: phone || null,
-                full_name: fullName,
-                reference_code: referenceCode,
-                password_hash: passwordHash,
-                is_verified: false,
-                created_at: new Date().toISOString()
-            })
-            .select()
-            .single()
-
-        if (createError || !newUser) {
-            console.error("Create User Error:", createError)
-            return NextResponse.json({ success: false, error: "Erreur lors de la création du compte" }, { status: 500 })
-        }
-
-        
+        // GENERATE OTP
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000) 
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
 
-        
-        await supabase.from('otp_codes').insert({
-            user_id: newUser.id,
+        // STORE PENDING REGISTRATION IN VERIFICATION_CODES
+        const { error: otpError } = await supabase.from('verification_codes').insert({
+            email: email || null,
+            phone: phone || null,
             code: otpCode,
-            code: otpCode,
-            code_hash: await bcrypt.hash(otpCode, 10), 
             expires_at: expiresAt.toISOString(),
-            used: false
+            verified: false,
+            attempts: 0,
+            metadata: {
+                full_name: fullName,
+                password_hash: passwordHash
+            }
         })
 
-        
-        
-        const magicLink = `${request.nextUrl.origin}/auth/verify?code=${otpCode}&uid=${newUser.id}`
+        if (otpError) {
+            console.error("Failed to save verification code:", otpError)
+            return NextResponse.json({ success: false, error: "Erreur lors de la génération du code" }, { status: 500 })
+        }
+
+        // SEND CODE
+        let magicLink = `${request.nextUrl.origin}/auth/verify?code=${otpCode}`
+        if (email) magicLink += `&email=${encodeURIComponent(email)}`
 
         if (email) {
             console.log(`Sending new account OTP to ${email}`)
             const htmlContent = getMagicLinkEmailHtml(magicLink, otpCode)
-            
             await sendEmail(email, "Confirmez votre inscription Météo Martinique", htmlContent)
         } else if (phone) {
             await sendSMS(phone, `Météo Martinique: Votre code de validation est ${otpCode}`)
         }
 
-        
-        const response = NextResponse.json({ success: true, message: "Compte créé, veuillez vérifier votre email" })
 
-        
-        
-        response.cookies.set('otp_user_id', newUser.id, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 600 
-        })
+        const response = NextResponse.json({ success: true, message: "Code envoyé" })
+
+        // We cannot set a session cookie yet because the user doesn't exist.
+        // OTP verification step will create the user and set the cookie.
 
         return response
 

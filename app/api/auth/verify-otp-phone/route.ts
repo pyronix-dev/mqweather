@@ -10,6 +10,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Phone and code required' }, { status: 400 })
         }
 
+        const trimmedCode = code.toString().trim()
+
         const supabase = createSupabaseAdmin()
 
 
@@ -19,13 +21,18 @@ export async function POST(request: Request) {
             .select('*')
             .eq('phone', phone)
             .eq('verified', false)
-            .gt('expires_at', new Date().toISOString())
             .order('created_at', { ascending: false })
             .limit(1)
             .single()
 
         if (error || !record) {
-            return NextResponse.json({ error: 'Code expiré ou introuvable. Veuillez renvoyer un nouveau code.' }, { status: 400 })
+            console.log("No OTP record found for:", phone)
+            return NextResponse.json({ error: 'Code introuvable' }, { status: 400 })
+        }
+
+        // JS Expiration Check
+        if (new Date() > new Date(record.expires_at)) {
+            return NextResponse.json({ error: 'Code expiré' }, { status: 400 })
         }
 
 
@@ -50,7 +57,7 @@ export async function POST(request: Request) {
         }
 
 
-        if (record.code !== code) {
+        if (record.code !== trimmedCode) {
 
             await supabase
                 .from('verification_codes')
@@ -72,24 +79,72 @@ export async function POST(request: Request) {
         }
 
 
+        // 3. Mark Code as Verified
         await supabase
             .from('verification_codes')
             .update({ verified: true })
             .eq('id', record.id)
 
 
-        const { data: user } = await supabase
+        // 4. Create User (if not exists)
+        let { data: user } = await supabase
             .from('users')
-            .select('id')
+            .select('id, reference_code, full_name, role, phone')
             .eq('phone', phone)
             .single()
 
+        if (!user) {
+            // New User Creation from Metadata
+            const metadata = record.metadata || {}
+            const { generateReferenceCode } = await import('@/lib/supabase')
+            const referenceCode = generateReferenceCode()
+
+            const { data: newUser, error: createError } = await supabase
+                .from('users')
+                .insert({
+                    phone: phone,
+                    full_name: metadata.full_name || 'Utilisateur',
+                    password_hash: metadata.password_hash || null,
+                    reference_code: referenceCode,
+                    is_verified: true,
+                    created_at: new Date().toISOString()
+                })
+                .select()
+                .single()
+
+            if (createError) {
+                console.error("Failed to create user after verification:", createError)
+                return NextResponse.json({ error: "Erreur crétion compte" }, { status: 500 })
+            }
+            user = newUser
+        } else {
+            if (!user.is_verified) {
+                await supabase.from('users').update({ is_verified: true }).eq('id', user.id)
+            }
+        }
+
+        // 5. Log Login
         if (user) {
             const { logUserLogin } = await import('@/lib/login-logger')
             await logUserLogin(user.id, request)
         }
 
-        return NextResponse.json({ success: true })
+        const response = NextResponse.json({ success: true, redirect: '/dashboard' })
+
+        response.cookies.set('auth_session', JSON.stringify({
+            userId: user.id,
+            referenceCode: user.reference_code,
+            phone: user.phone,
+            fullName: user.full_name,
+            role: user.role
+        }), {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 7
+        })
+
+        return response
 
     } catch (error) {
         console.error('Verify OTP error:', error)
