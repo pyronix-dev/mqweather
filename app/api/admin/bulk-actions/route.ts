@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Invalid request parameters' }, { status: 400 })
     }
 
-    
+
     if (userIds.includes(admin.id)) {
         return NextResponse.json({ error: 'You cannot perform bulk actions on yourself' }, { status: 403 })
     }
@@ -42,18 +42,18 @@ export async function POST(request: Request) {
             if (error) throw error
             results.success = userIds.length
 
-            
+
             await logAdminAction(admin.id, 'bulk_ban_update', 'users', 'batch', { count: userIds.length, action }, clientIP)
 
         } else if (action === 'delete') {
-            
-            if (admin.role !== 'super_admin') {
-                return NextResponse.json({ error: 'Only super admins can bulk delete' }, { status: 403 })
+
+            if (admin.role !== 'super_admin' && userIds.length > 1) {
+                return NextResponse.json({ error: 'Only super admins can perform bulk delete. You can delete 1 user at a time.' }, { status: 403 })
             }
 
-            
-            
-            
+
+
+
             const { data: usersToDelete } = await supabase.from('users').select('*').in('id', userIds)
 
             if (usersToDelete) {
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
             await logAdminAction(admin.id, 'bulk_delete', 'users', 'batch', { count: results.success }, clientIP)
 
         } else if (action === 'email') {
-            
+
             return NextResponse.json({ error: 'Email broadcast not implemented yet' }, { status: 501 })
         }
 
